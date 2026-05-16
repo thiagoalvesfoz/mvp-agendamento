@@ -154,10 +154,7 @@ export async function createAppointment(
     return { ok: true, protocol, appointmentId };
   } catch (err) {
     // Constraint EXCLUDE violada → 409 conceitual
-    if (
-      err instanceof Prisma.PrismaClientKnownRequestError &&
-      err.code === "P2010"
-    ) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2010") {
       return {
         ok: false,
         error: "Esse horário acabou de ser reservado. Escolha outro disponível.",

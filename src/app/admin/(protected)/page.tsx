@@ -19,14 +19,8 @@ import {
   getAllPending,
   getAgendaStats,
 } from "@/features/appointments/queries";
-import {
-  listBlockedDatesByMonth,
-  listBlockedDatesInRange,
-} from "@/features/settings/queries";
-import {
-  AgendaScreen,
-  type AgendaView,
-} from "@/features/appointments/components/agenda-screen";
+import { listBlockedDatesByMonth, listBlockedDatesInRange } from "@/features/settings/queries";
+import { AgendaScreen, type AgendaView } from "@/features/appointments/components/agenda-screen";
 
 interface AdminAgendaPageProps {
   searchParams: Promise<{
@@ -74,17 +68,14 @@ function parseMonth(
   return { year, month };
 }
 
-export default async function AdminAgendaPage({
-  searchParams,
-}: AdminAgendaPageProps) {
+export default async function AdminAgendaPage({ searchParams }: AdminAgendaPageProps) {
   const params = await searchParams;
   const today = todayISO();
 
   const view = parseView(params.view);
   const rawSelectedDate = parseDate(params.date, today);
   // Week view sempre começa no domingo (dom → sáb). Snap antes de qualquer fetch.
-  const selectedDate =
-    view === "week" ? snapToSundayISO(rawSelectedDate) : rawSelectedDate;
+  const selectedDate = view === "week" ? snapToSundayISO(rawSelectedDate) : rawSelectedDate;
   const todayDate = new Date(`${today}T12:00:00`);
   const { year: monthYear, month: monthMonth } = parseMonth(params.ym, {
     year: todayDate.getFullYear(),
@@ -94,34 +85,25 @@ export default async function AdminAgendaPage({
   const stats = await getAgendaStats(today);
 
   // Fetch específico da view atual — evita carga desnecessária
-  const [
-    dayAppointments,
-    weekAppointments,
-    monthAppointments,
-    pendingAppointments,
-    blockedDates,
-  ] = await Promise.all([
-    // Day view busca range [-3, +3] do strip pra alimentar dots dos 7 dias visíveis.
-    // Lista do dia selecionado filtra no client a partir desse mesmo conjunto.
-    view === "day"
-      ? getAppointmentsByDateRange(shiftISO(selectedDate, -3), 7)
-      : Promise.resolve([]),
-    view === "week"
-      ? getAppointmentsByDateRange(selectedDate, 7)
-      : Promise.resolve([]),
-    view === "month"
-      ? getAppointmentsByMonth(monthYear, monthMonth)
-      : Promise.resolve([]),
-    view === "pending" ? getAllPending() : Promise.resolve([]),
-    // Day: cobre o strip de 7 dias [-3, +3]. Week: bloco de 7 dias. Month: mês inteiro.
-    view === "day"
-      ? listBlockedDatesInRange(shiftISO(selectedDate, -3), shiftISO(selectedDate, 4))
-      : view === "week"
-        ? listBlockedDatesInRange(selectedDate, shiftISO(selectedDate, 7))
-        : view === "month"
-          ? listBlockedDatesByMonth(monthYear, monthMonth)
-          : Promise.resolve([]),
-  ]);
+  const [dayAppointments, weekAppointments, monthAppointments, pendingAppointments, blockedDates] =
+    await Promise.all([
+      // Day view busca range [-3, +3] do strip pra alimentar dots dos 7 dias visíveis.
+      // Lista do dia selecionado filtra no client a partir desse mesmo conjunto.
+      view === "day"
+        ? getAppointmentsByDateRange(shiftISO(selectedDate, -3), 7)
+        : Promise.resolve([]),
+      view === "week" ? getAppointmentsByDateRange(selectedDate, 7) : Promise.resolve([]),
+      view === "month" ? getAppointmentsByMonth(monthYear, monthMonth) : Promise.resolve([]),
+      view === "pending" ? getAllPending() : Promise.resolve([]),
+      // Day: cobre o strip de 7 dias [-3, +3]. Week: bloco de 7 dias. Month: mês inteiro.
+      view === "day"
+        ? listBlockedDatesInRange(shiftISO(selectedDate, -3), shiftISO(selectedDate, 4))
+        : view === "week"
+          ? listBlockedDatesInRange(selectedDate, shiftISO(selectedDate, 7))
+          : view === "month"
+            ? listBlockedDatesByMonth(monthYear, monthMonth)
+            : Promise.resolve([]),
+    ]);
 
   return (
     <AgendaScreen

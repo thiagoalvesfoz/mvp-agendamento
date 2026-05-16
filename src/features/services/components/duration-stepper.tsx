@@ -35,7 +35,7 @@ export function DurationStepper({
   return (
     <div
       className={cn(
-        "flex items-center rounded-xl border border-[var(--input)] bg-[var(--background)] h-11",
+        "flex h-11 items-center rounded-xl border border-[var(--input)] bg-[var(--background)]",
         className,
       )}
     >
@@ -44,12 +44,12 @@ export function DurationStepper({
         onClick={decrement}
         disabled={value <= min}
         aria-label="Diminuir"
-        className="press flex h-full w-11 shrink-0 items-center justify-center text-[var(--foreground)] disabled:opacity-30 disabled:pointer-events-none"
+        className="press flex h-full w-11 shrink-0 items-center justify-center text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30"
       >
-        <span className="text-[18px] leading-none select-none">–</span>
+        <span className="select-none text-[18px] leading-none">–</span>
       </button>
 
-      <div className="flex-1 text-center font-mono text-[15px] font-medium tabular-nums select-none">
+      <div className="flex-1 select-none text-center font-mono text-[15px] font-medium tabular-nums">
         {value} min
       </div>
 

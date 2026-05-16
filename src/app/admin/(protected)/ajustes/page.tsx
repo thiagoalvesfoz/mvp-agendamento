@@ -20,13 +20,13 @@ export default async function AdminAjustesPage() {
   const adminName = adminEmail.split("@")[0] ?? "Admin";
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       {/* ── Header ── */}
-      <div className="px-5 pt-6 pb-4">
+      <div className="px-5 pb-4 pt-6">
         <p className="text-[12px] font-medium uppercase tracking-widest text-[var(--muted-foreground)]">
           Painel
         </p>
-        <h1 className="text-[22px] font-semibold tracking-tight leading-tight">Ajustes</h1>
+        <h1 className="text-[22px] font-semibold leading-tight tracking-tight">Ajustes</h1>
       </div>
 
       {/* ── Conteúdo scrollável ── */}
@@ -34,15 +34,17 @@ export default async function AdminAjustesPage() {
         {/* ── Card do admin ── */}
         <div className="px-5 pb-4">
           <Link href="/admin/ajustes/perfil" className="press block">
-            <Card className="p-3.5 flex items-center gap-3">
+            <Card className="flex items-center gap-3 p-3.5">
               <CustomerAvatar name={adminName} size="sm" />
-              <div className="flex-1 min-w-0">
-                <div className="text-[14.5px] font-medium tracking-tight truncate">{adminEmail}</div>
-                <div className="text-[12px] text-[var(--muted-foreground)] truncate">
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[14.5px] font-medium tracking-tight">
+                  {adminEmail}
+                </div>
+                <div className="truncate text-[12px] text-[var(--muted-foreground)]">
                   Ver perfil
                 </div>
               </div>
-              <I.Chevron size={16} className="text-[var(--muted-foreground)] shrink-0" />
+              <I.Chevron size={16} className="shrink-0 text-[var(--muted-foreground)]" />
             </Card>
           </Link>
         </div>
@@ -110,14 +112,14 @@ export default async function AdminAjustesPage() {
         </ListGroup>
 
         {/* ── Sair ── */}
-        <div className="px-5 mt-2">
-          <div className="rounded-[14px] border border-[var(--border)] bg-[var(--card)] overflow-hidden">
+        <div className="mt-2 px-5">
+          <div className="overflow-hidden rounded-[14px] border border-[var(--border)] bg-[var(--card)]">
             <form action={logoutAction}>
               <button
                 type="submit"
-                className="press w-full flex items-center gap-3 px-3.5 py-3 text-left text-[var(--destructive)]"
+                className="press flex w-full items-center gap-3 px-3.5 py-3 text-left text-[var(--destructive)]"
               >
-                <div className="size-8 rounded-lg flex items-center justify-center shrink-0 bg-[color-mix(in_oklch,var(--destructive)_12%,transparent)]">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[color-mix(in_oklch,var(--destructive)_12%,transparent)]">
                   <I.LogOut size={17} />
                 </div>
                 <span className="text-[14px] font-medium tracking-tight">Sair do painel</span>
@@ -127,7 +129,7 @@ export default async function AdminAjustesPage() {
         </div>
 
         {/* ── Footer ── */}
-        <p className="px-5 mt-4 text-[11px] text-center text-[var(--muted-foreground)]">
+        <p className="mt-4 px-5 text-center text-[11px] text-[var(--muted-foreground)]">
           Estúdio Foz · MVP v1.0
         </p>
       </div>

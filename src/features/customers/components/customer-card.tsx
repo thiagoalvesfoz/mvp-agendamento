@@ -33,20 +33,20 @@ export function CustomerCard({ customer }: CustomerCardProps) {
   return (
     <Link
       href={`/admin/clientes/${customer.id}`}
-      className="press flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 py-2.5 w-full text-left"
+      className="press flex w-full items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 py-2.5 text-left"
     >
       <CustomerAvatar name={customer.name} size="sm" />
 
-      <div className="flex-1 min-w-0">
-        <div className="text-[14px] font-medium tracking-tight truncate">{customer.name}</div>
-        <div className="text-[12px] text-[var(--muted-foreground)] truncate">
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-[14px] font-medium tracking-tight">{customer.name}</div>
+        <div className="truncate text-[12px] text-[var(--muted-foreground)]">
           {fmtPhone(customer.phone)}
           {customer.socialMedia && ` · ${customer.socialMedia}`}
         </div>
       </div>
 
-      <div className="text-right shrink-0">
-        <div className="text-[13px] font-medium font-mono tracking-tight">{count}</div>
+      <div className="shrink-0 text-right">
+        <div className="font-mono text-[13px] font-medium tracking-tight">{count}</div>
         <div className="text-[10px] uppercase tracking-[0.1em] text-[var(--muted-foreground)]">
           {count === 1 ? "visita" : "visitas"}
         </div>

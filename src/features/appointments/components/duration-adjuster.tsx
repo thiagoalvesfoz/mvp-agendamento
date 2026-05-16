@@ -80,7 +80,7 @@ export function DurationAdjuster({
 
   if (!editing) {
     return (
-      <div className="mt-4 pt-3.5 border-t border-[var(--border)] flex items-center justify-between">
+      <div className="mt-4 flex items-center justify-between border-t border-[var(--border)] pt-3.5">
         <div>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
             Duração atual
@@ -88,7 +88,7 @@ export function DurationAdjuster({
           <div className="mt-0.5 text-[14px] font-medium tracking-tight">
             {baseDuration} min
             {baseDuration !== durationSnapshot && (
-              <span className="ml-2 text-[12px] text-[var(--muted-foreground)] font-normal">
+              <span className="ml-2 text-[12px] font-normal text-[var(--muted-foreground)]">
                 ({baseDuration > durationSnapshot ? "+" : ""}
                 {baseDuration - durationSnapshot} min vs. estimado)
               </span>
@@ -98,7 +98,7 @@ export function DurationAdjuster({
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="press inline-flex items-center gap-1.5 text-[13px] text-[var(--primary)] font-medium"
+          className="press inline-flex items-center gap-1.5 text-[13px] font-medium text-[var(--primary)]"
         >
           <I.Edit size={14} /> Ajustar
         </button>
@@ -107,14 +107,12 @@ export function DurationAdjuster({
   }
 
   return (
-    <div className="mt-4 pt-3.5 border-t border-[var(--border)]">
+    <div className="mt-4 border-t border-[var(--border)] pt-3.5">
       <div className="flex items-center justify-between">
         <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
           Ajustar duração
         </div>
-        <span className="text-[11px] text-[var(--muted-foreground)]">
-          recalcula término
-        </span>
+        <span className="text-[11px] text-[var(--muted-foreground)]">recalcula término</span>
       </div>
 
       <div className="mt-2.5 flex items-center gap-2">
@@ -122,22 +120,16 @@ export function DurationAdjuster({
           type="button"
           onClick={() => setDuration((d) => Math.max(MIN, d - STEP))}
           disabled={duration <= MIN || isPending}
-          className="press size-10 rounded-xl bg-[var(--muted)] flex items-center justify-center disabled:opacity-40"
+          className="press flex size-10 items-center justify-center rounded-xl bg-[var(--muted)] disabled:opacity-40"
           aria-label="Diminuir"
         >
           <span className="text-[18px] leading-none">–</span>
         </button>
         <div className="flex-1 text-center">
-          <div className="font-mono text-[20px] font-medium tracking-tight">
-            {duration} min
-          </div>
+          <div className="font-mono text-[20px] font-medium tracking-tight">{duration} min</div>
           <div className="text-[11px] text-[var(--muted-foreground)]">
             término{" "}
-            <span
-              className={
-                changed ? "text-[var(--primary)] font-medium" : undefined
-              }
-            >
+            <span className={changed ? "font-medium text-[var(--primary)]" : undefined}>
               {newEnd}
             </span>
             {deltaVsSnapshot !== 0 && (
@@ -153,16 +145,14 @@ export function DurationAdjuster({
           type="button"
           onClick={() => setDuration((d) => Math.min(MAX, d + STEP))}
           disabled={duration >= MAX || isPending}
-          className="press size-10 rounded-xl bg-[var(--muted)] flex items-center justify-center disabled:opacity-40"
+          className="press flex size-10 items-center justify-center rounded-xl bg-[var(--muted)] disabled:opacity-40"
           aria-label="Aumentar"
         >
           <I.Plus size={16} />
         </button>
       </div>
 
-      {error && (
-        <p className="mt-2 text-[12px] text-[var(--destructive)]">{error}</p>
-      )}
+      {error && <p className="mt-2 text-[12px] text-[var(--destructive)]">{error}</p>}
 
       <div className="mt-3 flex gap-2">
         <Button

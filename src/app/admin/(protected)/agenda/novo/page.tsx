@@ -20,9 +20,7 @@ function parseDate(raw: string | undefined, fallback: string): string {
   return raw && /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : fallback;
 }
 
-export default async function NovoAgendamentoPage({
-  searchParams,
-}: NovoAgendamentoPageProps) {
+export default async function NovoAgendamentoPage({ searchParams }: NovoAgendamentoPageProps) {
   const params = await searchParams;
   const today = todayISO();
   const initialDate = parseDate(params.date, today);

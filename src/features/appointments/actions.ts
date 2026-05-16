@@ -33,9 +33,7 @@ import type { ActionResult } from "./types";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-async function requireAuth(): Promise<
-  { ok: true; userId: string } | { ok: false; error: string }
-> {
+async function requireAuth(): Promise<{ ok: true; userId: string } | { ok: false; error: string }> {
   const session = await auth();
   if (!session?.user?.email) return { ok: false, error: "Não autorizado" };
   return { ok: true, userId: session.user.email };
@@ -72,10 +70,7 @@ function addMinutesToHHmm(hhmm: string, minutes: number): string {
 
 /** Detecta se o erro é uma violação da constraint EXCLUDE (anti-sobreposição). */
 function isOverlapError(err: unknown): boolean {
-  if (
-    err instanceof Prisma.PrismaClientKnownRequestError &&
-    err.code === "P2010"
-  ) {
+  if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2010") {
     return true;
   }
   if (err instanceof Error && err.message.includes("23P01")) {
@@ -214,8 +209,7 @@ export async function adminCreateAppointment(
     if (isOverlapError(err)) {
       return {
         ok: false,
-        error:
-          "Esse horário já está ocupado. Escolha outro horário disponível.",
+        error: "Esse horário já está ocupado. Escolha outro horário disponível.",
       };
     }
     console.error("adminCreateAppointment failed", err);
@@ -235,9 +229,7 @@ export async function adminCreateAppointment(
  *  CONFIRMED → COMPLETED | NO_SHOW | CANCELED
  *  Qualquer → qualquer (admin override)
  */
-export async function updateAppointmentStatus(
-  input: UpdateStatusInput,
-): Promise<ActionResult> {
+export async function updateAppointmentStatus(input: UpdateStatusInput): Promise<ActionResult> {
   const guard = await requireAuth();
   if (!guard.ok) return guard;
 
@@ -375,8 +367,7 @@ export async function updateAppointmentDuration(
   if (current.status !== "PENDING" && current.status !== "CONFIRMED") {
     return {
       ok: false,
-      error:
-        "Só é possível ajustar duração de agendamentos pendentes ou confirmados.",
+      error: "Só é possível ajustar duração de agendamentos pendentes ou confirmados.",
     };
   }
 
@@ -398,8 +389,7 @@ export async function updateAppointmentDuration(
         data: {
           appointmentId,
           eventType: "duration_change",
-          durationFrom:
-            current.actualDurationMinutes ?? current.durationMinutesSnapshot,
+          durationFrom: current.actualDurationMinutes ?? current.durationMinutesSnapshot,
           durationTo: durationMinutes,
           changedBy: `admin:${guard.userId}`,
           reason: "duração ajustada manualmente",
@@ -410,8 +400,7 @@ export async function updateAppointmentDuration(
     if (isOverlapError(err)) {
       return {
         ok: false,
-        error:
-          "A nova duração conflita com outro agendamento. Reduza o tempo ou remarque.",
+        error: "A nova duração conflita com outro agendamento. Reduza o tempo ou remarque.",
       };
     }
     console.error("updateAppointmentDuration failed", err);

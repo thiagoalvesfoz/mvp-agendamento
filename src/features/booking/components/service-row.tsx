@@ -16,9 +16,7 @@ export function ServiceRow({ service, selected, onSelect }: ServiceRowProps) {
       onClick={() => onSelect(service)}
       className={cn(
         "press flex w-full items-center gap-3 rounded-2xl border bg-white px-3.5 py-3.5 text-left transition-colors",
-        selected
-          ? "border-[var(--primary)] ring-2 ring-[var(--primary)]/20"
-          : "border-border",
+        selected ? "ring-[var(--primary)]/20 border-[var(--primary)] ring-2" : "border-border",
       )}
     >
       <div

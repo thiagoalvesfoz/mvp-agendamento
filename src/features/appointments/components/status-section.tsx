@@ -23,10 +23,7 @@ interface StatusSectionProps {
   status: AppointmentStatus;
 }
 
-const STATUS_META: Record<
-  AppointmentStatus,
-  { label: string; hint: string }
-> = {
+const STATUS_META: Record<AppointmentStatus, { label: string; hint: string }> = {
   PENDING: { label: "Pendente", hint: "Aguardando confirmação" },
   CONFIRMED: { label: "Confirmado", hint: "Agendado e ocupando o slot" },
   COMPLETED: { label: "Concluído", hint: "Atendimento finalizado" },
@@ -81,27 +78,23 @@ export function StatusSection({ appointmentId, status }: StatusSectionProps) {
         </div>
         <div className="mt-2.5 flex items-center gap-3">
           <StatusDot status={status} />
-          <div className="flex-1 min-w-0">
-            <div className="text-[20px] font-semibold tracking-tight leading-tight">
+          <div className="min-w-0 flex-1">
+            <div className="text-[20px] font-semibold leading-tight tracking-tight">
               {meta.label}
             </div>
-            <div className="text-[12.5px] text-[var(--muted-foreground)] mt-0.5">
-              {meta.hint}
-            </div>
+            <div className="mt-0.5 text-[12.5px] text-[var(--muted-foreground)]">{meta.hint}</div>
           </div>
         </div>
         <Button
           variant="outline"
           size="sm"
-          className="w-full mt-3.5"
+          className="mt-3.5 w-full"
           onClick={() => setOpen(true)}
           disabled={isPending}
         >
           <I.Edit size={14} /> Alterar status
         </Button>
-        {error && (
-          <p className="mt-2 text-[12px] text-[var(--destructive)]">{error}</p>
-        )}
+        {error && <p className="mt-2 text-[12px] text-[var(--destructive)]">{error}</p>}
       </Card>
 
       {open && (
@@ -131,16 +124,14 @@ function StatusPickerSheet({
     <div className="fixed inset-0 z-50" onClick={onCancel}>
       <div className="absolute inset-0 bg-black/40" />
       <div
-        className="absolute left-0 right-0 bottom-0 mx-auto max-w-[440px] rounded-t-[20px] bg-[var(--background)] p-5 border-t border-[var(--border)]"
+        className="absolute bottom-0 left-0 right-0 mx-auto max-w-[440px] rounded-t-[20px] border-t border-[var(--border)] bg-[var(--background)] p-5"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="pt-1 pb-3 flex justify-center">
-          <div className="w-10 h-1 rounded-full bg-[var(--border)]" />
+        <div className="flex justify-center pb-3 pt-1">
+          <div className="h-1 w-10 rounded-full bg-[var(--border)]" />
         </div>
-        <h3 className="text-[17px] font-semibold tracking-tight">
-          Alterar status
-        </h3>
-        <p className="text-[12.5px] text-[var(--muted-foreground)] mt-1">
+        <h3 className="text-[17px] font-semibold tracking-tight">Alterar status</h3>
+        <p className="mt-1 text-[12.5px] text-[var(--muted-foreground)]">
           Selecione o novo status. Toda mudança fica registrada no histórico.
         </p>
         <div className="mt-4 space-y-1.5">
@@ -153,32 +144,21 @@ function StatusPickerSheet({
                 type="button"
                 onClick={() => onPick(s)}
                 disabled={isPending || isCurrent}
-                className="press w-full flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--background)] px-3.5 py-3 text-left hover:bg-[var(--muted)] disabled:opacity-50 disabled:pointer-events-none"
+                className="press flex w-full items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--background)] px-3.5 py-3 text-left hover:bg-[var(--muted)] disabled:pointer-events-none disabled:opacity-50"
               >
                 <StatusDot status={s} />
-                <div className="flex-1 min-w-0">
-                  <div className="text-[14px] font-medium tracking-tight">
-                    {meta.label}
-                  </div>
-                  <div className="text-[11.5px] text-[var(--muted-foreground)]">
-                    {meta.hint}
-                  </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-[14px] font-medium tracking-tight">{meta.label}</div>
+                  <div className="text-[11.5px] text-[var(--muted-foreground)]">{meta.hint}</div>
                 </div>
                 {isCurrent && (
-                  <span className="text-[11px] text-[var(--muted-foreground)]">
-                    atual
-                  </span>
+                  <span className="text-[11px] text-[var(--muted-foreground)]">atual</span>
                 )}
               </button>
             );
           })}
         </div>
-        <Button
-          variant="outline"
-          className="w-full mt-4"
-          onClick={onCancel}
-          disabled={isPending}
-        >
+        <Button variant="outline" className="mt-4 w-full" onClick={onCancel} disabled={isPending}>
           Fechar
         </Button>
       </div>

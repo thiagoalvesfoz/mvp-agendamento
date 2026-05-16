@@ -28,38 +28,38 @@ export function BlocksPageClient({ blockedDates, recurringBlocks }: BlocksPageCl
   };
 
   return (
-    <div className="flex flex-1 min-h-0 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       {/* ── Header ── */}
-      <div className="flex items-start justify-between gap-3 px-5 pt-6 pb-3">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+      <div className="flex items-start justify-between gap-3 px-5 pb-3 pt-6">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           <Link
             href="/admin/ajustes"
-            className="press size-9 rounded-full flex items-center justify-center text-[var(--muted-foreground)] hover:bg-[var(--muted)]"
+            className="press flex size-9 items-center justify-center rounded-full text-[var(--muted-foreground)] hover:bg-[var(--muted)]"
             aria-label="Voltar"
           >
             <I.ChevronLeft size={20} />
           </Link>
-          <div className="flex-1 min-w-0">
-            <p className="text-[12px] font-medium uppercase tracking-widest text-[var(--muted-foreground)] leading-none">
+          <div className="min-w-0 flex-1">
+            <p className="text-[12px] font-medium uppercase leading-none tracking-widest text-[var(--muted-foreground)]">
               Ajustes
             </p>
-            <h1 className="text-[20px] font-semibold tracking-tight leading-tight">Bloqueios</h1>
+            <h1 className="text-[20px] font-semibold leading-tight tracking-tight">Bloqueios</h1>
           </div>
         </div>
         <button
           type="button"
           onClick={() => setSheetOpen(true)}
           aria-label="Adicionar bloqueio"
-          className="press size-10 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] flex items-center justify-center shrink-0"
+          className="press flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-[var(--primary-foreground)]"
         >
           <I.Plus size={18} strokeWidth={2.2} />
         </button>
       </div>
 
       {/* Subtítulo */}
-      <p className="px-5 text-[13px] text-[var(--muted-foreground)] mb-3">
-        Bloqueie datas pontuais (férias, feriados) ou recorrentes que se repetem toda semana ou
-        todo ano.
+      <p className="mb-3 px-5 text-[13px] text-[var(--muted-foreground)]">
+        Bloqueie datas pontuais (férias, feriados) ou recorrentes que se repetem toda semana ou todo
+        ano.
       </p>
 
       {/* Lista */}

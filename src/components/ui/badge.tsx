@@ -7,25 +7,17 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "bg-[var(--secondary)] text-[var(--secondary-foreground)] border-transparent",
+        default: "bg-[var(--secondary)] text-[var(--secondary-foreground)] border-transparent",
         outline: "bg-transparent text-[var(--foreground)] border-[var(--border)]",
-        primary:
-          "bg-[var(--primary)] text-[var(--primary-foreground)] border-transparent",
-        accent:
-          "bg-[var(--primary)]/10 text-[var(--primary)] border-[var(--primary)]/20",
-        pending:
-          "bg-[oklch(0.97_0.04_85)] text-[oklch(0.40_0.10_75)] border-transparent",
-        confirmed:
-          "bg-[oklch(0.96_0.04_150)] text-[oklch(0.38_0.10_150)] border-transparent",
-        completed:
-          "bg-[var(--primary)]/10 text-[var(--primary)] border-transparent",
-        cancelled:
-          "bg-[var(--muted)] text-[var(--muted-foreground)] border-transparent",
+        primary: "bg-[var(--primary)] text-[var(--primary-foreground)] border-transparent",
+        accent: "bg-[var(--primary)]/10 text-[var(--primary)] border-[var(--primary)]/20",
+        pending: "bg-[oklch(0.97_0.04_85)] text-[oklch(0.40_0.10_75)] border-transparent",
+        confirmed: "bg-[oklch(0.96_0.04_150)] text-[oklch(0.38_0.10_150)] border-transparent",
+        completed: "bg-[var(--primary)]/10 text-[var(--primary)] border-transparent",
+        cancelled: "bg-[var(--muted)] text-[var(--muted-foreground)] border-transparent",
         noshow:
           "bg-[color-mix(in_oklch,var(--destructive)_10%,transparent)] text-[var(--destructive)] border-transparent",
-        expired:
-          "bg-[var(--muted)] text-[var(--muted-foreground)] border-transparent",
+        expired: "bg-[var(--muted)] text-[var(--muted-foreground)] border-transparent",
       },
     },
     defaultVariants: {
@@ -35,8 +27,7 @@ const badgeVariants = cva(
 );
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLSpanElement>,
-    VariantProps<typeof badgeVariants> {}
+  extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof badgeVariants> {}
 
 function Badge({ className, variant, ...props }: BadgeProps) {
   return <span className={cn(badgeVariants({ variant }), className)} {...props} />;

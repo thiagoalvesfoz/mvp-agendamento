@@ -12,7 +12,7 @@ export default function AdminServicosNovoPage() {
   return (
     <div className="flex flex-col">
       {/* ── Header ── */}
-      <div className="flex items-center gap-3 px-5 pt-6 pb-4">
+      <div className="flex items-center gap-3 px-5 pb-4 pt-6">
         <Link
           href="/admin/servicos"
           className="press flex size-9 items-center justify-center rounded-xl text-[var(--muted-foreground)]"
@@ -24,7 +24,7 @@ export default function AdminServicosNovoPage() {
           <p className="text-[12px] font-medium uppercase tracking-widest text-[var(--muted-foreground)]">
             Novo serviço
           </p>
-          <h1 className="text-[20px] font-semibold tracking-tight leading-tight">Criar serviço</h1>
+          <h1 className="text-[20px] font-semibold leading-tight tracking-tight">Criar serviço</h1>
         </div>
       </div>
 

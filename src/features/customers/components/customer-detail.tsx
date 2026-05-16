@@ -46,16 +46,16 @@ function ContactRow({ icon, label, value, href }: ContactRowProps) {
   return (
     <div className="flex items-center gap-3">
       <span className="text-[var(--muted-foreground)]">{icon}</span>
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="text-[11px] text-[var(--muted-foreground)]">{label}</div>
-        <div className="text-[13.5px] font-medium tracking-tight truncate">{value}</div>
+        <div className="truncate text-[13.5px] font-medium tracking-tight">{value}</div>
       </div>
       {href && (
         <a
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className="press text-[12px] font-medium text-[var(--primary)] border border-[var(--primary)]/30 rounded-lg px-2.5 py-1 shrink-0"
+          className="press border-[var(--primary)]/30 shrink-0 rounded-lg border px-2.5 py-1 text-[12px] font-medium text-[var(--primary)]"
         >
           Abrir
         </a>
@@ -72,12 +72,12 @@ export function CustomerDetail({ customer }: CustomerDetailProps) {
   const appointmentCount = customer.appointments.length;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       {/* ── Header com back button ── */}
-      <div className="flex items-center gap-2 px-5 pt-5 pb-2">
+      <div className="flex items-center gap-2 px-5 pb-2 pt-5">
         <Link
           href="/admin/clientes"
-          className="press size-8 rounded-full flex items-center justify-center text-[var(--muted-foreground)] hover:bg-[var(--muted)] -ml-1"
+          className="press -ml-1 flex size-8 items-center justify-center rounded-full text-[var(--muted-foreground)] hover:bg-[var(--muted)]"
           aria-label="Voltar para clientes"
         >
           <I.ChevronLeft size={20} />
@@ -90,13 +90,13 @@ export function CustomerDetail({ customer }: CustomerDetailProps) {
       {/* ── Conteúdo scrollável ── */}
       <div className="flex-1 overflow-y-auto px-5 pb-4">
         {/* Avatar + nome + cliente desde */}
-        <div className="flex items-center gap-3.5 mt-1">
+        <div className="mt-1 flex items-center gap-3.5">
           <CustomerAvatar name={customer.name} size="lg" />
           <div>
             <h1 className="text-[20px] font-semibold leading-tight tracking-tight">
               {customer.name}
             </h1>
-            <div className="text-[12px] text-[var(--muted-foreground)] mt-0.5">
+            <div className="mt-0.5 text-[12px] text-[var(--muted-foreground)]">
               Cliente desde {formatInTZ(customer.createdAt, "dd/MM/yyyy")}
             </div>
           </div>
@@ -115,11 +115,7 @@ export function CustomerDetail({ customer }: CustomerDetailProps) {
               href={waLink(customer.phone)}
             />
             {customer.email && (
-              <ContactRow
-                icon={<I.Mail size={15} />}
-                label="Email"
-                value={customer.email}
-              />
+              <ContactRow icon={<I.Mail size={15} />} label="Email" value={customer.email} />
             )}
             {customer.socialMedia && (
               <ContactRow
@@ -132,7 +128,7 @@ export function CustomerDetail({ customer }: CustomerDetailProps) {
         </Card>
 
         {/* ── Histórico de agendamentos ── */}
-        <div className="mt-5 mb-3 flex items-baseline justify-between">
+        <div className="mb-3 mt-5 flex items-baseline justify-between">
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
             Histórico
           </div>
@@ -142,7 +138,7 @@ export function CustomerDetail({ customer }: CustomerDetailProps) {
         </div>
 
         {appointmentCount === 0 ? (
-          <p className="text-[13px] text-[var(--muted-foreground)] text-center py-6">
+          <p className="py-6 text-center text-[13px] text-[var(--muted-foreground)]">
             Nenhum agendamento registrado.
           </p>
         ) : (
@@ -154,8 +150,8 @@ export function CustomerDetail({ customer }: CustomerDetailProps) {
                 className="press flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 py-2.5 transition-colors hover:bg-[var(--muted)]"
               >
                 <StatusDot status={appt.status} />
-                <div className="flex-1 min-w-0">
-                  <div className="text-[13.5px] font-medium tracking-tight truncate">
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-[13.5px] font-medium tracking-tight">
                     {appt.serviceNameSnapshot}
                   </div>
                   <div className="text-[11.5px] text-[var(--muted-foreground)]">
@@ -166,21 +162,21 @@ export function CustomerDetail({ customer }: CustomerDetailProps) {
                   </div>
                 </div>
                 <StatusBadge status={appt.status} />
-                <I.Chevron size={14} className="text-[var(--muted-foreground)] shrink-0" />
+                <I.Chevron size={14} className="shrink-0 text-[var(--muted-foreground)]" />
               </Link>
             ))}
           </div>
         )}
 
         {/* ── Seção LGPD ── */}
-        <div className="mt-7 pt-5 border-t border-[var(--border)]">
-          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted-foreground)] mb-2">
+        <div className="mt-7 border-t border-[var(--border)] pt-5">
+          <div className="mb-2 text-[11px] uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
             LGPD
           </div>
-          <Card className="p-4 bg-[var(--muted)]/40">
+          <Card className="bg-[var(--muted)]/40 p-4">
             <div className="flex gap-2.5">
-              <I.Shield size={15} className="text-[var(--muted-foreground)] shrink-0 mt-0.5" />
-              <p className="text-[12px] text-[var(--muted-foreground)] leading-snug flex-1">
+              <I.Shield size={15} className="mt-0.5 shrink-0 text-[var(--muted-foreground)]" />
+              <p className="flex-1 text-[12px] leading-snug text-[var(--muted-foreground)]">
                 Conforme exige a LGPD, o cliente pode solicitar a exclusão dos seus dados. Você
                 consegue executar a exclusão imediatamente aqui.
               </p>

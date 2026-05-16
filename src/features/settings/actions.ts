@@ -20,9 +20,7 @@ import {
   updateLandingSchema,
 } from "@/features/settings/schemas";
 
-type ActionResult<T = undefined> =
-  | { ok: true; data?: T }
-  | { ok: false; error: string };
+type ActionResult<T = undefined> = { ok: true; data?: T } | { ok: false; error: string };
 
 async function requireAuth(): Promise<{ ok: true } | { ok: false; error: string }> {
   const session = await auth();

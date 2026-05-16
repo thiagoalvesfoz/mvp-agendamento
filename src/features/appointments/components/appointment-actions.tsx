@@ -18,10 +18,7 @@ interface AppointmentActionsProps {
   status: AppointmentStatus;
 }
 
-export function AppointmentActions({
-  appointmentId,
-  status,
-}: AppointmentActionsProps) {
+export function AppointmentActions({ appointmentId, status }: AppointmentActionsProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [confirmCancel, setConfirmCancel] = useState(false);
@@ -64,9 +61,7 @@ export function AppointmentActions({
             <I.Check size={16} strokeWidth={2.2} /> Confirmar
           </Button>
         </div>
-        {error && (
-          <p className="mt-2 text-[12px] text-[var(--destructive)]">{error}</p>
-        )}
+        {error && <p className="mt-2 text-[12px] text-[var(--destructive)]">{error}</p>}
         {confirmCancel && (
           <CancelConfirmSheet
             onCancel={() => setConfirmCancel(false)}
@@ -101,9 +96,7 @@ export function AppointmentActions({
             <I.Check size={16} strokeWidth={2.2} /> Concluído
           </Button>
         </div>
-        {error && (
-          <p className="mt-2 text-[12px] text-[var(--destructive)]">{error}</p>
-        )}
+        {error && <p className="mt-2 text-[12px] text-[var(--destructive)]">{error}</p>}
       </>
     );
   }
@@ -123,16 +116,14 @@ function CancelConfirmSheet({
     <div className="fixed inset-0 z-50" onClick={onCancel}>
       <div className="absolute inset-0 bg-black/40" />
       <div
-        className="absolute left-0 right-0 bottom-0 mx-auto max-w-[440px] rounded-t-[20px] bg-[var(--background)] p-5 border-t border-[var(--border)]"
+        className="absolute bottom-0 left-0 right-0 mx-auto max-w-[440px] rounded-t-[20px] border-t border-[var(--border)] bg-[var(--background)] p-5"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="pt-1 pb-3 flex justify-center">
-          <div className="w-10 h-1 rounded-full bg-[var(--border)]" />
+        <div className="flex justify-center pb-3 pt-1">
+          <div className="h-1 w-10 rounded-full bg-[var(--border)]" />
         </div>
-        <h3 className="text-[17px] font-semibold tracking-tight">
-          Cancelar este agendamento?
-        </h3>
-        <p className="text-[13px] text-[var(--muted-foreground)] mt-2 leading-snug">
+        <h3 className="text-[17px] font-semibold tracking-tight">Cancelar este agendamento?</h3>
+        <p className="mt-2 text-[13px] leading-snug text-[var(--muted-foreground)]">
           O horário voltará a ficar disponível. Esta ação não pode ser desfeita.
         </p>
         <div className="mt-5 flex gap-2">

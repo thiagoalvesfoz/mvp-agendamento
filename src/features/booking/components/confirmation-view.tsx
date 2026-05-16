@@ -33,7 +33,7 @@ export function ConfirmationView({
 
   return (
     <div className="flex flex-col items-center px-5 pt-6 text-center">
-      <div className="flex size-14 items-center justify-center rounded-full bg-[var(--primary)]/10 text-[var(--primary)]">
+      <div className="bg-[var(--primary)]/10 flex size-14 items-center justify-center rounded-full text-[var(--primary)]">
         <I.Check size={28} strokeWidth={2.2} />
       </div>
       <h2 className="mt-4 text-[22px] font-semibold leading-tight tracking-tight">
@@ -76,12 +76,12 @@ export function ConfirmationView({
         </div>
       </Card>
 
-      <Card className="mt-3 w-full bg-muted/40 p-4 text-left">
+      <Card className="bg-muted/40 mt-3 w-full p-4 text-left">
         <div className="flex gap-2.5">
           <I.Info size={16} className="mt-0.5 shrink-0 text-muted-foreground" />
           <div className="text-[12.5px] leading-snug text-muted-foreground">
-            Seu horário já está <span className="font-medium text-foreground">reservado</span>.
-            Se não confirmarmos em 48h, o pedido expira e o horário volta a ficar disponível.
+            Seu horário já está <span className="font-medium text-foreground">reservado</span>. Se
+            não confirmarmos em 48h, o pedido expira e o horário volta a ficar disponível.
           </div>
         </div>
       </Card>

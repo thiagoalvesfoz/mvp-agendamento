@@ -37,49 +37,41 @@ export default async function PerfilPage() {
     : null;
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center gap-3 px-5 pt-6 pb-3">
+    <div className="flex h-full flex-col">
+      <div className="flex items-center gap-3 px-5 pb-3 pt-6">
         <Link
           href="/admin/ajustes"
-          className="press size-9 rounded-full flex items-center justify-center text-[var(--muted-foreground)] hover:bg-[var(--muted)]"
+          className="press flex size-9 items-center justify-center rounded-full text-[var(--muted-foreground)] hover:bg-[var(--muted)]"
           aria-label="Voltar"
         >
           <I.ChevronLeft size={20} />
         </Link>
         <div>
-          <p className="text-[12px] font-medium uppercase tracking-widest text-[var(--muted-foreground)] leading-none">
+          <p className="text-[12px] font-medium uppercase leading-none tracking-widest text-[var(--muted-foreground)]">
             Ajustes
           </p>
-          <h1 className="text-[20px] font-semibold tracking-tight leading-tight">
-            Perfil
-          </h1>
+          <h1 className="text-[20px] font-semibold leading-tight tracking-tight">Perfil</h1>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 pb-6">
-        <p className="text-[13px] text-[var(--muted-foreground)] mb-5">
+        <p className="mb-5 text-[13px] text-[var(--muted-foreground)]">
           Informações da sua conta de administrador.
         </p>
 
-        <Card className="p-4 flex items-center gap-3 mb-4">
+        <Card className="mb-4 flex items-center gap-3 p-4">
           <CustomerAvatar name={adminName} size="lg" />
-          <div className="flex-1 min-w-0">
-            <div className="text-[15px] font-semibold tracking-tight truncate">
-              {adminName}
-            </div>
-            <div className="text-[12.5px] text-[var(--muted-foreground)] truncate">
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-[15px] font-semibold tracking-tight">{adminName}</div>
+            <div className="truncate text-[12.5px] text-[var(--muted-foreground)]">
               {adminEmail}
             </div>
           </div>
         </Card>
 
-        <Card className="p-0 divide-y divide-[var(--border)]">
+        <Card className="divide-y divide-[var(--border)] p-0">
           <InfoRow icon={<I.Mail size={16} />} label="Email" value={adminEmail} />
-          <InfoRow
-            icon={<I.Shield size={16} />}
-            label="Papel"
-            value="Administrador"
-          />
+          <InfoRow icon={<I.Shield size={16} />} label="Papel" value="Administrador" />
           <InfoRow
             icon={<I.Calendar size={16} />}
             label="Conta criada em"
@@ -90,12 +82,7 @@ export default async function PerfilPage() {
             label="Último acesso"
             value={user?.lastLoginAt ? formatDateTime(user.lastLoginAt) : "—"}
           />
-          <InfoRow
-            icon={<I.User size={16} />}
-            label="ID do usuário"
-            value={user?.id ?? "—"}
-            mono
-          />
+          <InfoRow icon={<I.User size={16} />} label="ID do usuário" value={user?.id ?? "—"} mono />
         </Card>
       </div>
     </div>
@@ -115,16 +102,16 @@ function InfoRow({
 }) {
   return (
     <div className="flex items-center gap-3 px-3.5 py-3">
-      <div className="size-8 rounded-lg bg-[var(--muted)] flex items-center justify-center text-[var(--muted-foreground)] shrink-0">
+      <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[var(--muted)] text-[var(--muted-foreground)]">
         {icon}
       </div>
-      <div className="flex-1 min-w-0">
-        <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--muted-foreground)] leading-none">
+      <div className="min-w-0 flex-1">
+        <div className="text-[11px] uppercase leading-none tracking-[0.12em] text-[var(--muted-foreground)]">
           {label}
         </div>
         <div
           className={
-            "mt-1 text-[13.5px] text-[var(--foreground)] truncate" +
+            "mt-1 truncate text-[13.5px] text-[var(--foreground)]" +
             (mono ? " font-mono text-[12px]" : "")
           }
         >

@@ -33,10 +33,7 @@ export function StepperHeader({ step, totalSteps, studioName, onBack }: StepperH
             {Array.from({ length: totalSteps }).map((_, i) => (
               <div
                 key={i}
-                className={cn(
-                  "h-1 flex-1 rounded-full",
-                  i < step ? "bg-primary" : "bg-border",
-                )}
+                className={cn("h-1 flex-1 rounded-full", i < step ? "bg-primary" : "bg-border")}
               />
             ))}
           </div>

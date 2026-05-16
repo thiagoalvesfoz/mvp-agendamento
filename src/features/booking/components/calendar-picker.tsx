@@ -19,7 +19,20 @@ const MESES = [
   "dezembro",
 ];
 
-const MESES_ABR = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+const MESES_ABR = [
+  "jan",
+  "fev",
+  "mar",
+  "abr",
+  "mai",
+  "jun",
+  "jul",
+  "ago",
+  "set",
+  "out",
+  "nov",
+  "dez",
+];
 
 const DIAS_ABR = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
 
@@ -30,7 +43,11 @@ function startOfDay(d: Date): Date {
 }
 
 function sameDay(a: Date, b: Date): boolean {
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
 }
 
 export type BlockedDateEntry = {
@@ -123,7 +140,7 @@ export function CalendarPicker({
             "press flex size-9 items-center justify-center rounded-full",
             canGoBack && !picker
               ? "text-foreground hover:bg-muted"
-              : "cursor-not-allowed text-muted-foreground/30",
+              : "text-muted-foreground/30 cursor-not-allowed",
           )}
           aria-label="Mês anterior"
         >
@@ -135,13 +152,12 @@ export function CalendarPicker({
           className="press flex flex-col items-center rounded-lg px-3 py-1 hover:bg-muted"
         >
           <div className="flex items-center gap-1.5">
-            <span className="text-[14px] font-semibold capitalize tracking-tight">{MESES[month]}</span>
+            <span className="text-[14px] font-semibold capitalize tracking-tight">
+              {MESES[month]}
+            </span>
             <I.ChevronDown
               size={14}
-              className={cn(
-                "text-muted-foreground transition-transform",
-                picker && "rotate-180",
-              )}
+              className={cn("text-muted-foreground transition-transform", picker && "rotate-180")}
             />
           </div>
           <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
@@ -155,7 +171,7 @@ export function CalendarPicker({
           className={cn(
             "press flex size-9 items-center justify-center rounded-full",
             picker
-              ? "cursor-not-allowed text-muted-foreground/30"
+              ? "text-muted-foreground/30 cursor-not-allowed"
               : "text-foreground hover:bg-muted",
           )}
           aria-label="Próximo mês"
@@ -165,7 +181,7 @@ export function CalendarPicker({
       </div>
 
       {picker ? (
-        <div className="fade-in px-3 py-3">
+        <div className="px-3 py-3 fade-in">
           {/* Year stepper */}
           <div className="mb-3 flex items-center justify-between">
             <button
@@ -175,7 +191,7 @@ export function CalendarPicker({
                 "press flex size-8 items-center justify-center rounded-full",
                 pickerYear > today.getFullYear()
                   ? "text-foreground hover:bg-muted"
-                  : "cursor-not-allowed text-muted-foreground/30",
+                  : "text-muted-foreground/30 cursor-not-allowed",
               )}
               aria-label="Ano anterior"
             >
@@ -189,7 +205,7 @@ export function CalendarPicker({
                 "press flex size-8 items-center justify-center rounded-full",
                 pickerYear < today.getFullYear() + 3
                   ? "text-foreground hover:bg-muted"
-                  : "cursor-not-allowed text-muted-foreground/30",
+                  : "text-muted-foreground/30 cursor-not-allowed",
               )}
               aria-label="Próximo ano"
             >
@@ -215,9 +231,9 @@ export function CalendarPicker({
                     isCurrent
                       ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
                       : isPast
-                        ? "cursor-not-allowed text-muted-foreground/35"
+                        ? "text-muted-foreground/35 cursor-not-allowed"
                         : "border border-border text-foreground hover:bg-muted",
-                    isThis && !isCurrent && "ring-1 ring-inset ring-[var(--primary)]/50",
+                    isThis && !isCurrent && "ring-[var(--primary)]/50 ring-1 ring-inset",
                   )}
                 >
                   {m}
@@ -264,19 +280,27 @@ export function CalendarPicker({
                         "press relative h-10 rounded-[8px] text-[14px] font-medium tabular-nums transition-colors",
                         isSel && "bg-[var(--primary)] text-[var(--primary-foreground)]",
                         !isSel && !disabled && "text-foreground hover:bg-muted",
-                        !isSel && isPast && "cursor-not-allowed text-muted-foreground/30 opacity-40",
+                        !isSel &&
+                          isPast &&
+                          "text-muted-foreground/30 cursor-not-allowed opacity-40",
                         !isSel &&
                           isOff &&
                           !isPast &&
                           !isBlocked &&
-                          "cursor-not-allowed text-muted-foreground/35 opacity-40",
+                          "text-muted-foreground/35 cursor-not-allowed opacity-40",
                         !isSel &&
                           isBlocked &&
                           "cursor-not-allowed bg-[repeating-linear-gradient(135deg,transparent_0,transparent_3px,color-mix(in_oklch,var(--destructive)_22%,transparent)_3px,color-mix(in_oklch,var(--destructive)_22%,transparent)_4px)] text-[color-mix(in_oklch,var(--destructive)_70%,var(--muted-foreground))]",
-                        isToday && !isSel && "ring-1 ring-inset ring-[var(--primary)]/50",
+                        isToday && !isSel && "ring-[var(--primary)]/50 ring-1 ring-inset",
                       )}
                     >
-                      <span className={cn(isBlocked && "line-through decoration-[1.2px] decoration-[color-mix(in_oklch,var(--destructive)_55%,transparent)]", isToday && "font-bold")}>
+                      <span
+                        className={cn(
+                          isBlocked &&
+                            "line-through decoration-[color-mix(in_oklch,var(--destructive)_55%,transparent)] decoration-[1.2px]",
+                          isToday && "font-bold",
+                        )}
+                      >
                         {d.getDate()}
                       </span>
                       {isToday && !isSel && (
@@ -290,7 +314,7 @@ export function CalendarPicker({
           </div>
 
           {/* Legenda */}
-          <div className="flex items-center justify-between gap-3 border-t border-border bg-muted/40 px-3.5 py-2">
+          <div className="bg-muted/40 flex items-center justify-between gap-3 border-t border-border px-3.5 py-2">
             <div className="flex items-center gap-3 text-[10.5px] text-muted-foreground">
               <span className="inline-flex items-center gap-1.5">
                 <span className="size-2 rounded-full bg-[var(--primary)]" />

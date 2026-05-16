@@ -34,9 +34,7 @@ function dayBoundsUTC(dateISO: string): { gte: Date; lt: Date } {
  *
  * @param dateISO - Data no formato YYYY-MM-DD (fuso da agenda).
  */
-export async function getAppointmentsByDay(
-  dateISO: string,
-): Promise<AppointmentCard[]> {
+export async function getAppointmentsByDay(dateISO: string): Promise<AppointmentCard[]> {
   const { gte, lt } = dayBoundsUTC(dateISO);
 
   const rows = await db.appointment.findMany({
@@ -106,9 +104,7 @@ export async function getAppointmentsByDateRange(
  * Agendamentos PENDING + CONFIRMED — "fila de atenção" na home.
  * Limitado a 50 para não sobrecarregar o payload.
  */
-export async function getPendingAndConfirmed(
-  limit = 50,
-): Promise<AppointmentCard[]> {
+export async function getPendingAndConfirmed(limit = 50): Promise<AppointmentCard[]> {
   const rows = await db.appointment.findMany({
     where: {
       status: { in: ["PENDING", "CONFIRMED"] },
@@ -137,9 +133,7 @@ export async function getPendingAndConfirmed(
  * Detalhe de um agendamento específico.
  * Retorna null se não encontrado.
  */
-export async function getAppointmentById(
-  id: string,
-): Promise<AppointmentDetail | null> {
+export async function getAppointmentById(id: string): Promise<AppointmentDetail | null> {
   const row = await db.appointment.findUnique({
     where: { id },
     select: {
@@ -185,17 +179,13 @@ export async function getAppointmentById(
 /**
  * Contagem rápida por status — usada no badge da aba Agenda.
  */
-export async function countByStatus(): Promise<
-  Record<string, number>
-> {
+export async function countByStatus(): Promise<Record<string, number>> {
   const groups = await db.appointment.groupBy({
     by: ["status"],
     _count: { id: true },
   });
 
-  return Object.fromEntries(
-    groups.map((g) => [g.status, g._count.id]),
-  );
+  return Object.fromEntries(groups.map((g) => [g.status, g._count.id]));
 }
 
 // ─── Agregações para os pills da Agenda ─────────────────────────────────────

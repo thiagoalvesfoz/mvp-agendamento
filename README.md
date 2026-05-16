@@ -57,6 +57,7 @@ pnpm dev
 ```
 
 Acesse:
+
 - **Pública**: <http://localhost:3000>
 - **Admin**: <http://localhost:3000/admin> (login: `admin@example.com` / `admin123`)
 
@@ -64,24 +65,24 @@ Acesse:
 
 ## Scripts úteis
 
-| Script | O que faz |
-|---|---|
-| `pnpm dev` | Servidor de desenvolvimento |
-| `pnpm build` | Build de produção |
-| `pnpm start` | Serve o build |
-| `pnpm typecheck` | Checa tipos com `tsc --noEmit` |
-| `pnpm lint` / `pnpm lint:fix` | ESLint |
-| `pnpm format` | Formata com Prettier |
-| `pnpm test` | Vitest (watch) |
-| `pnpm test:run` | Vitest (uma vez) |
-| `pnpm test:e2e` | Playwright |
-| `pnpm db:up` / `pnpm db:down` | Sobe/desce Postgres no Docker |
-| `pnpm db:migrate` | Aplica migrations do Prisma |
-| `pnpm db:apply-extras` | Aplica SQL manual (EXCLUDE + índices parciais) dentro do container |
-| `pnpm db:psql` | Abre shell `psql` interativo no container |
-| `pnpm db:seed` | Popula dados iniciais |
-| `pnpm db:studio` | Abre Prisma Studio |
-| `pnpm db:reset` | Reseta o banco (cuidado!) |
+| Script                        | O que faz                                                          |
+| ----------------------------- | ------------------------------------------------------------------ |
+| `pnpm dev`                    | Servidor de desenvolvimento                                        |
+| `pnpm build`                  | Build de produção                                                  |
+| `pnpm start`                  | Serve o build                                                      |
+| `pnpm typecheck`              | Checa tipos com `tsc --noEmit`                                     |
+| `pnpm lint` / `pnpm lint:fix` | ESLint                                                             |
+| `pnpm format`                 | Formata com Prettier                                               |
+| `pnpm test`                   | Vitest (watch)                                                     |
+| `pnpm test:run`               | Vitest (uma vez)                                                   |
+| `pnpm test:e2e`               | Playwright                                                         |
+| `pnpm db:up` / `pnpm db:down` | Sobe/desce Postgres no Docker                                      |
+| `pnpm db:migrate`             | Aplica migrations do Prisma                                        |
+| `pnpm db:apply-extras`        | Aplica SQL manual (EXCLUDE + índices parciais) dentro do container |
+| `pnpm db:psql`                | Abre shell `psql` interativo no container                          |
+| `pnpm db:seed`                | Popula dados iniciais                                              |
+| `pnpm db:studio`              | Abre Prisma Studio                                                 |
+| `pnpm db:reset`               | Reseta o banco (cuidado!)                                          |
 
 ---
 
@@ -139,18 +140,23 @@ agenda-agendamentos/
 ## Decisões arquiteturais importantes
 
 ### Server-first
+
 Server Components por padrão. Marque `"use client"` **apenas** no componente folha que precisa de interatividade. Server Actions são preferidas sobre Route Handlers para mutações.
 
 ### Constraint anti-sobreposição (RN01)
+
 A tabela `appointments` tem `EXCLUDE USING gist` que **impede dois agendamentos ativos** no mesmo intervalo. Em colisão, o Postgres retorna erro `23P01` que deve virar HTTP 409 amigável na API. Buffer pré/pós é validado **em código** antes do INSERT — a constraint cobre só o intervalo do atendimento (a rede de proteção final).
 
 ### Snapshots em agendamentos (RN15)
+
 Cada agendamento guarda snapshots de serviço e cliente. Edição em `services` ou `customers` **não altera agendamentos passados**. Ajuste de duração em agendamento existente é via RF13 (PATCH `/api/admin/appointments/:id/duration`).
 
 ### Fuso horário fixo (RN10)
+
 Toda regra de negócio roda em `America/Sao_Paulo`. **Nunca use `new Date()` direto** — sempre use os helpers de `@/lib/time.ts`. A Vercel roda em UTC e isso geraria bugs sutis.
 
 ### Validação no boundary
+
 Todo input externo (form, API, Server Action) passa por schema Zod antes de chegar na lógica. Falha → erro estruturado, nunca exception bruta para o cliente.
 
 ---
@@ -167,6 +173,7 @@ Para começar um novo projeto Next.js a partir desta base:
 6. **Atualize** este README
 
 A base que vale a pena manter:
+
 - Toda a configuração de tooling (ESLint, Prettier, Husky, Vitest, Playwright)
 - `src/lib/*` (env, db, auth, utils, time)
 - Estrutura de pastas e route groups

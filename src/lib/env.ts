@@ -48,15 +48,10 @@ const processEnv = {
 const isServer = typeof window === "undefined";
 
 const merged = serverSchema.merge(clientSchema);
-const parsed = isServer
-  ? merged.safeParse(processEnv)
-  : clientSchema.safeParse(processEnv);
+const parsed = isServer ? merged.safeParse(processEnv) : clientSchema.safeParse(processEnv);
 
 if (!parsed.success) {
-  console.error(
-    "❌ Variáveis de ambiente inválidas:",
-    parsed.error.flatten().fieldErrors,
-  );
+  console.error("❌ Variáveis de ambiente inválidas:", parsed.error.flatten().fieldErrors);
   throw new Error("Variáveis de ambiente inválidas — confira .env");
 }
 

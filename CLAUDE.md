@@ -3,6 +3,7 @@
 Contexto para retomar trabalho no projeto. Atualize conforme avança.
 
 ## Stack
+
 Next.js 15 (App Router) · React 19 · TypeScript estrito · Tailwind 3 + shadcn/ui · Prisma 6 + Postgres 16 · Auth.js v5 (Credentials) · Zod · Vitest · Playwright · Docker Compose.
 
 ## Estado atual (2026-05-16)
@@ -10,6 +11,7 @@ Next.js 15 (App Router) · React 19 · TypeScript estrito · Tailwind 3 + shadcn
 Fase: **descoberta / pré-MVP**. Estrutura base, login + shell do admin + abas Serviços, Clientes e Ajustes implementadas.
 
 ### Implementado
+
 - **Auth.js v5** com Credentials provider + bcrypt (`src/lib/auth.ts`). Sessão JWT 7d.
 - **Login admin** em `/admin/login` (`src/app/admin/(public)/login/page.tsx` + `src/features/auth/components/login-form.tsx`).
 - **Server Action** `loginAction` / `logoutAction` em `src/features/auth/actions.ts`.
@@ -49,6 +51,7 @@ Fase: **descoberta / pré-MVP**. Estrutura base, login + shell do admin + abas S
 - **Tooling**: ESLint, Prettier, Husky, Vitest, Playwright configurados.
 
 ### Estrutura de rotas
+
 ```
 src/app/
 ├── page.tsx                          # landing pública
@@ -75,7 +78,9 @@ src/app/
 ```
 
 ### Fora do MVP — campos do protótipo não mapeados no schema
+
 Os seguintes campos existem no protótipo visual (`prototipo/admin-screens.jsx`) mas **não foram implementados** porque não há coluna correspondente no `schema.prisma`:
+
 - **`icon`** — ícone do serviço (picker visual). Atualmente exibe `I.Camera` fixo no card.
 - **`tag`** — etiqueta de destaque (ex.: "Mais procurado"). Badge não renderizado.
 - **`starting`** — "valor de partida" (ex.: "a partir de R$ 680"). Campo omitido.
@@ -94,6 +99,7 @@ Para adicionar qualquer um deles: criar migration adicionando a coluna em `servi
 - **Validação no boundary**: Zod em todo input externo. Falha → erro estruturado.
 
 ## Rodar localmente
+
 ```bash
 pnpm install
 cp .env.example .env.local        # gere AUTH_SECRET com openssl rand -base64 32
@@ -103,9 +109,11 @@ pnpm db:apply-extras
 pnpm db:seed
 pnpm dev
 ```
+
 Admin: <http://localhost:3000/admin> · seed: `admin@example.com` / `admin123`.
 
 ## Scripts úteis
+
 `pnpm typecheck` · `pnpm lint` · `pnpm test:run` · `pnpm test:e2e` · `pnpm db:studio` · `pnpm db:reset`.
 
 ## Gotchas conhecidos
@@ -122,6 +130,7 @@ Admin: <http://localhost:3000/admin> · seed: `admin@example.com` / `admin123`.
 - **Prisma client travado no Windows**: se `prisma generate` falhar com `EPERM rename`, o dev server está usando a DLL. Feche o servidor (`Ctrl+C`), rode `pnpm exec prisma generate`, depois reinicie com `pnpm dev`.
 
 ## Próximos passos sugeridos
+
 1. **Aplicar migration landing**: `pnpm db:migrate` + `pnpm exec prisma generate` (fechar dev server antes no Windows). Depois remover os casts `as any` de `features/settings/queries.ts` e `features/settings/actions.ts`.
 2. **Agenda** dia/semana/mês ligando em `features/appointments/`.
 3. **Recuperação de senha** por email (Resend).
@@ -130,12 +139,14 @@ Admin: <http://localhost:3000/admin> · seed: `admin@example.com` / `admin123`.
 6. (Opcional) Job de anonimização automática após `retentionMonths` (configurável em Settings — já editável em `/admin/ajustes/regras`).
 
 ## Convenções
+
 - Imports via `@/...` (alias).
 - `camelCase` em TS, `snake_case` em SQL (via `@map`).
 - Comentários explicam **porquê**, não **o quê**.
 - Componentes shadcn em `src/components/ui/`; compostos em `src/components/shared/` ou `features/<x>/components/`.
 
 ## Referências
+
 - Requisitos: `documento_requisitos_mvp_agenda_v5.md` (workspace root).
 - Documento técnico: `documento_tecnico_agenda_agendamentos.pdf`.
 - Protótipo HTML/JSX: `../prototipo/` — referência visual e de fluxo. **Não é código de produção**.

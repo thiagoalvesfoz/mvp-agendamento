@@ -65,8 +65,7 @@ function fmtDateBR(d: Date): string {
 function displayPhone(phone: string): string {
   if (!phone) return "";
   const digits = phone.replace(/\D/g, "");
-  const local =
-    digits.startsWith("55") && digits.length > 11 ? digits.slice(2) : digits;
+  const local = digits.startsWith("55") && digits.length > 11 ? digits.slice(2) : digits;
   return maskPhoneBR(local);
 }
 
@@ -107,11 +106,9 @@ export function CreateAppointmentForm({
     [services, serviceId],
   );
 
-  const clientReady =
-    customerName.trim().length > 0 && customerPhone.trim().length >= 8;
+  const clientReady = customerName.trim().length > 0 && customerPhone.trim().length >= 8;
   const canCreate = !!service && !!date && !!time && clientReady;
-  const endTimePreview =
-    service && time ? addMinutesToHHmm(time, service.durationMinutes) : null;
+  const endTimePreview = service && time ? addMinutesToHHmm(time, service.durationMinutes) : null;
 
   useEffect(() => {
     if (!serviceId || !date) {
@@ -162,9 +159,7 @@ export function CreateAppointmentForm({
     setCustomerEmail(c.email ?? "");
     setCustomerInstagram(c.socialMedia ?? "");
     setLinkedCustomerId(c.id);
-    setSuggestions((prev) =>
-      prev.find((s) => s.id === c.id) ? prev : [...prev, c],
-    );
+    setSuggestions((prev) => (prev.find((s) => s.id === c.id) ? prev : [...prev, c]));
     setNameFocused(false);
   };
 
@@ -221,17 +216,15 @@ export function CreateAppointmentForm({
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col bg-[var(--background)]">
       {/* Header */}
-      <div className="px-5 pt-3 pb-3 flex items-center justify-between border-b border-[var(--border)]">
+      <div className="flex items-center justify-between border-b border-[var(--border)] px-5 pb-3 pt-3">
         <Link
           href="/admin"
-          className="press -ml-2 size-10 rounded-full flex items-center justify-center"
+          className="press -ml-2 flex size-10 items-center justify-center rounded-full"
           aria-label="Voltar"
         >
           <I.ChevronLeft size={22} />
         </Link>
-        <h1 className="text-[15px] font-semibold tracking-tight">
-          Novo agendamento
-        </h1>
+        <h1 className="text-[15px] font-semibold tracking-tight">Novo agendamento</h1>
         <div className="size-10" />
       </div>
 
@@ -243,22 +236,21 @@ export function CreateAppointmentForm({
           type="button"
           onClick={() => setShowServicePicker(true)}
           className={cn(
-            "press mt-2 w-full flex items-center gap-3 rounded-[10px] border bg-[var(--background)] px-3 h-11 text-left transition-colors",
+            "press mt-2 flex h-11 w-full items-center gap-3 rounded-[10px] border bg-[var(--background)] px-3 text-left transition-colors",
             service ? "border-[var(--border)]" : "border-[var(--input)]",
           )}
         >
           {service ? (
             <>
-              <div className="size-7 rounded-[6px] bg-[var(--primary)]/10 text-[var(--primary)] flex items-center justify-center shrink-0">
+              <div className="bg-[var(--primary)]/10 flex size-7 shrink-0 items-center justify-center rounded-[6px] text-[var(--primary)]">
                 <I.Camera size={14} />
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-[14px] font-medium tracking-tight truncate">
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[14px] font-medium tracking-tight">
                   {service.name}
                 </div>
                 <div className="text-[11.5px] text-[var(--muted-foreground)]">
-                  {service.durationMinutes} min · buffer +
-                  {service.bufferPosMinutes}
+                  {service.durationMinutes} min · buffer +{service.bufferPosMinutes}
                 </div>
               </div>
             </>
@@ -267,20 +259,12 @@ export function CreateAppointmentForm({
               Selecionar serviço…
             </span>
           )}
-          <I.ChevronDown
-            size={16}
-            className="text-[var(--muted-foreground)] shrink-0"
-          />
+          <I.ChevronDown size={16} className="shrink-0 text-[var(--muted-foreground)]" />
         </button>
 
         {/* Step 2 — Quando */}
-        <div className={cn("mt-7", !service && "opacity-50 pointer-events-none")}>
-          <SectionLabel
-            n="2"
-            label="Quando"
-            done={!!date && !!time}
-            disabled={!service}
-          />
+        <div className={cn("mt-7", !service && "pointer-events-none opacity-50")}>
+          <SectionLabel n="2" label="Quando" done={!!date && !!time} disabled={!service} />
           {!service ? (
             <p className="mt-2 text-[12.5px] text-[var(--muted-foreground)]">
               Escolha um serviço primeiro.
@@ -301,7 +285,7 @@ export function CreateAppointmentForm({
                 <div className="mt-4">
                   <Label>Horário</Label>
                   {loadingSlots ? (
-                    <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--muted)]/30 p-6 text-center text-[13px] text-[var(--muted-foreground)]">
+                    <div className="bg-[var(--muted)]/30 rounded-2xl border border-dashed border-[var(--border)] p-6 text-center text-[13px] text-[var(--muted-foreground)]">
                       Buscando horários…
                     </div>
                   ) : (
@@ -323,11 +307,10 @@ export function CreateAppointmentForm({
           <SectionLabel n="3" label="Cliente" done={clientReady} />
 
           {linkedCustomerId && linkedSuggestion && (
-            <div className="mt-2 flex items-center gap-2 rounded-[10px] bg-[var(--primary)]/10 border border-[var(--primary)]/20 px-2.5 py-1.5">
-              <I.Check size={13} className="text-[var(--primary)] shrink-0" />
-              <span className="text-[11.5px] text-[var(--primary)] flex-1 min-w-0 truncate">
-                Vinculado a cliente existente ·{" "}
-                {linkedSuggestion.appointmentsCount} agendamento
+            <div className="bg-[var(--primary)]/10 border-[var(--primary)]/20 mt-2 flex items-center gap-2 rounded-[10px] border px-2.5 py-1.5">
+              <I.Check size={13} className="shrink-0 text-[var(--primary)]" />
+              <span className="min-w-0 flex-1 truncate text-[11.5px] text-[var(--primary)]">
+                Vinculado a cliente existente · {linkedSuggestion.appointmentsCount} agendamento
                 {linkedSuggestion.appointmentsCount === 1 ? "" : "s"}
               </span>
               <button
@@ -348,17 +331,15 @@ export function CreateAppointmentForm({
                 value={customerName}
                 onChange={(e) => handleNameChange(e.target.value)}
                 onFocus={() => setNameFocused(true)}
-                onBlur={() =>
-                  window.setTimeout(() => setNameFocused(false), 150)
-                }
+                onBlur={() => window.setTimeout(() => setNameFocused(false), 150)}
                 placeholder="Nome completo"
                 maxLength={120}
                 autoComplete="off"
               />
 
               {nameFocused && suggestions.length > 0 && (
-                <div className="absolute left-0 right-0 top-full mt-1 z-20 bg-[var(--background)] border border-[var(--border)] rounded-[10px] shadow-[0_8px_24px_rgba(0,0,0,0.08)] overflow-hidden">
-                  <div className="px-3 pt-2 pb-1 text-[10px] uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
+                <div className="absolute left-0 right-0 top-full z-20 mt-1 overflow-hidden rounded-[10px] border border-[var(--border)] bg-[var(--background)] shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
+                  <div className="px-3 pb-1 pt-2 text-[10px] uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
                     Clientes encontrados
                   </div>
                   {suggestions.map((c, i) => (
@@ -370,12 +351,11 @@ export function CreateAppointmentForm({
                         handleSelectSuggestion(c);
                       }}
                       className={cn(
-                        "press w-full text-left flex items-center gap-2.5 px-3 py-2 transition-colors hover:bg-[var(--muted)]",
-                        i < suggestions.length - 1 &&
-                          "border-b border-[var(--border)]",
+                        "press flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-[var(--muted)]",
+                        i < suggestions.length - 1 && "border-b border-[var(--border)]",
                       )}
                     >
-                      <div className="size-7 rounded-full bg-[var(--muted)] text-[var(--foreground)] text-[11px] font-semibold flex items-center justify-center shrink-0">
+                      <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[var(--muted)] text-[11px] font-semibold text-[var(--foreground)]">
                         {c.name
                           .split(" ")
                           .map((w) => w[0])
@@ -384,15 +364,15 @@ export function CreateAppointmentForm({
                           .join("")
                           .toUpperCase()}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[13px] font-medium tracking-tight truncate">
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-[13px] font-medium tracking-tight">
                           {c.name}
                         </div>
-                        <div className="font-mono text-[11px] text-[var(--muted-foreground)] truncate">
+                        <div className="truncate font-mono text-[11px] text-[var(--muted-foreground)]">
                           {displayPhone(c.phone)}
                         </div>
                       </div>
-                      <span className="text-[10.5px] text-[var(--muted-foreground)] shrink-0">
+                      <span className="shrink-0 text-[10.5px] text-[var(--muted-foreground)]">
                         {c.appointmentsCount} ag.
                       </span>
                     </button>
@@ -411,9 +391,7 @@ export function CreateAppointmentForm({
                   type="tel"
                   inputMode="tel"
                   value={customerPhone}
-                  onChange={(e) =>
-                    setCustomerPhone(maskPhoneBR(e.target.value))
-                  }
+                  onChange={(e) => setCustomerPhone(maskPhoneBR(e.target.value))}
                   placeholder="(11) 9..."
                   maxLength={15}
                 />
@@ -451,11 +429,7 @@ export function CreateAppointmentForm({
 
         {/* Step 4 — Briefing */}
         <div className="mt-7">
-          <SectionLabel
-            n="4"
-            label="Briefing"
-            done={briefing.trim().length > 0}
-          />
+          <SectionLabel n="4" label="Briefing" done={briefing.trim().length > 0} />
           <div className="mt-3">
             <textarea
               id="apt-briefing"
@@ -476,38 +450,29 @@ export function CreateAppointmentForm({
 
         {/* Detalhes — info card sem título */}
         <div className="mt-7 flex items-start gap-2 rounded-[10px] bg-[var(--muted)] px-3 py-2.5">
-          <I.Info
-            size={14}
-            className="text-[var(--muted-foreground)] shrink-0 mt-0.5"
-          />
-          <p className="text-[12px] text-[var(--muted-foreground)] leading-snug">
+          <I.Info size={14} className="mt-0.5 shrink-0 text-[var(--muted-foreground)]" />
+          <p className="text-[12px] leading-snug text-[var(--muted-foreground)]">
             Agendamentos criados por você entram diretamente como{" "}
-            <strong className="font-semibold text-[var(--foreground)]">
-              Confirmado
-            </strong>
-            , sem necessidade de aprovação.
+            <strong className="font-semibold text-[var(--foreground)]">Confirmado</strong>, sem
+            necessidade de aprovação.
           </p>
         </div>
 
-        {error && (
-          <p className="mt-4 text-[13px] text-[var(--destructive)]">{error}</p>
-        )}
+        {error && <p className="mt-4 text-[13px] text-[var(--destructive)]">{error}</p>}
       </div>
 
       {/* Footer sticky */}
-      <div className="px-5 py-3.5 border-t border-[var(--border)] bg-[var(--background)]">
+      <div className="border-t border-[var(--border)] bg-[var(--background)] px-5 py-3.5">
         {canCreate && service && date && endTimePreview && (
           <div className="mb-2.5 flex items-center justify-between text-[12px]">
-            <div className="text-[var(--muted-foreground)] truncate flex-1 min-w-0 pr-2">
-              <span className="text-[var(--foreground)] font-medium">
-                {service.name}
-              </span>
+            <div className="min-w-0 flex-1 truncate pr-2 text-[var(--muted-foreground)]">
+              <span className="font-medium text-[var(--foreground)]">{service.name}</span>
               {" · "}
               <span className="font-mono">
                 {fmtDateBR(date)} · {time}
               </span>
             </div>
-            <div className="text-[var(--muted-foreground)] shrink-0 font-mono">
+            <div className="shrink-0 font-mono text-[var(--muted-foreground)]">
               → {endTimePreview}
             </div>
           </div>
@@ -535,26 +500,21 @@ export function CreateAppointmentForm({
 
       {/* Service picker — sub-sheet */}
       {showServicePicker && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setShowServicePicker(false)}
-        >
+        <div className="fixed inset-0 z-40" onClick={() => setShowServicePicker(false)}>
           <div className="absolute inset-0 bg-black/40" />
           <div
             onClick={(e) => e.stopPropagation()}
-            className="absolute left-0 right-0 bottom-0 mx-auto max-w-[440px] rounded-t-[20px] bg-[var(--background)] max-h-[78%] flex flex-col"
+            className="absolute bottom-0 left-0 right-0 mx-auto flex max-h-[78%] max-w-[440px] flex-col rounded-t-[20px] bg-[var(--background)]"
           >
-            <div className="pt-2.5 pb-1 flex justify-center">
-              <div className="w-9 h-1 rounded-full bg-[var(--border)]" />
+            <div className="flex justify-center pb-1 pt-2.5">
+              <div className="h-1 w-9 rounded-full bg-[var(--border)]" />
             </div>
-            <div className="px-5 pt-2 pb-3 flex items-center justify-between border-b border-[var(--border)]">
-              <h3 className="text-[16px] font-semibold tracking-tight">
-                Selecionar serviço
-              </h3>
+            <div className="flex items-center justify-between border-b border-[var(--border)] px-5 pb-3 pt-2">
+              <h3 className="text-[16px] font-semibold tracking-tight">Selecionar serviço</h3>
               <button
                 type="button"
                 onClick={() => setShowServicePicker(false)}
-                className="press size-8 rounded-full bg-[var(--muted)] flex items-center justify-center"
+                className="press flex size-8 items-center justify-center rounded-full bg-[var(--muted)]"
                 aria-label="Fechar seleção"
               >
                 <I.Close size={14} />
@@ -562,7 +522,7 @@ export function CreateAppointmentForm({
             </div>
             <div className="flex-1 overflow-y-auto px-3 py-2">
               {services.length === 0 ? (
-                <p className="text-center text-[13px] text-[var(--destructive)] py-8">
+                <p className="py-8 text-center text-[13px] text-[var(--destructive)]">
                   Nenhum serviço ativo. Crie um serviço antes de agendar.
                 </p>
               ) : (
@@ -579,29 +539,23 @@ export function CreateAppointmentForm({
                             setShowServicePicker(false);
                           }}
                           className={cn(
-                            "press w-full flex items-center gap-3 rounded-[10px] px-3 py-2.5 text-left transition-colors",
-                            selected
-                              ? "bg-[var(--primary)]/10"
-                              : "hover:bg-[var(--muted)]",
+                            "press flex w-full items-center gap-3 rounded-[10px] px-3 py-2.5 text-left transition-colors",
+                            selected ? "bg-[var(--primary)]/10" : "hover:bg-[var(--muted)]",
                           )}
                         >
-                          <div className="size-8 rounded-[8px] bg-[var(--primary)]/10 text-[var(--primary)] flex items-center justify-center shrink-0">
+                          <div className="bg-[var(--primary)]/10 flex size-8 shrink-0 items-center justify-center rounded-[8px] text-[var(--primary)]">
                             <I.Camera size={15} />
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="text-[14px] font-medium tracking-tight truncate">
+                          <div className="min-w-0 flex-1">
+                            <div className="truncate text-[14px] font-medium tracking-tight">
                               {s.name}
                             </div>
                             <div className="text-[11.5px] text-[var(--muted-foreground)]">
-                              {s.durationMinutes} min · buffer +
-                              {s.bufferPosMinutes}
+                              {s.durationMinutes} min · buffer +{s.bufferPosMinutes}
                             </div>
                           </div>
                           {selected && (
-                            <I.Check
-                              size={16}
-                              className="text-[var(--primary)] shrink-0"
-                            />
+                            <I.Check size={16} className="shrink-0 text-[var(--primary)]" />
                           )}
                         </button>
                       </li>
@@ -631,7 +585,7 @@ function SectionLabel({ n, label, done, disabled }: SectionLabelProps) {
     <div className="flex items-center gap-2">
       <span
         className={cn(
-          "inline-flex items-center justify-center size-5 rounded-full text-[10.5px] font-semibold tabular-nums",
+          "inline-flex size-5 items-center justify-center rounded-full text-[10.5px] font-semibold tabular-nums",
           done
             ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
             : disabled

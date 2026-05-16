@@ -22,10 +22,10 @@ const intervalSchema = z
     startTime: timeField,
     endTime: timeField,
   })
-  .refine(
-    ({ startTime, endTime }) => startTime < endTime,
-    { message: "Fim deve ser após o início", path: ["endTime"] },
-  );
+  .refine(({ startTime, endTime }) => startTime < endTime, {
+    message: "Fim deve ser após o início",
+    path: ["endTime"],
+  });
 
 const dayAvailabilitySchema = z.object({
   weekDay: z.number().int().min(0).max(6),
@@ -38,30 +38,26 @@ const dayAvailabilitySchema = z.object({
  * Valida a disponibilidade semanal inteira.
  * Superrefine garante que não há sobreposição de intervalos no mesmo dia.
  */
-export const saveAvailabilitySchema = z
-  .array(dayAvailabilitySchema)
-  .superRefine((days, ctx) => {
-    days.forEach((day, dayIdx) => {
-      if (!day.open || day.intervals.length <= 1) return;
+export const saveAvailabilitySchema = z.array(dayAvailabilitySchema).superRefine((days, ctx) => {
+  days.forEach((day, dayIdx) => {
+    if (!day.open || day.intervals.length <= 1) return;
 
-      // Ordena por startTime e verifica sobreposição entre consecutivos
-      const sorted = [...day.intervals].sort((a, b) =>
-        a.startTime.localeCompare(b.startTime),
-      );
+    // Ordena por startTime e verifica sobreposição entre consecutivos
+    const sorted = [...day.intervals].sort((a, b) => a.startTime.localeCompare(b.startTime));
 
-      for (let i = 0; i < sorted.length - 1; i++) {
-        const current = sorted[i]!;
-        const next = sorted[i + 1]!;
-        if (current.endTime > next.startTime) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Intervalos sobrepostos no dia (${current.endTime} > ${next.startTime})`,
-            path: [dayIdx, "intervals"],
-          });
-        }
+    for (let i = 0; i < sorted.length - 1; i++) {
+      const current = sorted[i]!;
+      const next = sorted[i + 1]!;
+      if (current.endTime > next.startTime) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Intervalos sobrepostos no dia (${current.endTime} > ${next.startTime})`,
+          path: [dayIdx, "intervals"],
+        });
       }
-    });
+    }
   });
+});
 
 export type SaveAvailabilityInput = z.infer<typeof saveAvailabilitySchema>;
 export type DayAvailability = z.infer<typeof dayAvailabilitySchema>;
@@ -71,9 +67,7 @@ export type TimeInterval = z.infer<typeof intervalSchema>;
 
 export const createBlockedDateSchema = z
   .object({
-    date: z
-      .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, "Data no formato YYYY-MM-DD"),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data no formato YYYY-MM-DD"),
     startTime: timeField.optional().or(z.literal("")),
     endTime: timeField.optional().or(z.literal("")),
     reason: z.string().max(200, "Motivo muito longo").optional().or(z.literal("")),

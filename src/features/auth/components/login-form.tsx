@@ -59,18 +59,13 @@ export function LoginForm({ studioName }: LoginFormProps) {
           </div>
           <div>
             <div className="mb-1.5 flex items-baseline justify-between">
-              <label
-                htmlFor="password"
-                className="text-[13px] font-medium text-foreground"
-              >
+              <label htmlFor="password" className="text-[13px] font-medium text-foreground">
                 Senha
               </label>
               <button
                 type="button"
                 className="text-[12px] text-[var(--primary)] underline"
-                onClick={() =>
-                  setError("Recuperação de senha ainda não implementada nesta fase.")
-                }
+                onClick={() => setError("Recuperação de senha ainda não implementada nesta fase.")}
               >
                 Esqueci
               </button>
@@ -87,7 +82,7 @@ export function LoginForm({ studioName }: LoginFormProps) {
           </div>
 
           {error && (
-            <div className="rounded-[10px] border border-destructive/30 bg-destructive/5 p-3 text-[13px] text-destructive">
+            <div className="border-destructive/30 bg-destructive/5 rounded-[10px] border p-3 text-[13px] text-destructive">
               {error}
             </div>
           )}
@@ -105,8 +100,8 @@ export function LoginForm({ studioName }: LoginFormProps) {
           {!isPending && <I.ArrowRight size={18} />}
         </Button>
         <p className="mt-3 text-center text-[11.5px] leading-snug text-muted-foreground">
-          <I.Shield size={11} className="mb-0.5 mr-0.5 inline" /> Acesso protegido ·
-          login + senha + recuperação por email
+          <I.Shield size={11} className="mb-0.5 mr-0.5 inline" /> Acesso protegido · login + senha +
+          recuperação por email
         </p>
       </div>
     </form>

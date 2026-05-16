@@ -9,9 +9,7 @@ import {
   idParamSchema,
 } from "@/features/services/schemas";
 
-type ActionResult<T = undefined> =
-  | { ok: true; data?: T }
-  | { ok: false; error: string };
+type ActionResult<T = undefined> = { ok: true; data?: T } | { ok: false; error: string };
 
 // Verifica sessão em todas as actions — não confiar só no middleware.
 async function requireAuth(): Promise<{ ok: true } | { ok: false; error: string }> {
@@ -43,10 +41,7 @@ export async function createService(formData: FormData): Promise<ActionResult<{ 
   return { ok: true, data: { id: service.id } };
 }
 
-export async function updateService(
-  id: string,
-  formData: FormData,
-): Promise<ActionResult> {
+export async function updateService(id: string, formData: FormData): Promise<ActionResult> {
   const guard = await requireAuth();
   if (!guard.ok) return guard;
 

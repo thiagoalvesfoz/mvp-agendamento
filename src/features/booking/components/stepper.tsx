@@ -125,12 +125,7 @@ export function BookingStepper({ studioName, services, blockedDates }: BookingSt
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <StepperHeader
-        step={step}
-        totalSteps={TOTAL_STEPS}
-        studioName={studioName}
-        onBack={back}
-      />
+      <StepperHeader step={step} totalSteps={TOTAL_STEPS} studioName={studioName} onBack={back} />
 
       <div className="flex-1 overflow-y-auto px-5 pb-32">
         {step === 1 && (
@@ -199,7 +194,7 @@ export function BookingStepper({ studioName, services, blockedDates }: BookingSt
               Quanto mais detalhes, melhor a preparação para o seu atendimento.
             </p>
 
-            <Card className="mt-5 bg-muted/50 p-3.5">
+            <Card className="bg-muted/50 mt-5 p-3.5">
               <div className="flex items-center gap-2 text-[12px] uppercase tracking-[0.14em] text-muted-foreground">
                 <I.Calendar size={13} /> Resumo
               </div>
@@ -227,9 +222,7 @@ export function BookingStepper({ studioName, services, blockedDates }: BookingSt
                   inputMode="tel"
                   maxLength={15}
                   value={form.phone}
-                  onChange={(e) =>
-                    setForm({ ...form, phone: maskPhoneBR(e.target.value) })
-                  }
+                  onChange={(e) => setForm({ ...form, phone: maskPhoneBR(e.target.value) })}
                 />
               </div>
               <div>
@@ -266,14 +259,15 @@ export function BookingStepper({ studioName, services, blockedDates }: BookingSt
                   className="mt-0.5 size-4 rounded border-input accent-[var(--primary)]"
                 />
                 <span className="text-[12.5px] leading-snug text-muted-foreground">
-                  Li e concordo com os <span className="text-foreground underline">Termos de uso</span> e a{" "}
+                  Li e concordo com os{" "}
+                  <span className="text-foreground underline">Termos de uso</span> e a{" "}
                   <span className="text-foreground underline">Política de privacidade</span> (LGPD).
                 </span>
               </label>
             </div>
 
             {submitError && (
-              <div className="mt-4 rounded-[10px] border border-destructive/30 bg-destructive/5 p-3 text-[13px] text-destructive">
+              <div className="border-destructive/30 bg-destructive/5 mt-4 rounded-[10px] border p-3 text-[13px] text-destructive">
                 {submitError}
               </div>
             )}
@@ -295,22 +289,12 @@ export function BookingStepper({ studioName, services, blockedDates }: BookingSt
       {step < 4 && (
         <div className="fixed inset-x-0 bottom-0 mx-auto max-w-[440px] bg-gradient-to-t from-background via-background to-transparent px-5 pb-5 pt-3">
           {step === 1 && (
-            <Button
-              size="lg"
-              className="w-full"
-              disabled={!service}
-              onClick={() => setStep(2)}
-            >
+            <Button size="lg" className="w-full" disabled={!service} onClick={() => setStep(2)}>
               Continuar <I.ArrowRight size={18} />
             </Button>
           )}
           {step === 2 && (
-            <Button
-              size="lg"
-              className="w-full"
-              disabled={!startTime}
-              onClick={() => setStep(3)}
-            >
+            <Button size="lg" className="w-full" disabled={!startTime} onClick={() => setStep(3)}>
               {startTime ? `Reservar ${startTime}` : "Escolha um horário"}{" "}
               <I.ArrowRight size={18} />
             </Button>

@@ -16,8 +16,18 @@ import { weekdayName } from "@/lib/time";
 import { createBlockedDate, createRecurringBlock } from "@/features/settings/actions";
 
 const MONTHS = [
-  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
 ];
 
 interface BlockCreateSheetProps {
@@ -99,11 +109,7 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
   return (
     <>
       {/* Overlay */}
-      <div
-        className="fixed inset-0 z-40 bg-black/40"
-        onClick={handleClose}
-        aria-hidden="true"
-      />
+      <div className="fixed inset-0 z-40 bg-black/40" onClick={handleClose} aria-hidden="true" />
 
       {/* Sheet */}
       <div
@@ -112,13 +118,13 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
         aria-label="Adicionar bloqueio"
         className={cn(
           "fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-[440px]",
-          "bg-[var(--background)] rounded-t-[20px] border-t border-[var(--border)]",
-          "flex flex-col max-h-[85dvh]",
+          "rounded-t-[20px] border-t border-[var(--border)] bg-[var(--background)]",
+          "flex max-h-[85dvh] flex-col",
         )}
       >
         {/* Handle */}
-        <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full bg-[var(--border)]" />
+        <div className="flex justify-center pb-1 pt-3">
+          <div className="h-1 w-10 rounded-full bg-[var(--border)]" />
         </div>
 
         {/* Header */}
@@ -127,25 +133,25 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
           <button
             type="button"
             onClick={handleClose}
-            className="press size-8 rounded-full flex items-center justify-center text-[var(--muted-foreground)]"
+            className="press flex size-8 items-center justify-center rounded-full text-[var(--muted-foreground)]"
           >
             <I.Close size={18} />
           </button>
         </div>
 
         {/* Conteúdo scrollável */}
-        <div className="flex-1 overflow-y-auto px-5 pb-4 space-y-4">
+        <div className="flex-1 space-y-4 overflow-y-auto px-5 pb-4">
           {/* Tipo */}
           <div>
             <Label>Tipo de bloqueio</Label>
-            <div className="grid grid-cols-2 gap-2 mt-1">
+            <div className="mt-1 grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setType("single")}
                 className={cn(
                   "press h-10 rounded-lg border text-[13.5px] font-medium transition-colors",
                   type === "single"
-                    ? "border-[var(--primary)] bg-[var(--primary)]/8 text-[var(--primary)]"
+                    ? "bg-[var(--primary)]/8 border-[var(--primary)] text-[var(--primary)]"
                     : "border-[var(--border)] text-[var(--muted-foreground)]",
                 )}
               >
@@ -157,7 +163,7 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
                 className={cn(
                   "press h-10 rounded-lg border text-[13.5px] font-medium transition-colors",
                   type === "recurring"
-                    ? "border-[var(--primary)] bg-[var(--primary)]/8 text-[var(--primary)]"
+                    ? "bg-[var(--primary)]/8 border-[var(--primary)] text-[var(--primary)]"
                     : "border-[var(--border)] text-[var(--muted-foreground)]",
                 )}
               >
@@ -183,14 +189,14 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
               {/* Pattern (weekly/yearly) */}
               <div>
                 <Label>Padrão</Label>
-                <div className="grid grid-cols-2 gap-2 mt-1">
+                <div className="mt-1 grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setPattern("weekly")}
                     className={cn(
                       "press h-10 rounded-lg border text-[13.5px] font-medium transition-colors",
                       pattern === "weekly"
-                        ? "border-[var(--primary)] bg-[var(--primary)]/8 text-[var(--primary)]"
+                        ? "bg-[var(--primary)]/8 border-[var(--primary)] text-[var(--primary)]"
                         : "border-[var(--border)] text-[var(--muted-foreground)]",
                     )}
                   >
@@ -202,7 +208,7 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
                     className={cn(
                       "press h-10 rounded-lg border text-[13.5px] font-medium transition-colors",
                       pattern === "yearly"
-                        ? "border-[var(--primary)] bg-[var(--primary)]/8 text-[var(--primary)]"
+                        ? "bg-[var(--primary)]/8 border-[var(--primary)] text-[var(--primary)]"
                         : "border-[var(--border)] text-[var(--muted-foreground)]",
                     )}
                   >
@@ -295,7 +301,7 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
               />
             </div>
           </div>
-          <p className="text-[11.5px] text-[var(--muted-foreground)] -mt-2">
+          <p className="-mt-2 text-[11.5px] text-[var(--muted-foreground)]">
             Deixe em branco para bloquear o dia inteiro.
           </p>
 
@@ -313,19 +319,12 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
             />
           </div>
 
-          {error && (
-            <p className="text-[13px] text-[var(--destructive)]">{error}</p>
-          )}
+          {error && <p className="text-[13px] text-[var(--destructive)]">{error}</p>}
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3.5 border-t border-[var(--border)]">
-          <Button
-            size="lg"
-            className="w-full"
-            onClick={handleSubmit}
-            disabled={isPending}
-          >
+        <div className="border-t border-[var(--border)] px-5 py-3.5">
+          <Button size="lg" className="w-full" onClick={handleSubmit} disabled={isPending}>
             {isPending ? "Salvando..." : "Salvar bloqueio"}
           </Button>
         </div>

@@ -17,7 +17,7 @@ export function TimeGrid({
 }: TimeGridProps) {
   if (slots.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-6 text-center text-[13px] text-muted-foreground">
+      <div className="bg-muted/30 rounded-2xl border border-dashed border-border p-6 text-center text-[13px] text-muted-foreground">
         {emptyMessage}
       </div>
     );

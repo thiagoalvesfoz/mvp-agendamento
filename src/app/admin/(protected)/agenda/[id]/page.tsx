@@ -54,9 +54,7 @@ function formatPhone(phone: string): string {
   return phone;
 }
 
-export default async function AppointmentDetailPage({
-  params,
-}: AppointmentDetailPageProps) {
+export default async function AppointmentDetailPage({ params }: AppointmentDetailPageProps) {
   const { id } = await params;
   const appt = await getAppointmentById(id);
 
@@ -87,12 +85,12 @@ export default async function AppointmentDetailPage({
     appt.status === "NO_SHOW";
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 h-full">
+    <div className="flex h-full min-h-0 flex-1 flex-col">
       {/* Header */}
-      <div className="px-5 pt-3 pb-3 flex items-center justify-between">
+      <div className="flex items-center justify-between px-5 pb-3 pt-3">
         <Link
           href="/admin"
-          className="press -ml-2 size-10 rounded-full flex items-center justify-center"
+          className="press -ml-2 flex size-10 items-center justify-center rounded-full"
           aria-label="Voltar"
         >
           <I.ChevronLeft size={22} />
@@ -122,7 +120,7 @@ export default async function AppointmentDetailPage({
         {/* Serviço + quando */}
         <Card className="mt-3 p-4">
           <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-[var(--muted)] flex items-center justify-center text-[var(--muted-foreground)]">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-[var(--muted)] text-[var(--muted-foreground)]">
               <I.Camera size={18} />
             </div>
             <div className="flex-1">
@@ -131,31 +129,21 @@ export default async function AppointmentDetailPage({
               </div>
               <div className="text-[12px] text-[var(--muted-foreground)]">
                 {appt.durationMinutesSnapshot} min
-                {appt.bufferPreSnapshot > 0 &&
-                  ` · buffer pré ${appt.bufferPreSnapshot}min`}
-                {appt.bufferPosSnapshot > 0 &&
-                  ` · pós ${appt.bufferPosSnapshot}min`}
+                {appt.bufferPreSnapshot > 0 && ` · buffer pré ${appt.bufferPreSnapshot}min`}
+                {appt.bufferPosSnapshot > 0 && ` · pós ${appt.bufferPosSnapshot}min`}
               </div>
             </div>
           </div>
-          <div className="h-px bg-[var(--border)] my-3.5" />
+          <div className="my-3.5 h-px bg-[var(--border)]" />
           <div className="space-y-2.5 text-[13.5px]">
             <div className="flex items-center gap-2.5">
-              <I.Calendar
-                size={15}
-                className="text-[var(--muted-foreground)]"
-              />
-              <span className="text-[var(--muted-foreground)] w-16">Data</span>
+              <I.Calendar size={15} className="text-[var(--muted-foreground)]" />
+              <span className="w-16 text-[var(--muted-foreground)]">Data</span>
               <span className="capitalize">{dateLong}</span>
             </div>
             <div className="flex items-center gap-2.5">
-              <I.Clock
-                size={15}
-                className="text-[var(--muted-foreground)]"
-              />
-              <span className="text-[var(--muted-foreground)] w-16">
-                Horário
-              </span>
+              <I.Clock size={15} className="text-[var(--muted-foreground)]" />
+              <span className="w-16 text-[var(--muted-foreground)]">Horário</span>
               <span className="font-mono">
                 {appt.startTime} – {appt.endTime}
               </span>
@@ -172,14 +160,9 @@ export default async function AppointmentDetailPage({
           ) : (
             appt.actualDurationMinutes &&
             appt.actualDurationMinutes !== appt.durationMinutesSnapshot && (
-              <div className="mt-4 pt-3.5 border-t border-[var(--border)] flex items-center gap-2.5 text-[13.5px]">
-                <I.Edit
-                  size={15}
-                  className="text-[var(--muted-foreground)]"
-                />
-                <span className="text-[var(--muted-foreground)] w-16">
-                  Real
-                </span>
+              <div className="mt-4 flex items-center gap-2.5 border-t border-[var(--border)] pt-3.5 text-[13.5px]">
+                <I.Edit size={15} className="text-[var(--muted-foreground)]" />
+                <span className="w-16 text-[var(--muted-foreground)]">Real</span>
                 <span>{appt.actualDurationMinutes} min</span>
               </div>
             )
@@ -215,10 +198,10 @@ export default async function AppointmentDetailPage({
               />
             )}
           </div>
-          <div className="h-px bg-[var(--border)] my-3" />
+          <div className="my-3 h-px bg-[var(--border)]" />
           <Link
             href={`/admin/clientes/${appt.customerId}`}
-            className="press inline-flex items-center gap-1 text-[12px] text-[var(--primary)] font-medium"
+            className="press inline-flex items-center gap-1 text-[12px] font-medium text-[var(--primary)]"
           >
             Ver perfil do cliente <I.ArrowRight size={12} />
           </Link>
@@ -241,8 +224,7 @@ export default async function AppointmentDetailPage({
           </div>
           <div className="mt-3 space-y-2.5 text-[12.5px]">
             {appt.history.map((h) => {
-              const isCreate =
-                h.eventType === "status_change" && h.statusFrom === null;
+              const isCreate = h.eventType === "status_change" && h.statusFrom === null;
               const base = HISTORY_LABELS[h.eventType] ?? h.eventType;
               const detail = isCreate
                 ? "Pedido criado"
@@ -263,7 +245,7 @@ export default async function AppointmentDetailPage({
       </div>
 
       {/* Ações */}
-      <div className="border-t border-[var(--border)] px-5 py-3.5 bg-[var(--background)]">
+      <div className="border-t border-[var(--border)] bg-[var(--background)] px-5 py-3.5">
         {isFinal ? (
           <Link
             href="/admin"
@@ -272,10 +254,7 @@ export default async function AppointmentDetailPage({
             Voltar para a agenda
           </Link>
         ) : (
-          <AppointmentActions
-            appointmentId={appt.id}
-            status={appt.status}
-          />
+          <AppointmentActions appointmentId={appt.id} status={appt.status} />
         )}
       </div>
     </div>
@@ -298,14 +277,14 @@ function ContactRow({
   return (
     <div className="flex items-center gap-2.5 text-[13.5px]">
       <span className="text-[var(--muted-foreground)]">{icon}</span>
-      <span className="text-[var(--muted-foreground)] w-[72px]">{label}</span>
+      <span className="w-[72px] text-[var(--muted-foreground)]">{label}</span>
       <span className="flex-1 truncate">{value}</span>
       {href && (
         <a
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className="press text-[12px] text-[var(--primary)] font-medium inline-flex items-center gap-0.5"
+          className="press inline-flex items-center gap-0.5 text-[12px] font-medium text-[var(--primary)]"
         >
           {actionLabel ?? "Abrir"} <I.ArrowRight size={12} />
         </a>
@@ -314,28 +293,16 @@ function ContactRow({
   );
 }
 
-function HistoryRow({
-  when,
-  label,
-  reason,
-}: {
-  when: string;
-  label: string;
-  reason?: string;
-}) {
+function HistoryRow({ when, label, reason }: { when: string; label: string; reason?: string }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="font-mono text-[11px] text-[var(--muted-foreground)] w-[70px] shrink-0 pt-0.5">
+      <span className="w-[70px] shrink-0 pt-0.5 font-mono text-[11px] text-[var(--muted-foreground)]">
         {when}
       </span>
-      <span className="size-1.5 rounded-full bg-[var(--border)] mt-2 shrink-0" />
-      <div className="flex-1 min-w-0">
-        <span className="text-[var(--foreground)] capitalize">{label}</span>
-        {reason && (
-          <p className="text-[11.5px] text-[var(--muted-foreground)] mt-0.5">
-            {reason}
-          </p>
-        )}
+      <span className="mt-2 size-1.5 shrink-0 rounded-full bg-[var(--border)]" />
+      <div className="min-w-0 flex-1">
+        <span className="capitalize text-[var(--foreground)]">{label}</span>
+        {reason && <p className="mt-0.5 text-[11.5px] text-[var(--muted-foreground)]">{reason}</p>}
       </div>
     </div>
   );

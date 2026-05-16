@@ -13,10 +13,7 @@ import type { Availability, BlockedDate, RecurringBlock, Settings } from "@prism
 
 export type AvailabilityRow = Pick<Availability, "id" | "weekDay" | "startTime" | "endTime">;
 
-export type BlockedDateRow = Pick<
-  BlockedDate,
-  "id" | "date" | "startTime" | "endTime" | "reason"
->;
+export type BlockedDateRow = Pick<BlockedDate, "id" | "date" | "startTime" | "endTime" | "reason">;
 
 export type RecurringBlockRow = Pick<
   RecurringBlock,

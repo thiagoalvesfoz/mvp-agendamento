@@ -17,12 +17,7 @@ import { I } from "@/components/shared/icons";
 import { StatusBadge, StatusDot } from "@/components/shared/status-badge";
 import { Card } from "@/components/ui/card";
 import type { AppointmentCard } from "@/features/appointments/types";
-import {
-  formatDateBR,
-  monthShort,
-  weekdayName,
-  weekdayShort,
-} from "@/lib/time";
+import { formatDateBR, monthShort, weekdayName, weekdayShort } from "@/lib/time";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -153,15 +148,15 @@ export function AgendaScreen({
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 relative h-full">
+    <div className="relative flex h-full min-h-0 flex-1 flex-col">
       {/* ── Header com stats ── */}
-      <div className="px-5 pt-5 pb-3">
-        <div className="flex items-start justify-between mb-4">
+      <div className="px-5 pb-3 pt-5">
+        <div className="mb-4 flex items-start justify-between">
           <div>
             <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
               Agenda
             </p>
-            <h1 className="text-[22px] font-semibold tracking-tight leading-tight mt-0.5">
+            <h1 className="mt-0.5 text-[22px] font-semibold leading-tight tracking-tight">
               Atendimentos
             </h1>
           </div>
@@ -230,24 +225,17 @@ export function AgendaScreen({
           todayISO={todayISO}
           appointments={monthAppointments}
           blockedDates={monthBlockedDates}
-          onMonthChange={(y, m) =>
-            navigate({ view: "month", monthYear: y, monthMonth: m })
-          }
+          onMonthChange={(y, m) => navigate({ view: "month", monthYear: y, monthMonth: m })}
           onDayJump={(iso) => navigate({ view: "day", date: iso })}
         />
       )}
-      {view === "pending" && (
-        <PendingView
-          appointments={pendingAppointments}
-          todayISO={todayISO}
-        />
-      )}
+      {view === "pending" && <PendingView appointments={pendingAppointments} todayISO={todayISO} />}
 
       {/* ── FAB ── */}
       <Link
         href={`/admin/agenda/novo?date=${selectedDate}`}
         aria-label="Novo agendamento"
-        className="press absolute bottom-5 right-5 size-14 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] flex items-center justify-center shadow-[0_10px_24px_rgba(0,0,0,0.18)] z-10"
+        className="press absolute bottom-5 right-5 z-10 flex size-14 items-center justify-center rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] shadow-[0_10px_24px_rgba(0,0,0,0.18)]"
       >
         <I.Plus size={22} strokeWidth={2.2} />
       </Link>
@@ -273,24 +261,20 @@ function StatPill({ label, value, accent, active, onClick }: StatPillProps) {
       className={cn(
         "press rounded-2xl border px-3 py-2.5 text-left transition-colors",
         active
-          ? "bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]"
-          : "bg-[var(--card)] border-[var(--border)] text-[var(--foreground)]",
+          ? "border-[var(--primary)] bg-[var(--primary)] text-[var(--primary-foreground)]"
+          : "border-[var(--border)] bg-[var(--card)] text-[var(--foreground)]",
       )}
     >
       <div
         className={cn(
           "text-[10px] uppercase tracking-[0.12em]",
-          active
-            ? "text-[var(--primary-foreground)]/80"
-            : "text-[var(--muted-foreground)]",
+          active ? "text-[var(--primary-foreground)]/80" : "text-[var(--muted-foreground)]",
         )}
       >
         {label}
       </div>
-      <div className="flex items-baseline gap-1 mt-0.5">
-        <span className="text-[22px] font-semibold tracking-tight tabular-nums">
-          {value}
-        </span>
+      <div className="mt-0.5 flex items-baseline gap-1">
+        <span className="text-[22px] font-semibold tabular-nums tracking-tight">{value}</span>
         {accent && !active && value > 0 && (
           <span className="size-1.5 rounded-full bg-[var(--primary)]" />
         )}
@@ -305,13 +289,9 @@ interface SegmentedProps<T extends string> {
   options: { value: T; label: string }[];
 }
 
-function Segmented<T extends string>({
-  value,
-  onChange,
-  options,
-}: SegmentedProps<T>) {
+function Segmented<T extends string>({ value, onChange, options }: SegmentedProps<T>) {
   return (
-    <div className="flex w-full p-0.5 rounded-full bg-[var(--muted)] border border-[var(--border)]">
+    <div className="flex w-full rounded-full border border-[var(--border)] bg-[var(--muted)] p-0.5">
       {options.map((opt) => {
         const active = opt.value === value;
         return (
@@ -320,7 +300,7 @@ function Segmented<T extends string>({
             type="button"
             onClick={() => onChange(opt.value)}
             className={cn(
-              "press flex-1 text-[12.5px] font-medium tracking-tight rounded-full px-2 py-1.5 transition-colors",
+              "press flex-1 rounded-full px-2 py-1.5 text-[12.5px] font-medium tracking-tight transition-colors",
               active
                 ? "bg-[var(--card)] text-[var(--foreground)] shadow-sm"
                 : "text-[var(--muted-foreground)]",
@@ -419,7 +399,7 @@ function DayView({
           <button
             type="button"
             onClick={() => shiftDay(-1)}
-            className="press size-9 rounded-full bg-[var(--card)] border border-[var(--border)] flex items-center justify-center"
+            className="press flex size-9 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)]"
             aria-label="Dia anterior"
           >
             <I.ChevronLeft size={16} />
@@ -429,26 +409,26 @@ function DayView({
               className={cn(
                 "text-[15px] font-semibold tracking-tight",
                 selectedBlocked &&
-                  "line-through decoration-[1.4px] decoration-[color-mix(in_oklch,var(--destructive)_55%,transparent)] text-[color-mix(in_oklch,var(--destructive)_70%,var(--muted-foreground))]",
+                  "text-[color-mix(in_oklch,var(--destructive)_70%,var(--muted-foreground))] line-through decoration-[color-mix(in_oklch,var(--destructive)_55%,transparent)] decoration-[1.4px]",
               )}
             >
               {dayLabel}
             </div>
-            <div className="text-[11px] text-[var(--muted-foreground)] mt-0.5 uppercase tracking-[0.08em]">
+            <div className="mt-0.5 text-[11px] uppercase tracking-[0.08em] text-[var(--muted-foreground)]">
               {formatDateBR(selected)}
             </div>
           </div>
           <button
             type="button"
             onClick={() => shiftDay(1)}
-            className="press size-9 rounded-full bg-[var(--card)] border border-[var(--border)] flex items-center justify-center"
+            className="press flex size-9 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)]"
             aria-label="Próximo dia"
           >
             <I.Chevron size={16} />
           </button>
         </div>
 
-        <div className="mt-3 flex gap-1 justify-between">
+        <div className="mt-3 flex justify-between gap-1">
           {stripDays.map(({ iso, date }) => {
             const isSelected = iso === selectedDate;
             const isToday = iso === todayISO;
@@ -459,15 +439,13 @@ function DayView({
                 key={iso}
                 type="button"
                 onClick={() => onSelectDate(iso)}
-                title={isBlocked ? reason ?? "Dia bloqueado" : undefined}
+                title={isBlocked ? (reason ?? "Dia bloqueado") : undefined}
                 className={cn(
-                  "press flex-1 flex flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 transition-colors border border-transparent",
+                  "press flex flex-1 flex-col items-center gap-0.5 rounded-xl border border-transparent px-1 py-1.5 transition-colors",
                   isSelected
                     ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
                     : "hover:bg-[var(--muted)]",
-                  isToday &&
-                    !isSelected &&
-                    "text-[var(--primary)]",
+                  isToday && !isSelected && "text-[var(--primary)]",
                   isBlocked &&
                     !isSelected &&
                     "bg-[repeating-linear-gradient(135deg,transparent_0,transparent_3px,color-mix(in_oklch,var(--destructive)_22%,transparent)_3px,color-mix(in_oklch,var(--destructive)_22%,transparent)_4px)]",
@@ -479,9 +457,7 @@ function DayView({
                     isSelected
                       ? "text-[var(--primary-foreground)]/80"
                       : "text-[var(--muted-foreground)]",
-                      isToday &&
-                    !isSelected &&
-                    "text-[var(--primary)]",
+                    isToday && !isSelected && "text-[var(--primary)]",
                   )}
                 >
                   {weekdayShort(date.getDay())}
@@ -491,7 +467,7 @@ function DayView({
                     "text-[15px] font-semibold tabular-nums leading-none",
                     isBlocked &&
                       !isSelected &&
-                      "line-through decoration-[1.2px] decoration-[color-mix(in_oklch,var(--destructive)_55%,transparent)] text-[color-mix(in_oklch,var(--destructive)_70%,var(--muted-foreground))]",
+                      "text-[color-mix(in_oklch,var(--destructive)_70%,var(--muted-foreground))] line-through decoration-[color-mix(in_oklch,var(--destructive)_55%,transparent)] decoration-[1.2px]",
                   )}
                 >
                   {date.getDate()}
@@ -500,14 +476,14 @@ function DayView({
                   const dayAppts = apptsByDay.get(iso) ?? [];
                   if (dayAppts.length === 0) return null;
                   return (
-                    <div className="flex items-center gap-0.5 mt-0.5">
+                    <div className="mt-0.5 flex items-center gap-0.5">
                       {dayAppts.slice(0, 3).map((a, i) => (
                         <StatusDot key={i} status={a.status} size="sm" />
                       ))}
                       {dayAppts.length > 3 && (
                         <span
                           className={cn(
-                            "text-[8.5px] font-mono leading-none ml-0.5",
+                            "ml-0.5 font-mono text-[8.5px] leading-none",
                             isSelected
                               ? "text-[var(--primary-foreground)]/80"
                               : "text-[var(--muted-foreground)]",
@@ -526,10 +502,8 @@ function DayView({
       </div>
 
       {/* Lista */}
-      <div className="flex-1 overflow-y-auto px-5 pt-2 pb-24">
-        {selectedBlocked && (
-          <BlockedReasonCard reason={selectedReason} className="mb-3" />
-        )}
+      <div className="flex-1 overflow-y-auto px-5 pb-24 pt-2">
+        {selectedBlocked && <BlockedReasonCard reason={selectedReason} className="mb-3" />}
         {selectedDayAppointments.length === 0 ? (
           selectedBlocked ? (
             <EmptyState
@@ -546,7 +520,7 @@ function DayView({
           )
         ) : (
           <div className="relative">
-            <div className="absolute left-[42px] top-1 bottom-1 w-px bg-[var(--border)]" />
+            <div className="absolute bottom-1 left-[42px] top-1 w-px bg-[var(--border)]" />
             <div className="space-y-2">
               {selectedDayAppointments.map((a) => (
                 <DayApptRow key={a.id} appt={a} />
@@ -563,28 +537,26 @@ function DayApptRow({ appt }: { appt: AppointmentCard }) {
   return (
     <Link
       href={`/admin/agenda/${appt.id}`}
-      className="press w-full text-left flex items-stretch gap-3"
+      className="press flex w-full items-stretch gap-3 text-left"
     >
       <div className="w-[42px] shrink-0 pt-1.5">
-        <div className="font-mono text-[13px] font-medium leading-none">
-          {appt.startTime}
-        </div>
-        <div className="font-mono text-[11px] text-[var(--muted-foreground)] leading-none mt-1">
+        <div className="font-mono text-[13px] font-medium leading-none">{appt.startTime}</div>
+        <div className="mt-1 font-mono text-[11px] leading-none text-[var(--muted-foreground)]">
           {appt.endTime}
         </div>
       </div>
-      <div className="relative pt-2.5 -ml-[5px]">
-        <div className="ring-4 ring-[var(--background)] rounded-full">
+      <div className="relative -ml-[5px] pt-2.5">
+        <div className="rounded-full ring-4 ring-[var(--background)]">
           <StatusDot status={appt.status} />
         </div>
       </div>
-      <Card className="flex-1 px-3.5 py-3 rounded-2xl">
+      <Card className="flex-1 rounded-2xl px-3.5 py-3">
         <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <span className="text-[14px] font-medium tracking-tight truncate block">
+          <div className="min-w-0 flex-1">
+            <span className="block truncate text-[14px] font-medium tracking-tight">
               {appt.customerNameSnapshot}
             </span>
-            <div className="text-[12.5px] text-[var(--muted-foreground)] mt-0.5 truncate">
+            <div className="mt-0.5 truncate text-[12.5px] text-[var(--muted-foreground)]">
               {appt.serviceNameSnapshot} · {appt.durationMinutesSnapshot} min
             </div>
           </div>
@@ -656,27 +628,25 @@ function WeekView({
 
   return (
     <>
-      <div className="px-5 pb-3 flex items-center justify-between">
+      <div className="flex items-center justify-between px-5 pb-3">
         <button
           type="button"
           onClick={() => shiftWeek(-1)}
-          className="press size-9 rounded-full bg-[var(--card)] border border-[var(--border)] flex items-center justify-center"
+          className="press flex size-9 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)]"
           aria-label="Semana anterior"
         >
           <I.ChevronLeft size={16} />
         </button>
         <div className="text-center">
-          <div className="text-[15px] font-semibold tracking-tight">
-            {rangeLabel}
-          </div>
-          <div className="text-[11px] text-[var(--muted-foreground)] mt-0.5 uppercase tracking-[0.08em]">
+          <div className="text-[15px] font-semibold tracking-tight">{rangeLabel}</div>
+          <div className="mt-0.5 text-[11px] uppercase tracking-[0.08em] text-[var(--muted-foreground)]">
             Domingo a sábado
           </div>
         </div>
         <button
           type="button"
           onClick={() => shiftWeek(1)}
-          className="press size-9 rounded-full bg-[var(--card)] border border-[var(--border)] flex items-center justify-center"
+          className="press flex size-9 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)]"
           aria-label="Próxima semana"
         >
           <I.Chevron size={16} />
@@ -695,20 +665,20 @@ function WeekView({
                 <button
                   type="button"
                   onClick={() => onDayJump(iso)}
-                  title={isBlocked ? reason ?? "Dia bloqueado" : undefined}
-                  className="press w-full text-left flex items-center justify-between mb-2"
+                  title={isBlocked ? (reason ?? "Dia bloqueado") : undefined}
+                  className="press mb-2 flex w-full items-center justify-between text-left"
                 >
                   <div className="flex items-baseline gap-2">
                     <span
                       className={cn(
                         "text-[14px] font-semibold tracking-tight",
                         isBlocked &&
-                          "line-through decoration-[1.2px] decoration-[color-mix(in_oklch,var(--destructive)_55%,transparent)] text-[color-mix(in_oklch,var(--destructive)_70%,var(--muted-foreground))]",
+                          "text-[color-mix(in_oklch,var(--destructive)_70%,var(--muted-foreground))] line-through decoration-[color-mix(in_oklch,var(--destructive)_55%,transparent)] decoration-[1.2px]",
                       )}
                     >
                       {isToday ? "Hoje" : weekdayName(date.getDay())}
                     </span>
-                    <span className="text-[11px] text-[var(--muted-foreground)] uppercase tracking-[0.08em]">
+                    <span className="text-[11px] uppercase tracking-[0.08em] text-[var(--muted-foreground)]">
                       {date.getDate()} {monthShort(date.getMonth())}
                     </span>
                   </div>
@@ -731,12 +701,12 @@ function WeekView({
                 )}
                 {dayAppts.length === 0 ? (
                   isBlocked ? (
-                    <div className="rounded-xl h-9 flex items-center justify-center gap-2 text-[12px] bg-[repeating-linear-gradient(135deg,transparent_0,transparent_3px,color-mix(in_oklch,var(--destructive)_22%,transparent)_3px,color-mix(in_oklch,var(--destructive)_22%,transparent)_4px)] text-[color-mix(in_oklch,var(--destructive)_70%,var(--muted-foreground))]">
+                    <div className="flex h-9 items-center justify-center gap-2 rounded-xl bg-[repeating-linear-gradient(135deg,transparent_0,transparent_3px,color-mix(in_oklch,var(--destructive)_22%,transparent)_3px,color-mix(in_oklch,var(--destructive)_22%,transparent)_4px)] text-[12px] text-[color-mix(in_oklch,var(--destructive)_70%,var(--muted-foreground))]">
                       <I.Ban size={13} />
                       {reason ? `bloqueado · ${reason}` : "dia bloqueado"}
                     </div>
                   ) : (
-                    <div className="rounded-xl bg-[var(--muted)]/60 h-9 flex items-center justify-center text-[12px] text-[var(--muted-foreground)]">
+                    <div className="bg-[var(--muted)]/60 flex h-9 items-center justify-center rounded-xl text-[12px] text-[var(--muted-foreground)]">
                       livre o dia todo
                     </div>
                   )
@@ -748,19 +718,14 @@ function WeekView({
                         <Link
                           key={a.id}
                           href={`/admin/agenda/${a.id}`}
-                          className="press w-full text-left flex items-center gap-3 rounded-xl bg-[var(--card)] border border-[var(--border)] px-3 py-2.5"
+                          className="press flex w-full items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 py-2.5 text-left"
                         >
                           <StatusDot status={a.status} />
-                          <span className="font-mono text-[12.5px] w-[44px]">
-                            {a.startTime}
-                          </span>
-                          <span className="flex-1 text-[13.5px] truncate">
+                          <span className="w-[44px] font-mono text-[12.5px]">{a.startTime}</span>
+                          <span className="flex-1 truncate text-[13.5px]">
                             {a.customerNameSnapshot}
                           </span>
-                          <I.Chevron
-                            size={14}
-                            className="text-[var(--muted-foreground)]"
-                          />
+                          <I.Chevron size={14} className="text-[var(--muted-foreground)]" />
                         </Link>
                       ))}
                   </div>
@@ -798,11 +763,7 @@ function MonthView({
   const today = parseISO(todayISO);
   // todayKey usa o tuple ano-mês-dia parseado de todayISO (não os getters do Date local)
   // para combinar com as chaves das células abaixo
-  const [todayY, todayM, todayD] = todayISO.split("-").map(Number) as [
-    number,
-    number,
-    number,
-  ];
+  const [todayY, todayM, todayD] = todayISO.split("-").map(Number) as [number, number, number];
   const todayKey = `${todayY}-${todayM - 1}-${todayD}`;
 
   // Agrupa por dia — chave via UTC (appt.date é @db.Date = 00:00 UTC)
@@ -865,27 +826,27 @@ function MonthView({
 
   return (
     <div className="flex-1 overflow-y-auto px-5 pb-24">
-      <div className="flex items-center justify-between mb-3">
+      <div className="mb-3 flex items-center justify-between">
         <button
           type="button"
           onClick={() => shiftMonth(-1)}
-          className="press size-9 rounded-full bg-[var(--card)] border border-[var(--border)] flex items-center justify-center"
+          className="press flex size-9 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)]"
           aria-label="Mês anterior"
         >
           <I.ChevronLeft size={16} />
         </button>
         <div className="text-center">
-          <div className="text-[15px] font-semibold tracking-tight capitalize">
+          <div className="text-[15px] font-semibold capitalize tracking-tight">
             {MESES_LONG[month]}
           </div>
-          <div className="font-mono text-[10.5px] tracking-[0.18em] text-[var(--muted-foreground)] uppercase mt-0.5">
+          <div className="mt-0.5 font-mono text-[10.5px] uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
             {year}
           </div>
         </div>
         <button
           type="button"
           onClick={() => shiftMonth(1)}
-          className="press size-9 rounded-full bg-[var(--card)] border border-[var(--border)] flex items-center justify-center"
+          className="press flex size-9 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)]"
           aria-label="Próximo mês"
         >
           <I.Chevron size={16} />
@@ -893,23 +854,19 @@ function MonthView({
       </div>
 
       {/* Totais */}
-      <div className="flex items-center justify-between text-[12px] mb-2 px-0.5">
+      <div className="mb-2 flex items-center justify-between px-0.5 text-[12px]">
         <span className="text-[var(--muted-foreground)]">
-          <span className="font-mono font-medium text-[var(--foreground)]">
-            {totals.total}
-          </span>{" "}
+          <span className="font-mono font-medium text-[var(--foreground)]">{totals.total}</span>{" "}
           agendamentos
           {totals.pending > 0 && (
-            <span className="text-[var(--primary)] ml-1.5">
+            <span className="ml-1.5 text-[var(--primary)]">
               · {totals.pending} pendente{totals.pending > 1 ? "s" : ""}
             </span>
           )}
         </span>
         <button
           type="button"
-          onClick={() =>
-            onMonthChange(today.getFullYear(), today.getMonth())
-          }
+          onClick={() => onMonthChange(today.getFullYear(), today.getMonth())}
           className="press text-[12px] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
         >
           hoje
@@ -917,11 +874,11 @@ function MonthView({
       </div>
 
       <Card className="overflow-hidden p-0">
-        <div className="grid grid-cols-7 border-b border-[var(--border)] bg-[var(--muted)]/40">
+        <div className="bg-[var(--muted)]/40 grid grid-cols-7 border-b border-[var(--border)]">
           {DIAS_INITIAL.map((d, i) => (
             <div
               key={i}
-              className="text-center text-[10px] uppercase tracking-[0.14em] text-[var(--muted-foreground)] py-1.5"
+              className="py-1.5 text-center text-[10px] uppercase tracking-[0.14em] text-[var(--muted-foreground)]"
             >
               {d}
             </div>
@@ -929,18 +886,9 @@ function MonthView({
         </div>
         <div className="divide-y divide-[var(--border)]">
           {cells.map((row, ri) => (
-            <div
-              key={ri}
-              className="grid grid-cols-7 divide-x divide-[var(--border)]"
-            >
+            <div key={ri} className="grid grid-cols-7 divide-x divide-[var(--border)]">
               {row.map((d, ci) => {
-                if (!d)
-                  return (
-                    <div
-                      key={ci}
-                      className="h-[58px] bg-[var(--muted)]/20"
-                    />
-                  );
+                if (!d) return <div key={ci} className="bg-[var(--muted)]/20 h-[58px]" />;
                 // Chave derivada do (year, month, day) — bate com dbDateKey (UTC)
                 const dayNum = d.getDate();
                 const key = `${year}-${month}-${dayNum}`;
@@ -949,17 +897,15 @@ function MonthView({
                 const isPast = d < today && !isToday;
                 const isBlocked = blockedByKey.has(key);
                 const blockedReason = blockedByKey.get(key) ?? undefined;
-                const hasPending = dayAppts.some(
-                  (a) => a.status === "PENDING",
-                );
+                const hasPending = dayAppts.some((a) => a.status === "PENDING");
                 return (
                   <button
                     key={ci}
                     type="button"
                     onClick={() => onDayJump(isoFromDate(d))}
-                    title={isBlocked ? blockedReason ?? "Dia bloqueado" : undefined}
+                    title={isBlocked ? (blockedReason ?? "Dia bloqueado") : undefined}
                     className={cn(
-                      "press relative h-[58px] flex flex-col items-start px-1.5 py-1.5 transition-colors text-left",
+                      "press relative flex h-[58px] flex-col items-start px-1.5 py-1.5 text-left transition-colors",
                       "hover:bg-[var(--muted)]",
                       isPast && "opacity-60",
                       isBlocked &&
@@ -970,26 +916,23 @@ function MonthView({
                       className={cn(
                         "text-[12px] tabular-nums leading-none",
                         isToday
-                          ? "inline-flex items-center justify-center size-5 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] font-semibold -ml-0.5"
+                          ? "-ml-0.5 inline-flex size-5 items-center justify-center rounded-full bg-[var(--primary)] font-semibold text-[var(--primary-foreground)]"
                           : "font-medium",
-                        !isToday &&
-                          hasPending &&
-                          !isBlocked &&
-                          "text-[var(--primary)]",
+                        !isToday && hasPending && !isBlocked && "text-[var(--primary)]",
                         isBlocked &&
                           !isToday &&
-                          "line-through decoration-[1.2px] decoration-[color-mix(in_oklch,var(--destructive)_55%,transparent)] text-[color-mix(in_oklch,var(--destructive)_70%,var(--muted-foreground))]",
+                          "text-[color-mix(in_oklch,var(--destructive)_70%,var(--muted-foreground))] line-through decoration-[color-mix(in_oklch,var(--destructive)_55%,transparent)] decoration-[1.2px]",
                       )}
                     >
                       {d.getDate()}
                     </span>
                     {dayAppts.length > 0 && (
-                      <div className="absolute left-1.5 right-1.5 bottom-1.5 flex items-end gap-0.5 flex-wrap">
+                      <div className="absolute bottom-1.5 left-1.5 right-1.5 flex flex-wrap items-end gap-0.5">
                         {dayAppts.slice(0, 4).map((a, i) => (
                           <StatusDot key={i} status={a.status} />
                         ))}
                         {dayAppts.length > 4 && (
-                          <span className="text-[9px] font-mono text-[var(--muted-foreground)] ml-0.5 leading-none">
+                          <span className="ml-0.5 font-mono text-[9px] leading-none text-[var(--muted-foreground)]">
                             +{dayAppts.length - 4}
                           </span>
                         )}
@@ -1004,7 +947,7 @@ function MonthView({
       </Card>
 
       {/* Legenda */}
-      <div className="mt-3 flex items-center gap-3 text-[10.5px] text-[var(--muted-foreground)] px-1 flex-wrap">
+      <div className="mt-3 flex flex-wrap items-center gap-3 px-1 text-[10.5px] text-[var(--muted-foreground)]">
         <span className="inline-flex items-center gap-1.5">
           <StatusDot status="PENDING" />
           pendente
@@ -1084,7 +1027,7 @@ function PendingView({ appointments, todayISO }: PendingViewProps) {
 
   return (
     <div className="flex-1 overflow-y-auto px-5 pb-24">
-      <p className="text-[12.5px] text-[var(--muted-foreground)] mb-3">
+      <p className="mb-3 text-[12.5px] text-[var(--muted-foreground)]">
         <span className="font-mono font-medium text-[var(--foreground)]">
           {appointments.length}
         </span>{" "}
@@ -1094,10 +1037,10 @@ function PendingView({ appointments, todayISO }: PendingViewProps) {
       <div className="space-y-5">
         {sections.map((s) => (
           <div key={s.key}>
-            <div className="flex items-baseline justify-between mb-2">
+            <div className="mb-2 flex items-baseline justify-between">
               <h3
                 className={cn(
-                  "text-[12px] uppercase tracking-[0.14em] font-medium",
+                  "text-[12px] font-medium uppercase tracking-[0.14em]",
                   s.tone === "danger"
                     ? "text-[var(--destructive)]"
                     : "text-[var(--muted-foreground)]",
@@ -1121,13 +1064,7 @@ function PendingView({ appointments, todayISO }: PendingViewProps) {
   );
 }
 
-function PendingCard({
-  appt,
-  todayISO,
-}: {
-  appt: AppointmentCard;
-  todayISO: string;
-}) {
+function PendingCard({ appt, todayISO }: { appt: AppointmentCard; todayISO: string }) {
   const date = new Date(appt.date);
   const today = parseISO(todayISO);
   // appt.date é @db.Date → leia via UTC getters para preservar o dia exato.
@@ -1153,27 +1090,22 @@ function PendingCard({
             : formatDateBR(displayDate);
 
   return (
-    <Link
-      href={`/admin/agenda/${appt.id}`}
-      className="press block"
-    >
+    <Link href={`/admin/agenda/${appt.id}`} className="press block">
       <Card className="px-3.5 py-3">
         <div className="flex items-start justify-between gap-2">
-          <span className="text-[14px] font-medium tracking-tight truncate flex-1 min-w-0">
+          <span className="min-w-0 flex-1 truncate text-[14px] font-medium tracking-tight">
             {appt.customerNameSnapshot}
           </span>
           <StatusBadge status={appt.status} />
         </div>
-        <div className="mt-1 flex items-center gap-2 text-[12.5px] text-[var(--muted-foreground)] flex-wrap">
-          <span className="text-[var(--foreground)] font-medium">
-            {dateLabel}
-          </span>
+        <div className="mt-1 flex flex-wrap items-center gap-2 text-[12.5px] text-[var(--muted-foreground)]">
+          <span className="font-medium text-[var(--foreground)]">{dateLabel}</span>
           <span>·</span>
           <span className="font-mono">{appt.startTime}</span>
           <span>·</span>
           <span className="truncate">{appt.serviceNameSnapshot}</span>
         </div>
-        <div className="mt-1 font-mono text-[10.5px] text-[var(--muted-foreground)]/70">
+        <div className="text-[var(--muted-foreground)]/70 mt-1 font-mono text-[10.5px]">
           {appt.protocol}
         </div>
       </Card>
@@ -1183,32 +1115,24 @@ function PendingCard({
 
 // ─── Blocked reason card ────────────────────────────────────────────────────
 
-function BlockedReasonCard({
-  reason,
-  className,
-}: {
-  reason?: string;
-  className?: string;
-}) {
+function BlockedReasonCard({ reason, className }: { reason?: string; className?: string }) {
   return (
     <div
       className={cn(
-        "rounded-2xl px-3.5 py-3 flex items-start gap-3 border bg-[repeating-linear-gradient(135deg,transparent_0,transparent_3px,color-mix(in_oklch,var(--destructive)_18%,transparent)_3px,color-mix(in_oklch,var(--destructive)_18%,transparent)_4px)]",
+        "flex items-start gap-3 rounded-2xl border bg-[repeating-linear-gradient(135deg,transparent_0,transparent_3px,color-mix(in_oklch,var(--destructive)_18%,transparent)_3px,color-mix(in_oklch,var(--destructive)_18%,transparent)_4px)] px-3.5 py-3",
         "border-[color-mix(in_oklch,var(--destructive)_25%,transparent)]",
         className,
       )}
     >
-      <div className="size-8 shrink-0 rounded-xl bg-[color-mix(in_oklch,var(--destructive)_15%,var(--background))] flex items-center justify-center text-[color-mix(in_oklch,var(--destructive)_80%,var(--muted-foreground))]">
+      <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[color-mix(in_oklch,var(--destructive)_15%,var(--background))] text-[color-mix(in_oklch,var(--destructive)_80%,var(--muted-foreground))]">
         <I.Ban size={16} />
       </div>
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="text-[13px] font-semibold tracking-tight text-[color-mix(in_oklch,var(--destructive)_75%,var(--foreground))]">
           Dia bloqueado
         </div>
-        <div className="text-[12.5px] mt-0.5 text-[color-mix(in_oklch,var(--destructive)_55%,var(--muted-foreground))] leading-snug">
-          {reason
-            ? `Motivo: ${reason}`
-            : "Sem motivo informado."}
+        <div className="mt-0.5 text-[12.5px] leading-snug text-[color-mix(in_oklch,var(--destructive)_55%,var(--muted-foreground))]">
+          {reason ? `Motivo: ${reason}` : "Sem motivo informado."}
         </div>
       </div>
     </div>
@@ -1217,22 +1141,14 @@ function BlockedReasonCard({
 
 // ─── Empty state ────────────────────────────────────────────────────────────
 
-function EmptyState({
-  icon,
-  title,
-  desc,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-}) {
+function EmptyState({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
-    <div className="flex flex-col items-center justify-center py-14 text-center gap-3">
-      <div className="size-14 rounded-2xl bg-[var(--muted)] flex items-center justify-center text-[var(--muted-foreground)]">
+    <div className="flex flex-col items-center justify-center gap-3 py-14 text-center">
+      <div className="flex size-14 items-center justify-center rounded-2xl bg-[var(--muted)] text-[var(--muted-foreground)]">
         {icon}
       </div>
       <p className="text-[15px] font-medium tracking-tight">{title}</p>
-      <p className="text-[13px] text-[var(--muted-foreground)] max-w-[260px] leading-snug">
+      <p className="max-w-[260px] text-[13px] leading-snug text-[var(--muted-foreground)]">
         {desc}
       </p>
     </div>

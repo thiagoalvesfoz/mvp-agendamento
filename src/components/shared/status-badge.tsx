@@ -10,7 +10,10 @@ import type { AppointmentStatus } from "@prisma/client";
 
 const STATUS_MAP: Record<
   AppointmentStatus,
-  { label: string; variant: "pending" | "confirmed" | "completed" | "cancelled" | "noshow" | "expired" }
+  {
+    label: string;
+    variant: "pending" | "confirmed" | "completed" | "cancelled" | "noshow" | "expired";
+  }
 > = {
   PENDING: { label: "Pendente", variant: "pending" },
   CONFIRMED: { label: "Confirmado", variant: "confirmed" },
@@ -44,7 +47,6 @@ interface StatusDotProps extends StatusBadgeProps {
 }
 
 export function StatusDot({ status, size }: StatusDotProps) {
-
   const sizeClass = size === "sm" ? "size-1.5" : "size-2";
 
   return (

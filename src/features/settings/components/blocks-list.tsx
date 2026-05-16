@@ -15,7 +15,12 @@ import type { BlockedDateRow, RecurringBlockRow } from "@/features/settings/quer
 
 // ── Helpers de label ──────────────────────────────────────────────────────────
 
-function formatBlockedDateLabel(date: Date): { month: string; day: number; weekday: string; full: string } {
+function formatBlockedDateLabel(date: Date): {
+  month: string;
+  day: number;
+  weekday: string;
+  full: string;
+} {
   const d = new Date(date);
   // date chega como Date às 00:00 UTC; parseamos via UTC para não deslocar um dia
   const utc = new Date(d.getTime() + d.getTimezoneOffset() * 60_000);
@@ -36,8 +41,18 @@ function recurringLabel(block: RecurringBlockRow): { title: string; subtitle: st
   }
   if (block.pattern === "yearly" && block.month != null && block.dayOfMonth != null) {
     const MONTHS = [
-      "janeiro", "fevereiro", "março", "abril", "maio", "junho",
-      "julho", "agosto", "setembro", "outubro", "novembro", "dezembro",
+      "janeiro",
+      "fevereiro",
+      "março",
+      "abril",
+      "maio",
+      "junho",
+      "julho",
+      "agosto",
+      "setembro",
+      "outubro",
+      "novembro",
+      "dezembro",
     ];
     const monthName = MONTHS[block.month - 1] ?? String(block.month);
     return {
@@ -50,13 +65,7 @@ function recurringLabel(block: RecurringBlockRow): { title: string; subtitle: st
 
 // ── Sub-componentes ───────────────────────────────────────────────────────────
 
-function RemoveButton({
-  onRemove,
-  label,
-}: {
-  onRemove: () => void;
-  label: string;
-}) {
+function RemoveButton({ onRemove, label }: { onRemove: () => void; label: string }) {
   const [isPending, startTransition] = useTransition();
 
   return (
@@ -66,12 +75,12 @@ function RemoveButton({
       disabled={isPending}
       onClick={() => startTransition(onRemove)}
       className={cn(
-        "press size-8 rounded-lg flex items-center justify-center",
-        "text-[var(--muted-foreground)] disabled:opacity-40 disabled:pointer-events-none",
+        "press flex size-8 items-center justify-center rounded-lg",
+        "text-[var(--muted-foreground)] disabled:pointer-events-none disabled:opacity-40",
       )}
     >
       {isPending ? (
-        <span className="size-3.5 rounded-full border-2 border-current border-t-transparent animate-spin" />
+        <span className="size-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
       ) : (
         <I.Trash size={14} />
       )}
@@ -105,15 +114,15 @@ export function BlocksList({ blockedDates, recurringBlocks }: BlocksListProps) {
   };
 
   return (
-    <div className="px-5 pb-6 space-y-6">
+    <div className="space-y-6 px-5 pb-6">
       {/* ── Datas pontuais ── */}
       <div>
-        <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted-foreground)] mb-2">
+        <div className="mb-2 text-[11px] uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
           Próximas datas bloqueadas
         </div>
 
         {localDates.length === 0 ? (
-          <p className="text-[13px] text-[var(--muted-foreground)] text-center py-8">
+          <p className="py-8 text-center text-[13px] text-[var(--muted-foreground)]">
             Nenhuma data bloqueada.
           </p>
         ) : (
@@ -123,18 +132,18 @@ export function BlocksList({ blockedDates, recurringBlocks }: BlocksListProps) {
               return (
                 <div
                   key={b.id}
-                  className="flex items-center gap-3 rounded-xl bg-[var(--card)] border border-[var(--border)] px-3 py-2.5"
+                  className="flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 py-2.5"
                 >
                   {/* Mini calendário */}
-                  <div className="size-10 rounded-lg bg-[var(--muted)] flex flex-col items-center justify-center shrink-0">
-                    <span className="text-[8px] uppercase tracking-wide text-[var(--muted-foreground)] leading-none">
+                  <div className="flex size-10 shrink-0 flex-col items-center justify-center rounded-lg bg-[var(--muted)]">
+                    <span className="text-[8px] uppercase leading-none tracking-wide text-[var(--muted-foreground)]">
                       {month}
                     </span>
-                    <span className="text-[14px] font-semibold leading-none mt-0.5">{day}</span>
+                    <span className="mt-0.5 text-[14px] font-semibold leading-none">{day}</span>
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[13.5px] font-medium tracking-tight truncate">
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[13.5px] font-medium tracking-tight">
                       {b.reason ?? "Bloqueio"}
                     </div>
                     <div className="text-[11.5px] text-[var(--muted-foreground)]">
@@ -156,12 +165,12 @@ export function BlocksList({ blockedDates, recurringBlocks }: BlocksListProps) {
 
       {/* ── Bloqueios recorrentes ── */}
       <div>
-        <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted-foreground)] mb-2">
+        <div className="mb-2 text-[11px] uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
           Bloqueios recorrentes
         </div>
 
         {localRecurring.length === 0 ? (
-          <p className="text-[13px] text-[var(--muted-foreground)] text-center py-8">
+          <p className="py-8 text-center text-[13px] text-[var(--muted-foreground)]">
             Nenhum bloqueio recorrente.
           </p>
         ) : (
@@ -171,13 +180,13 @@ export function BlocksList({ blockedDates, recurringBlocks }: BlocksListProps) {
               return (
                 <div
                   key={r.id}
-                  className="flex items-center gap-3 rounded-xl bg-[var(--card)] border border-[var(--border)] px-3 py-3"
+                  className="flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 py-3"
                 >
-                  <div className="size-9 rounded-lg bg-[var(--primary)]/10 text-[var(--primary)] flex items-center justify-center shrink-0">
+                  <div className="bg-[var(--primary)]/10 flex size-9 shrink-0 items-center justify-center rounded-lg text-[var(--primary)]">
                     <I.Repeat size={16} />
                   </div>
 
-                  <div className="flex-1 min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="text-[13.5px] font-medium tracking-tight">{title}</div>
                     <div className="text-[11.5px] text-[var(--muted-foreground)]">{subtitle}</div>
                   </div>

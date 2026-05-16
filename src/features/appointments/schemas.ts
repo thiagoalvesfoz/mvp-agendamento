@@ -16,38 +16,21 @@ const phoneRegex = /^[\d\s()+\-.]{8,20}$/;
  */
 export const adminCreateAppointmentSchema = z.object({
   serviceId: z.string().uuid("Selecione um serviço válido"),
-  customerId: z
-    .string()
-    .uuid("Cliente inválido")
-    .optional()
-    .or(z.literal("")),
+  customerId: z.string().uuid("Cliente inválido").optional().or(z.literal("")),
   /** Se o cliente ainda não existe, o admin pode preencher os dados. */
   customerName: z.string().min(1, "Informe o nome do cliente").max(120),
-  customerPhone: z
-    .string()
-    .regex(phoneRegex, "Telefone inválido (ex: (45) 99999-9999)"),
-  customerEmail: z
-    .string()
-    .email("Email inválido")
-    .max(200)
-    .optional()
-    .or(z.literal("")),
+  customerPhone: z.string().regex(phoneRegex, "Telefone inválido (ex: (45) 99999-9999)"),
+  customerEmail: z.string().email("Email inválido").max(200).optional().or(z.literal("")),
   /** Perfil social (ex: @instagram) — opcional. */
   customerInstagram: z.string().max(120).optional().or(z.literal("")),
-  date: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida (YYYY-MM-DD)"),
-  startTime: z
-    .string()
-    .regex(/^\d{2}:\d{2}$/, "Horário inválido (HH:mm)"),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida (YYYY-MM-DD)"),
+  startTime: z.string().regex(/^\d{2}:\d{2}$/, "Horário inválido (HH:mm)"),
   briefing: z.string().max(2000).optional().or(z.literal("")),
   /** Status inicial — admin pode criar como confirmado ou pendente. */
   status: z.enum(["CONFIRMED", "PENDING"]).optional(),
 });
 
-export type AdminCreateAppointmentInput = z.infer<
-  typeof adminCreateAppointmentSchema
->;
+export type AdminCreateAppointmentInput = z.infer<typeof adminCreateAppointmentSchema>;
 
 // ─── Mudança de status ────────────────────────────────────────────────────────
 
@@ -72,16 +55,10 @@ export type UpdateStatusInput = z.infer<typeof updateStatusSchema>;
 
 export const updateActualDurationSchema = z.object({
   appointmentId: z.string().uuid("ID inválido"),
-  actualDurationMinutes: z
-    .number()
-    .int()
-    .min(1, "Mínimo 1 minuto")
-    .max(600, "Máximo 10 horas"),
+  actualDurationMinutes: z.number().int().min(1, "Mínimo 1 minuto").max(600, "Máximo 10 horas"),
 });
 
-export type UpdateActualDurationInput = z.infer<
-  typeof updateActualDurationSchema
->;
+export type UpdateActualDurationInput = z.infer<typeof updateActualDurationSchema>;
 
 // ─── Reajuste ativo de duração ───────────────────────────────────────────────
 
@@ -92,13 +69,7 @@ export type UpdateActualDurationInput = z.infer<
  */
 export const updateAppointmentDurationSchema = z.object({
   appointmentId: z.string().uuid("ID inválido"),
-  durationMinutes: z
-    .number()
-    .int()
-    .min(15, "Mínimo 15 minutos")
-    .max(600, "Máximo 10 horas"),
+  durationMinutes: z.number().int().min(15, "Mínimo 15 minutos").max(600, "Máximo 10 horas"),
 });
 
-export type UpdateAppointmentDurationInput = z.infer<
-  typeof updateAppointmentDurationSchema
->;
+export type UpdateAppointmentDurationInput = z.infer<typeof updateAppointmentDurationSchema>;

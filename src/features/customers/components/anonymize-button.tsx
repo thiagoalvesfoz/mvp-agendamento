@@ -44,7 +44,7 @@ export function AnonymizeButton({ customerId, customerName }: AnonymizeButtonPro
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="press mt-3 w-full text-[13px] text-[var(--destructive)] py-2.5 inline-flex items-center justify-center gap-2 border border-[var(--destructive)]/30 rounded-xl bg-[var(--background)]"
+        className="press border-[var(--destructive)]/30 mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border bg-[var(--background)] py-2.5 text-[13px] text-[var(--destructive)]"
       >
         <I.Trash size={14} />
         Excluir dados deste cliente
@@ -52,31 +52,26 @@ export function AnonymizeButton({ customerId, customerName }: AnonymizeButtonPro
 
       {/* ── Confirm Sheet ── */}
       {open && (
-        <div
-          className="fixed inset-0 z-30"
-          onClick={() => !isPending && setOpen(false)}
-        >
+        <div className="fixed inset-0 z-30" onClick={() => !isPending && setOpen(false)}>
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/40" />
 
           {/* Bottom sheet */}
           <div
-            className="absolute left-0 right-0 bottom-0 mx-auto max-w-[440px] rounded-t-[28px] bg-[var(--background)] p-5 animate-in slide-in-from-bottom duration-300"
+            className="absolute bottom-0 left-0 right-0 mx-auto max-w-[440px] rounded-t-[28px] bg-[var(--background)] p-5 duration-300 animate-in slide-in-from-bottom"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Handle */}
-            <div className="pt-1 pb-3 flex justify-center">
-              <div className="w-9 h-1 rounded-full bg-[var(--border)]" />
+            <div className="flex justify-center pb-3 pt-1">
+              <div className="h-1 w-9 rounded-full bg-[var(--border)]" />
             </div>
 
-            <h3 className="text-[17px] font-semibold tracking-tight">
-              Excluir dados de cliente?
-            </h3>
-            <p className="text-[13px] text-[var(--muted-foreground)] mt-2 leading-snug">
+            <h3 className="text-[17px] font-semibold tracking-tight">Excluir dados de cliente?</h3>
+            <p className="mt-2 text-[13px] leading-snug text-[var(--muted-foreground)]">
               Anonimizaremos o nome, telefone, email e redes sociais de{" "}
               <strong className="text-[var(--foreground)]">{customerName}</strong> nos agendamentos
-              existentes. O histórico de datas e serviços permanece para fins fiscais. Esta ação
-              não pode ser desfeita.
+              existentes. O histórico de datas e serviços permanece para fins fiscais. Esta ação não
+              pode ser desfeita.
             </p>
 
             <div className="mt-5 flex gap-2">

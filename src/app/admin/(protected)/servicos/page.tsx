@@ -18,18 +18,18 @@ export default async function AdminServicosPage() {
   const inactive = allServices.filter((s) => !s.active);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       {/* ── Header ── */}
-      <div className="flex items-start justify-between px-5 pt-6 pb-2">
+      <div className="flex items-start justify-between px-5 pb-2 pt-6">
         <div>
           <p className="text-[12px] font-medium uppercase tracking-widest text-[var(--muted-foreground)]">
             Serviços
           </p>
-          <h1 className="text-[22px] font-semibold tracking-tight leading-tight">Catálogo</h1>
+          <h1 className="text-[22px] font-semibold leading-tight tracking-tight">Catálogo</h1>
         </div>
         <Link
           href="/admin/servicos/novo"
-          className="press size-10 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] flex items-center justify-center"
+          className="press flex size-10 items-center justify-center rounded-full bg-[var(--primary)] text-[var(--primary-foreground)]"
           aria-label="Novo serviço"
         >
           <I.Plus size={18} strokeWidth={2.2} />
@@ -45,7 +45,7 @@ export default async function AdminServicosPage() {
       </div>
 
       {/* ── Lista (Client Component, gerencia toggle) ── */}
-      <div className="flex-1 overflow-y-auto px-5 pb-4 mt-3">
+      <div className="mt-3 flex-1 overflow-y-auto px-5 pb-4">
         <ServiceList active={active} inactive={inactive} />
       </div>
     </div>

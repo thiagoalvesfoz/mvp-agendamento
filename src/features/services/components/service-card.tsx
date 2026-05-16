@@ -26,33 +26,33 @@ export function ServiceCard({ service }: ServiceCardProps) {
     <Link
       href={`/admin/servicos/${service.id}`}
       className={cn(
-        "press block w-full text-left rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4",
+        "press block w-full rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 text-left",
         !service.active && "opacity-60",
       )}
     >
       <div className="flex items-start gap-3">
         {/* Ícone genérico — campo icon não existe no schema (fora do MVP) */}
-        <div className="size-10 shrink-0 rounded-xl bg-[var(--muted)] flex items-center justify-center">
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[var(--muted)]">
           <I.Camera size={18} className="text-[var(--muted-foreground)]" />
         </div>
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-[15px] font-medium tracking-tight">{service.name}</span>
             {!service.active && (
-              <span className="text-[11px] text-[var(--muted-foreground)] border border-[var(--border)] rounded-full px-2 py-0.5">
+              <span className="rounded-full border border-[var(--border)] px-2 py-0.5 text-[11px] text-[var(--muted-foreground)]">
                 Desativado
               </span>
             )}
           </div>
 
           {service.description && (
-            <p className="mt-1 text-[12.5px] text-[var(--muted-foreground)] line-clamp-2 leading-snug">
+            <p className="mt-1 line-clamp-2 text-[12.5px] leading-snug text-[var(--muted-foreground)]">
               {service.description}
             </p>
           )}
 
-          <div className="mt-2 flex items-center gap-2 flex-wrap text-[12px] text-[var(--muted-foreground)]">
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] text-[var(--muted-foreground)]">
             <span className="inline-flex items-center gap-1">
               <I.Clock size={13} />
               {service.durationMinutes} min
@@ -74,7 +74,7 @@ export function ServiceCard({ service }: ServiceCardProps) {
           </div>
         </div>
 
-        <I.Edit size={15} className="text-[var(--muted-foreground)] shrink-0 mt-1" />
+        <I.Edit size={15} className="mt-1 shrink-0 text-[var(--muted-foreground)]" />
       </div>
     </Link>
   );

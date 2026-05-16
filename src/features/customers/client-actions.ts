@@ -14,9 +14,7 @@ import { searchCustomersByName, type CustomerSuggestion } from "./queries";
  * Restrita a admin autenticado — não expõe lista de clientes publicamente.
  * Retorna lista vazia em caso de não-autenticado para não vazar o motivo.
  */
-export async function searchCustomersAction(
-  query: string,
-): Promise<CustomerSuggestion[]> {
+export async function searchCustomersAction(query: string): Promise<CustomerSuggestion[]> {
   const session = await auth();
   if (!session?.user?.email) return [];
   return searchCustomersByName(query);

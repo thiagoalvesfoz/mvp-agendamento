@@ -24,7 +24,7 @@ export function DateStrip({ days, value, onChange }: DateStripProps) {
               className={cn(
                 "press flex h-16 w-14 shrink-0 flex-col items-center justify-center rounded-2xl border text-center transition-colors",
                 isSelected
-                  ? "border-[var(--primary)] bg-[var(--primary)]/5"
+                  ? "bg-[var(--primary)]/5 border-[var(--primary)]"
                   : "border-border bg-white",
               )}
             >

@@ -60,9 +60,7 @@ export function ServiceForm({ service }: ServiceFormProps) {
 
     startTransition(async () => {
       const fd = buildFormData();
-      const result = isNew
-        ? await createService(fd)
-        : await updateService(service!.id, fd);
+      const result = isNew ? await createService(fd) : await updateService(service!.id, fd);
 
       if (!result.ok) {
         setError(result.error);
@@ -141,13 +139,13 @@ export function ServiceForm({ service }: ServiceFormProps) {
         </div>
 
         {/* Card informativo de reserva total */}
-        <Card className="p-3.5 bg-[var(--muted)]/40 border-[var(--border)]">
+        <Card className="bg-[var(--muted)]/40 border-[var(--border)] p-3.5">
           <div className="flex gap-2.5">
-            <I.Info size={15} className="text-[var(--muted-foreground)] shrink-0 mt-0.5" />
-            <p className="text-[12px] text-[var(--muted-foreground)] leading-snug">
+            <I.Info size={15} className="mt-0.5 shrink-0 text-[var(--muted-foreground)]" />
+            <p className="text-[12px] leading-snug text-[var(--muted-foreground)]">
               O sistema reserva{" "}
-              <span className="font-medium text-[var(--foreground)]">{totalMinutes} min</span>{" "}
-              ao todo no calendário (atendimento + buffers), evitando agendamentos colados.
+              <span className="font-medium text-[var(--foreground)]">{totalMinutes} min</span> ao
+              todo no calendário (atendimento + buffers), evitando agendamentos colados.
             </p>
           </div>
         </Card>
@@ -183,11 +181,11 @@ export function ServiceForm({ service }: ServiceFormProps) {
               type="button"
               onClick={handleDeactivate}
               disabled={isPending}
-              className="press w-full text-[13px] text-[var(--destructive)] py-3 flex items-center justify-center gap-2 disabled:opacity-50"
+              className="press flex w-full items-center justify-center gap-2 py-3 text-[13px] text-[var(--destructive)] disabled:opacity-50"
             >
               <I.Ban size={15} /> Desativar serviço
             </button>
-            <p className="text-[11.5px] text-center text-[var(--muted-foreground)] mt-1">
+            <p className="mt-1 text-center text-[11.5px] text-[var(--muted-foreground)]">
               agendamentos existentes não são afetados
             </p>
           </div>
@@ -195,7 +193,7 @@ export function ServiceForm({ service }: ServiceFormProps) {
       </div>
 
       {/* ── Footer fixo com ações ── */}
-      <div className="sticky bottom-0 px-5 py-3.5 border-t border-[var(--border)] bg-[var(--background)] flex gap-2">
+      <div className="sticky bottom-0 flex gap-2 border-t border-[var(--border)] bg-[var(--background)] px-5 py-3.5">
         {isNew && (
           <Button
             variant="outline"
@@ -207,12 +205,7 @@ export function ServiceForm({ service }: ServiceFormProps) {
             Cancelar
           </Button>
         )}
-        <Button
-          size="lg"
-          className="flex-1"
-          disabled={!canSave || isPending}
-          onClick={handleSave}
-        >
+        <Button size="lg" className="flex-1" disabled={!canSave || isPending} onClick={handleSave}>
           {isPending ? "Salvando…" : isNew ? "Criar serviço" : "Salvar alterações"}
         </Button>
       </div>

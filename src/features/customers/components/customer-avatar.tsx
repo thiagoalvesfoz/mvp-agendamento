@@ -10,10 +10,10 @@ import { cn } from "@/lib/utils";
 const BG_PALETTE = [
   "bg-[oklch(0.93_0.06_260)]", // azul suave
   "bg-[oklch(0.93_0.06_150)]", // verde suave
-  "bg-[oklch(0.93_0.06_30)]",  // laranja suave
+  "bg-[oklch(0.93_0.06_30)]", // laranja suave
   "bg-[oklch(0.93_0.06_320)]", // rosa suave
   "bg-[oklch(0.93_0.06_200)]", // ciano suave
-  "bg-[oklch(0.93_0.06_80)]",  // amarelo suave
+  "bg-[oklch(0.93_0.06_80)]", // amarelo suave
 ];
 
 function pickBg(name: string): string {
@@ -44,7 +44,7 @@ export function CustomerAvatar({ name, size = "sm", className }: CustomerAvatarP
   return (
     <div
       className={cn(
-        "shrink-0 rounded-full flex items-center justify-center font-semibold select-none",
+        "flex shrink-0 select-none items-center justify-center rounded-full font-semibold",
         size === "sm" && "size-[38px] text-[13px]",
         size === "lg" && "size-16 text-[20px]",
         bg,

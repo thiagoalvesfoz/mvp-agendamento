@@ -74,6 +74,4 @@ export type AppointmentHistoryEntry = {
 
 // ─── Tipos de mutação (Server Actions) ──────────────────────────────────────
 
-export type ActionResult<T = undefined> =
-  | { ok: true; data?: T }
-  | { ok: false; error: string };
+export type ActionResult<T = undefined> = { ok: true; data?: T } | { ok: false; error: string };

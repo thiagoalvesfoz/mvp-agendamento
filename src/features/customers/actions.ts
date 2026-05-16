@@ -13,9 +13,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { idParamSchema } from "@/features/customers/schemas";
 
-type ActionResult<T = undefined> =
-  | { ok: true; data?: T }
-  | { ok: false; error: string };
+type ActionResult<T = undefined> = { ok: true; data?: T } | { ok: false; error: string };
 
 async function requireAuth(): Promise<{ ok: true } | { ok: false; error: string }> {
   const session = await auth();

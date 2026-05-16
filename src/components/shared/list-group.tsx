@@ -18,11 +18,11 @@ export function ListGroup({ title, children, className }: ListGroupProps) {
   return (
     <div className={cn("px-5 pb-2", className)}>
       {title && (
-        <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted-foreground)] font-medium mb-1.5 px-1">
+        <div className="mb-1.5 px-1 text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
           {title}
         </div>
       )}
-      <div className="rounded-[14px] border border-[var(--border)] bg-[var(--card)] overflow-hidden divide-y divide-[var(--border)]">
+      <div className="divide-y divide-[var(--border)] overflow-hidden rounded-[14px] border border-[var(--border)] bg-[var(--card)]">
         {children}
       </div>
     </div>
@@ -72,7 +72,7 @@ export function ListItem({
       {icon && (
         <div
           className={cn(
-            "size-8 rounded-lg flex items-center justify-center shrink-0",
+            "flex size-8 shrink-0 items-center justify-center rounded-lg",
             danger
               ? "bg-[color-mix(in_oklch,var(--destructive)_12%,transparent)] text-[var(--destructive)]"
               : "bg-[var(--muted)] text-[var(--foreground)]",
@@ -82,7 +82,7 @@ export function ListItem({
         </div>
       )}
 
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <div
           className={cn(
             "text-[14px] font-medium tracking-tight",
@@ -92,18 +92,18 @@ export function ListItem({
           {title}
         </div>
         {subtitle && (
-          <div className="text-[12px] text-[var(--muted-foreground)] mt-0.5 truncate">
+          <div className="mt-0.5 truncate text-[12px] text-[var(--muted-foreground)]">
             {subtitle}
           </div>
         )}
       </div>
 
       {value && (
-        <span className="text-[13px] text-[var(--muted-foreground)] shrink-0">{value}</span>
+        <span className="shrink-0 text-[13px] text-[var(--muted-foreground)]">{value}</span>
       )}
 
       {!isStatic && showChevron && (
-        <I.Chevron size={15} className="text-[var(--muted-foreground)] shrink-0" />
+        <I.Chevron size={15} className="shrink-0 text-[var(--muted-foreground)]" />
       )}
     </div>
   );
@@ -128,7 +128,7 @@ export function ListItemButton({
       type="button"
       onClick={onClick}
       className={cn(
-        "press w-full flex items-center gap-3 px-3.5 py-3 text-left",
+        "press flex w-full items-center gap-3 px-3.5 py-3 text-left",
         danger && "text-[var(--destructive)]",
         className,
       )}
@@ -136,7 +136,7 @@ export function ListItemButton({
       {icon && (
         <div
           className={cn(
-            "size-8 rounded-lg flex items-center justify-center shrink-0",
+            "flex size-8 shrink-0 items-center justify-center rounded-lg",
             danger
               ? "bg-[color-mix(in_oklch,var(--destructive)_12%,transparent)] text-[var(--destructive)]"
               : "bg-[var(--muted)] text-[var(--foreground)]",
@@ -146,7 +146,7 @@ export function ListItemButton({
         </div>
       )}
 
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <div
           className={cn(
             "text-[14px] font-medium tracking-tight",
@@ -156,19 +156,17 @@ export function ListItemButton({
           {title}
         </div>
         {subtitle && (
-          <div className="text-[12px] text-[var(--muted-foreground)] mt-0.5 truncate">
+          <div className="mt-0.5 truncate text-[12px] text-[var(--muted-foreground)]">
             {subtitle}
           </div>
         )}
       </div>
 
       {value && (
-        <span className="text-[13px] text-[var(--muted-foreground)] shrink-0">{value}</span>
+        <span className="shrink-0 text-[13px] text-[var(--muted-foreground)]">{value}</span>
       )}
 
-      {showChevron && (
-        <I.Chevron size={15} className="text-[var(--muted-foreground)] shrink-0" />
-      )}
+      {showChevron && <I.Chevron size={15} className="shrink-0 text-[var(--muted-foreground)]" />}
     </button>
   );
 }

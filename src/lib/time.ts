@@ -47,19 +47,21 @@ const WEEKDAY_NAMES_LONG = [
   "Sábado",
 ] as const;
 
-const WEEKDAY_NAMES_SHORT = [
-  "Dom",
-  "Seg",
-  "Ter",
-  "Qua",
-  "Qui",
-  "Sex",
-  "Sáb",
-] as const;
+const WEEKDAY_NAMES_SHORT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"] as const;
 
 const MONTH_NAMES_SHORT = [
-  "jan", "fev", "mar", "abr", "mai", "jun",
-  "jul", "ago", "set", "out", "nov", "dez",
+  "jan",
+  "fev",
+  "mar",
+  "abr",
+  "mai",
+  "jun",
+  "jul",
+  "ago",
+  "set",
+  "out",
+  "nov",
+  "dez",
 ] as const;
 
 /** Retorna o nome completo do dia da semana em PT-BR (0 = domingo). */
