@@ -1,0 +1,253 @@
+// Schema do banco — Agenda de Agendamentos
+//
+// IMPORTANTE: o Prisma NÃO suporta a constraint `EXCLUDE USING gist`
+// diretamente. Ela é adicionada manualmente via migration SQL
+// (ver prisma/migrations/000_init/migration.sql).
+//
+// Sempre rodar `pnpm db:migrate` para aplicar.
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [btree_gist]
+}
+
+// ============================================================
+// Domínio: Clientes (RN14 — normalizado, dedup por telefone)
+// ============================================================
+
+model Customer {
+  id           String    @id @default(uuid()) @db.Uuid
+  // CONTRATO: sempre armazenar o telefone NORMALIZADO (só dígitos, com DDI 55 + DDD).
+  phone        String    @unique
+  name         String
+  email        String?
+  socialMedia  String?   @map("social_media")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  anonymizedAt DateTime? @map("anonymized_at") @db.Timestamptz
+
+  appointments Appointment[]
+  history      CustomerHistory[]
+
+  @@map("customers")
+}
+
+model CustomerHistory {
+  id         String   @id @default(uuid()) @db.Uuid
+  customerId String   @map("customer_id") @db.Uuid
+  field      String
+  oldValue   String?  @map("old_value")
+  newValue   String?  @map("new_value")
+  changedAt  DateTime @default(now()) @map("changed_at") @db.Timestamptz
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId, changedAt(sort: Desc)])
+  @@map("customer_history")
+}
+
+// ============================================================
+// Domínio: Serviços
+// ============================================================
+
+model Service {
+  id               String   @id @default(uuid()) @db.Uuid
+  name             String
+  description      String?
+  durationMinutes  Int      @map("duration_minutes")
+  bufferPreMinutes Int      @default(0) @map("buffer_pre_minutes")
+  bufferPosMinutes Int      @default(0) @map("buffer_pos_minutes")
+  active           Boolean  @default(true)
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  appointments Appointment[]
+
+  @@map("services")
+}
+
+// ============================================================
+// Domínio: Disponibilidade e bloqueios
+// ============================================================
+
+model Availability {
+  id        String @id @default(uuid()) @db.Uuid
+  weekDay   Int    @map("week_day")
+  startTime String @map("start_time")
+  endTime   String @map("end_time")
+
+  @@map("availability")
+}
+
+model BlockedDate {
+  id        String   @id @default(uuid()) @db.Uuid
+  date      DateTime @db.Date
+  startTime String?  @map("start_time")
+  endTime   String?  @map("end_time")
+  reason    String?
+
+  @@index([date])
+  @@map("blocked_dates")
+}
+
+model RecurringBlock {
+  id         String  @id @default(uuid()) @db.Uuid
+  pattern    String // 'weekly' | 'yearly'
+  weekDay    Int?    @map("week_day")
+  month      Int?
+  dayOfMonth Int?    @map("day_of_month")
+  startTime  String? @map("start_time")
+  endTime    String? @map("end_time")
+  reason     String?
+
+  @@map("recurring_blocks")
+}
+
+// ============================================================
+// Domínio: Agendamentos (coração do sistema)
+// ============================================================
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  NO_SHOW
+  CANCELED
+  EXPIRED
+}
+
+model Appointment {
+  id         String @id @default(uuid()) @db.Uuid
+  protocol   String @unique
+  serviceId  String @map("service_id") @db.Uuid
+  customerId String @map("customer_id") @db.Uuid
+
+  // Snapshots (RN15) — refletem o ACORDO atual
+  serviceNameSnapshot         String  @map("service_name_snapshot")
+  durationMinutesSnapshot     Int     @map("duration_minutes_snapshot")
+  bufferPreSnapshot           Int     @default(0) @map("buffer_pre_snapshot")
+  bufferPosSnapshot           Int     @default(0) @map("buffer_pos_snapshot")
+  customerNameSnapshot        String  @map("customer_name_snapshot")
+  customerContactSnapshot     String  @map("customer_contact_snapshot")
+  customerEmailSnapshot       String? @map("customer_email_snapshot")
+  customerSocialMediaSnapshot String? @map("customer_social_media_snapshot")
+  briefing                    String?
+
+  // Realidade (RN24)
+  actualDurationMinutes Int? @map("actual_duration_minutes")
+
+  date            DateTime          @db.Date
+  startTime       String            @map("start_time")
+  endTime         String            @map("end_time")
+  status          AppointmentStatus
+  rescheduledToId String?           @map("rescheduled_to_id") @db.Uuid
+  idempotencyKey  String?           @unique @map("idempotency_key")
+
+  consentAcceptedAt DateTime @map("consent_accepted_at") @db.Timestamptz
+  consentVersion    String   @map("consent_version")
+
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  anonymizedAt DateTime? @map("anonymized_at") @db.Timestamptz
+
+  service         Service              @relation(fields: [serviceId], references: [id])
+  customer        Customer             @relation(fields: [customerId], references: [id])
+  rescheduledTo   Appointment?         @relation("Reschedule", fields: [rescheduledToId], references: [id])
+  reschedulesFrom Appointment[]        @relation("Reschedule")
+  history         AppointmentHistory[]
+
+  @@index([date, status])
+  @@index([customerId, status])
+  @@index([status, createdAt])
+  @@map("appointments")
+}
+
+model AppointmentHistory {
+  id            String @id @default(uuid()) @db.Uuid
+  appointmentId String @map("appointment_id") @db.Uuid
+
+  eventType String @map("event_type") // 'status_change' | 'duration_change' | 'reschedule'
+
+  statusFrom String? @map("status_from")
+  statusTo   String? @map("status_to")
+
+  durationFrom    Int?    @map("duration_from")
+  durationTo      Int?    @map("duration_to")
+  bufferPreFrom   Int?    @map("buffer_pre_from")
+  bufferPreTo     Int?    @map("buffer_pre_to")
+  bufferPosFrom   Int?    @map("buffer_pos_from")
+  bufferPosTo     Int?    @map("buffer_pos_to")
+  endTimeFrom     String? @map("end_time_from")
+  endTimeTo       String? @map("end_time_to")
+  rescheduledToId String? @map("rescheduled_to_id") @db.Uuid
+
+  changedBy String   @map("changed_by") // 'admin:<user_id>' | 'system'
+  reason    String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@index([appointmentId, createdAt(sort: Desc)])
+  @@map("appointment_history")
+}
+
+// ============================================================
+// Configurações e autenticação
+// ============================================================
+
+model Settings {
+  id                         Int      @id @default(1)
+  minimumScheduleNoticeHours Int      @default(12) @map("minimum_schedule_notice_hours")
+  maximumScheduleDaysAhead   Int      @default(60) @map("maximum_schedule_days_ahead")
+  pendingExpirationHours     Int      @default(48) @map("pending_expiration_hours")
+  retentionMonths            Int      @default(24) @map("retention_months")
+  notificationEmail          String   @map("notification_email")
+  publicSlug                 String   @unique @map("public_slug")
+  currentPolicyVersion       String   @default("v1") @map("current_policy_version")
+  createdAt                  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt                  DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("settings")
+}
+
+model AdminUser {
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  lastLoginAt  DateTime? @map("last_login_at") @db.Timestamptz
+
+  passwordResetTokens PasswordResetToken[]
+
+  @@map("admin_users")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @map("token_hash")
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz
+  usedAt    DateTime? @map("used_at") @db.Timestamptz
+
+  user AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tokenHash])
+  @@map("password_reset_tokens")
+}
+
+model LoginAttempt {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String
+  ip        String?
+  success   Boolean
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([email, createdAt(sort: Desc)])
+  @@map("login_attempts")
+}

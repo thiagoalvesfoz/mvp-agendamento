@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* shadcn tokens (oklch) — extraídos do design */
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --primary: oklch(0.491 0.27 292.581); /* violet */
+    --primary-foreground: oklch(0.969 0.016 293.756);
+    --secondary: oklch(0.967 0.001 286.375);
+    --secondary-foreground: oklch(0.21 0.006 285.885);
+    --accent: oklch(0.967 0.001 286.375);
+    --accent-foreground: oklch(0.21 0.006 285.885);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.708 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(0.969 0.016 293.756);
+    --radius: 0.625rem;
+
+    /* aliases legacy do design — mapeiam para os tokens shadcn */
+    --bg: var(--background);
+    --fg: var(--foreground);
+    --muted-fg: var(--muted-foreground);
+    --border-strong: var(--input);
+    --accent-fg: var(--primary-foreground);
+    --danger: var(--destructive);
+    --success: oklch(0.62 0.16 150);
+    --warn: oklch(0.78 0.14 80);
+  }
+
+  .dark {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --primary: oklch(0.629 0.252 292.581);
+    --primary-foreground: oklch(0.969 0.016 293.756);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --border: oklch(0.269 0 0);
+    --input: oklch(0.269 0 0);
+    --ring: oklch(0.439 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --destructive-foreground: oklch(0.985 0 0);
+  }
+
+  * {
+    @apply border-border;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html,
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overscroll-behavior: none;
+  }
+}
+
+@layer components {
+  /* shadcn focus ring — halo de 3px */
+  .focus-ring:focus-visible {
+    outline: none;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px oklch(0.708 0 0 / 0.5);
+  }
+
+  /* press effect — 1px translate */
+  .press {
+    transition:
+      background-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+      color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 200ms ease,
+      transform 100ms ease;
+  }
+
+  .press:active {
+    transform: translateY(1px);
+  }
+
+  /* placeholder de foto neutro */
+  .placeholder-photo {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, oklch(0.96 0 0) 0%, oklch(0.93 0 0) 100%);
+    color: oklch(0.556 0 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono), "Geist Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+    border: 1px solid var(--border);
+  }
+
+  .placeholder-photo::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      135deg,
+      transparent 0,
+      transparent 11px,
+      oklch(0 0 0 / 0.025) 11px,
+      oklch(0 0 0 / 0.025) 12px
+    );
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  .placeholder-photo > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* esconde scrollbar dentro do frame mobile */
+  .phone-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .phone-scroll {
+    scrollbar-width: none;
+  }
+}
+
+@layer utilities {
+  @keyframes sheetIn {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .sheet-in {
+    animation: sheetIn 280ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .fade-in {
+    animation: fadeIn 180ms ease both;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .slide-in {
+    animation: slideIn 220ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+}
