@@ -1,6 +1,6 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
 import { BottomTabs } from "@/components/admin/bottom-tabs";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -18,9 +18,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!session) redirect("/admin/login");
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-[440px] flex-col bg-background">
-      <main className="flex-1 overflow-y-auto pb-2">{children}</main>
-      <BottomTabs />
+    <div className="admin-shell fixed inset-0 mx-auto flex w-full max-w-[440px] flex-col overflow-hidden bg-background">
+      <div
+        className="flex h-full flex-col"
+        style={{ paddingTop: "env(safe-area-inset-top)" }}
+      >
+        <main className="phone-scroll flex-1 overflow-y-auto overscroll-contain">{children}</main>
+        <BottomTabs />
+      </div>
     </div>
   );
 }

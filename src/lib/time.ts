@@ -34,3 +34,61 @@ export function nextSlotAfter(baseDate: Date, durationMinutes: number): Date {
 }
 
 export { addMinutes, addHours, addDays, isBefore, isAfter, format, parseISO };
+
+// ── Helpers de calendário PT-BR ──────────────────────────────────────────────
+
+const WEEKDAY_NAMES_LONG = [
+  "Domingo",
+  "Segunda-feira",
+  "Terça-feira",
+  "Quarta-feira",
+  "Quinta-feira",
+  "Sexta-feira",
+  "Sábado",
+] as const;
+
+const WEEKDAY_NAMES_SHORT = [
+  "Dom",
+  "Seg",
+  "Ter",
+  "Qua",
+  "Qui",
+  "Sex",
+  "Sáb",
+] as const;
+
+const MONTH_NAMES_SHORT = [
+  "jan", "fev", "mar", "abr", "mai", "jun",
+  "jul", "ago", "set", "out", "nov", "dez",
+] as const;
+
+/** Retorna o nome completo do dia da semana em PT-BR (0 = domingo). */
+export function weekdayName(dow: number): string {
+  return WEEKDAY_NAMES_LONG[dow] ?? "—";
+}
+
+/** Retorna o nome abreviado do dia da semana em PT-BR (0 = domingo). */
+export function weekdayShort(dow: number): string {
+  return WEEKDAY_NAMES_SHORT[dow] ?? "—";
+}
+
+/** Retorna o nome abreviado do mês em PT-BR (0 = janeiro). */
+export function monthShort(month: number): string {
+  return MONTH_NAMES_SHORT[month] ?? "—";
+}
+
+/**
+ * Formata uma data (objeto Date no TZ local) no padrão brasileiro.
+ * Exemplo: "14/05/2026".
+ */
+export function formatDateBR(date: Date): string {
+  return formatInTimeZone(date, TZ, "dd/MM/yyyy");
+}
+
+/**
+ * Retorna "hoje" no fuso da agenda como string YYYY-MM-DD.
+ * Usado para comparar com datas armazenadas como @db.Date.
+ */
+export function todayISO(): string {
+  return formatInTimeZone(new Date(), TZ, "yyyy-MM-dd");
+}

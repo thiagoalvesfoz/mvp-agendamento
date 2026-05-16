@@ -184,6 +184,59 @@ export const LogOut = (p: IconProps) => (
     <line x1="21" y1="12" x2="9" y2="12" />
   </Icon>
 );
+export const Plus = (p: IconProps) => (
+  <Icon {...p}>
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </Icon>
+);
+export const Edit = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+  </Icon>
+);
+export const Ban = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+  </Icon>
+);
+export const Search = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </Icon>
+);
+export const Trash = (p: IconProps) => (
+  <Icon {...p}>
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+    <path d="M10 11v6M14 11v6" />
+    <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+  </Icon>
+);
+export const Home = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M3 12L12 3l9 9" />
+    <path d="M9 21V12h6v9" />
+    <path d="M3 12v9h5M16 21h5V12" />
+  </Icon>
+);
+export const Bell = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+    <path d="M13.73 21a2 2 0 01-3.46 0" />
+  </Icon>
+);
+export const Repeat = (p: IconProps) => (
+  <Icon {...p}>
+    <polyline points="17 1 21 5 17 9" />
+    <path d="M3 11V9a4 4 0 014-4h14" />
+    <polyline points="7 23 3 19 7 15" />
+    <path d="M21 13v2a4 4 0 01-4 4H3" />
+  </Icon>
+);
 
 /** Acesso agrupado, igual ao `I.*` do design original */
 export const I = {
@@ -212,4 +265,12 @@ export const I = {
   Shield,
   Users,
   LogOut,
+  Plus,
+  Edit,
+  Ban,
+  Search,
+  Trash,
+  Home,
+  Bell,
+  Repeat,
 };

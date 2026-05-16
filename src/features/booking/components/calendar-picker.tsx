@@ -272,11 +272,11 @@ export function CalendarPicker({
                           "cursor-not-allowed text-muted-foreground/35 opacity-40",
                         !isSel &&
                           isBlocked &&
-                          "cursor-not-allowed bg-[repeating-linear-gradient(135deg,transparent_0,transparent_3px,var(--border)_3px,var(--border)_4px)] text-muted-foreground/55",
+                          "cursor-not-allowed bg-[repeating-linear-gradient(135deg,transparent_0,transparent_3px,color-mix(in_oklch,var(--destructive)_22%,transparent)_3px,color-mix(in_oklch,var(--destructive)_22%,transparent)_4px)] text-[color-mix(in_oklch,var(--destructive)_70%,var(--muted-foreground))]",
                         isToday && !isSel && "ring-1 ring-inset ring-[var(--primary)]/50",
                       )}
                     >
-                      <span className={cn(isBlocked && "line-through decoration-[1.2px]", isToday && "font-bold")}>
+                      <span className={cn(isBlocked && "line-through decoration-[1.2px] decoration-[color-mix(in_oklch,var(--destructive)_55%,transparent)]", isToday && "font-bold")}>
                         {d.getDate()}
                       </span>
                       {isToday && !isSel && (
@@ -297,7 +297,7 @@ export function CalendarPicker({
                 hoje
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <span className="size-2 rounded-sm border border-input bg-[repeating-linear-gradient(135deg,transparent_0,transparent_2px,var(--input)_2px,var(--input)_3px)]" />
+                <span className="size-2 rounded-sm border border-[color-mix(in_oklch,var(--destructive)_20%,transparent)] bg-[repeating-linear-gradient(135deg,transparent_0,transparent_2px,color-mix(in_oklch,var(--destructive)_22%,transparent)_2px,color-mix(in_oklch,var(--destructive)_22%,transparent)_3px)]" />
                 bloqueado
               </span>
             </div>

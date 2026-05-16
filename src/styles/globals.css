@@ -140,6 +140,15 @@
   .phone-scroll {
     scrollbar-width: none;
   }
+
+  /* admin shell: oculta scrollbar de qualquer área scrollável aninhada */
+  .admin-shell *::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-shell * {
+    scrollbar-width: none;
+  }
 }
 
 @layer utilities {

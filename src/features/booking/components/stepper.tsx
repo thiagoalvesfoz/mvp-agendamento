@@ -16,6 +16,7 @@ import { CalendarPicker } from "./calendar-picker";
 import { TimeGrid } from "./time-grid";
 import { ConfirmationView } from "./confirmation-view";
 import { createAppointment } from "../actions";
+import { maskPhoneBR } from "@/lib/phone";
 import type { ServiceForBooking } from "../queries";
 import type { BlockedDateEntry } from "./calendar-picker";
 import { getSlotsAction } from "../client-actions";
@@ -222,9 +223,13 @@ export function BookingStepper({ studioName, services, blockedDates }: BookingSt
                 <Label hint="WhatsApp">Telefone</Label>
                 <Input
                   placeholder="(45) 99999-9999"
+                  type="tel"
                   inputMode="tel"
+                  maxLength={15}
                   value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, phone: maskPhoneBR(e.target.value) })
+                  }
                 />
               </div>
               <div>

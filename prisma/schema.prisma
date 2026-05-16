@@ -213,6 +213,18 @@ model Settings {
   createdAt                  DateTime @default(now()) @map("created_at") @db.Timestamptz
   updatedAt                  DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
+  // ── Campos da landing page pública ──────────────────────────────────────────
+  // Adicionados em: migration add_landing_fields_to_settings
+  // Se NULL/vazio, a landing usa fallback definido em features/settings/queries.ts
+  landingName       String? @map("landing_name")
+  landingTagline    String? @map("landing_tagline")
+  landingHandle     String? @map("landing_handle")
+  landingCity       String? @map("landing_city")
+  landingAbout      String? @map("landing_about")
+  landingCallout    String? @map("landing_callout")
+  landingCoverLabel String? @map("landing_cover_label")
+  landingCtaLabel   String? @map("landing_cta_label")
+
   @@map("settings")
 }
 

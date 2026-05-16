@@ -3,6 +3,8 @@
 import { db } from "@/lib/db";
 import { createAppointmentSchema, type CreateAppointmentInput } from "./schemas";
 import { Prisma } from "@prisma/client";
+import { fromZonedTime } from "date-fns-tz";
+import { TZ } from "@/lib/time";
 
 export type CreateAppointmentResult =
   | {
@@ -124,7 +126,7 @@ export async function createAppointment(
           customerEmailSnapshot: data.email || null,
           customerSocialMediaSnapshot: data.instagram || null,
           briefing: data.briefing || null,
-          date: new Date(`${data.date}T12:00:00`),
+          date: fromZonedTime(`${data.date}T12:00:00`, TZ),
           startTime: data.startTime,
           endTime,
           status: "PENDING",
@@ -142,7 +144,7 @@ export async function createAppointment(
           statusFrom: null,
           statusTo: "PENDING",
           changedBy: "system",
-          reason: "created by client",
+          reason: "criado pelo cliente",
         },
       });
 

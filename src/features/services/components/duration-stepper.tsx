@@ -1,0 +1,66 @@
+"use client";
+
+import { I } from "@/components/shared/icons";
+import { cn } from "@/lib/utils";
+
+interface DurationStepperProps {
+  value: number;
+  onChange: (value: number) => void;
+  /** Passo em minutos (padrão: 15) */
+  step?: number;
+  /** Valor mínimo (padrão: 0 — permite buffer zerado) */
+  min?: number;
+  label?: string;
+  className?: string;
+}
+
+/**
+ * Stepper de duração em minutos, incrementando de 15 em 15.
+ * Mantém o valor na faixa [min, ∞) e em múltiplos de `step`.
+ */
+export function DurationStepper({
+  value,
+  onChange,
+  step = 15,
+  min = 0,
+  className,
+}: DurationStepperProps) {
+  const decrement = () => {
+    const next = value - step;
+    if (next >= min) onChange(next);
+  };
+
+  const increment = () => onChange(value + step);
+
+  return (
+    <div
+      className={cn(
+        "flex items-center rounded-xl border border-[var(--input)] bg-[var(--background)] h-11",
+        className,
+      )}
+    >
+      <button
+        type="button"
+        onClick={decrement}
+        disabled={value <= min}
+        aria-label="Diminuir"
+        className="press flex h-full w-11 shrink-0 items-center justify-center text-[var(--foreground)] disabled:opacity-30 disabled:pointer-events-none"
+      >
+        <span className="text-[18px] leading-none select-none">–</span>
+      </button>
+
+      <div className="flex-1 text-center font-mono text-[15px] font-medium tabular-nums select-none">
+        {value} min
+      </div>
+
+      <button
+        type="button"
+        onClick={increment}
+        aria-label="Aumentar"
+        className="press flex h-full w-11 shrink-0 items-center justify-center text-[var(--foreground)]"
+      >
+        <I.Plus size={15} />
+      </button>
+    </div>
+  );
+}

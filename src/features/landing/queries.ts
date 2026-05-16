@@ -1,5 +1,5 @@
 import "server-only";
-import { db } from "@/lib/db";
+import { getLandingConfig } from "@/features/settings/queries";
 
 export type StudioInfo = {
   name: string;
@@ -13,27 +13,25 @@ export type StudioInfo = {
 };
 
 /**
- * Carrega dados públicos do studio.
+ * Carrega dados públicos do studio a partir de Settings.
  *
- * Em descoberta: settings tem o mínimo (slug, email). Os campos de marketing
- * (sobre, tagline, etc.) ainda não estão modelados — usamos fallback estático.
- * Quando precisarmos editar isso pelo admin, adicionamos colunas à tabela
- * settings ou criamos uma `landing_config`.
+ * Os campos landing* foram adicionados à tabela settings via
+ * migration `add_landing_fields_to_settings`. Se a migration ainda não foi
+ * aplicada, getLandingConfig retorna os valores estáticos de fallback.
+ *
+ * Para editar pelo admin: /admin/ajustes/landing
  */
 export async function getStudioInfo(): Promise<StudioInfo> {
-  const settings = await db.settings.findUnique({ where: { id: 1 } });
-  void settings; // slug/email não usados na landing por enquanto
+  const config = await getLandingConfig();
 
   return {
-    name: "Estúdio Foz",
-    handle: "@estudio.foz",
-    city: "Foz do Iguaçu",
-    tagline: "Fotografia e produção de conteúdo",
-    about:
-      "Trabalho com ensaios autorais, cobertura de eventos e produção de conteúdo para redes sociais. Atendimentos com hora marcada — você escolhe o horário e a gente alinha o restante pelo WhatsApp.",
-    callout:
-      "Os horários são reservados após o seu pedido. Em até 48h, entro em contato pelo WhatsApp para confirmar valores e detalhes.",
-    coverLabel: "capa",
-    ctaLabel: "Ver horários disponíveis",
+    name: config.landingName,
+    handle: config.landingHandle,
+    city: config.landingCity,
+    tagline: config.landingTagline,
+    about: config.landingAbout,
+    callout: config.landingCallout,
+    coverLabel: config.landingCoverLabel,
+    ctaLabel: config.landingCtaLabel,
   };
 }

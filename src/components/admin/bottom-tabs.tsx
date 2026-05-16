@@ -6,7 +6,12 @@ import { I } from "@/components/shared/icons";
 import { cn } from "@/lib/utils";
 
 const TABS = [
-  { href: "/admin", label: "Agenda", match: /^\/admin\/?$/, icon: I.Calendar },
+  {
+    href: "/admin",
+    label: "Agenda",
+    match: /^\/admin(\/agenda(\/.*)?)?\/?$/,
+    icon: I.Calendar,
+  },
   {
     href: "/admin/servicos",
     label: "Serviços",
@@ -31,7 +36,10 @@ export function BottomTabs() {
   const pathname = usePathname();
 
   return (
-    <nav className="border-t border-border bg-white px-2 pb-2.5 pt-2">
+    <nav
+      className="shrink-0 border-t border-border bg-white px-2 pt-2"
+      style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.625rem)" }}
+    >
       <div className="flex items-stretch">
         {TABS.map((t) => {
           const active = t.match.test(pathname);
