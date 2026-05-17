@@ -279,9 +279,25 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
           {/* Horários (opcionais) */}
           <div className="grid grid-cols-2 gap-3">
             <div className="min-w-0">
-              <Label htmlFor="block-start" hint="opcional">
-                Das
-              </Label>
+              <div className="mb-1.5 flex items-baseline justify-between">
+                <label
+                  htmlFor="block-start"
+                  className="text-[13px] font-medium text-[var(--foreground)]"
+                >
+                  Das
+                </label>
+                {startTime ? (
+                  <button
+                    type="button"
+                    onClick={() => setStartTime("")}
+                    className="press text-[12px] text-[var(--primary)]"
+                  >
+                    Limpar
+                  </button>
+                ) : (
+                  <span className="text-[12px] text-[var(--muted-foreground)]">opcional</span>
+                )}
+              </div>
               <Input
                 id="block-start"
                 type="time"
@@ -290,9 +306,25 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
               />
             </div>
             <div className="min-w-0">
-              <Label htmlFor="block-end" hint="opcional">
-                Até
-              </Label>
+              <div className="mb-1.5 flex items-baseline justify-between">
+                <label
+                  htmlFor="block-end"
+                  className="text-[13px] font-medium text-[var(--foreground)]"
+                >
+                  Até
+                </label>
+                {endTime ? (
+                  <button
+                    type="button"
+                    onClick={() => setEndTime("")}
+                    className="press text-[12px] text-[var(--primary)]"
+                  >
+                    Limpar
+                  </button>
+                ) : (
+                  <span className="text-[12px] text-[var(--muted-foreground)]">opcional</span>
+                )}
+              </div>
               <Input
                 id="block-end"
                 type="time"
