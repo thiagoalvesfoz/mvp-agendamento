@@ -6,7 +6,7 @@ import { PhotoPlaceholder } from "@/components/shared/photo-placeholder";
 import { I } from "@/components/shared/icons";
 import { getStudioInfo } from "@/features/landing/queries";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export default async function LandingPage() {
   const studio = await getStudioInfo();

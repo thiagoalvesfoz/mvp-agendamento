@@ -14,7 +14,7 @@
  *  - Evita round-trip ao servidor a cada keystroke.
  *  - Simplifica o código (sem useSearchParams + Suspense boundary).
  */
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { I } from "@/components/shared/icons";
 import { CustomerCard } from "@/features/customers/components/customer-card";
@@ -26,25 +26,32 @@ export function CustomerList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [query, setQuery] = useState("");
+  const [retryKey, setRetryKey] = useState(0);
 
-  async function fetchData() {
-    setLoading(true);
-    setError(false);
-    try {
-      const res = await fetch("/api/admin/clientes");
-      if (!res.ok) throw new Error("fetch failed");
-      const json = (await res.json()) as { customers: CustomerRow[] };
-      setCustomers(json.customers);
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  }
+  const retry = useCallback(() => setRetryKey((k) => k + 1), []);
 
   useEffect(() => {
+    const controller = new AbortController();
+
+    async function fetchData() {
+      setLoading(true);
+      setError(false);
+      try {
+        const res = await fetch("/api/admin/clientes", { signal: controller.signal });
+        if (!res.ok) throw new Error("fetch failed");
+        const json = (await res.json()) as { customers: CustomerRow[] };
+        setCustomers(json.customers);
+      } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") return;
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     void fetchData();
-  }, []);
+    return () => controller.abort();
+  }, [retryKey]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -62,11 +69,7 @@ export function CustomerList() {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center">
         <p className="text-[14px] font-medium">Erro ao carregar clientes</p>
-        <button
-          type="button"
-          onClick={() => void fetchData()}
-          className="press text-[13px] text-[var(--primary)]"
-        >
+        <button type="button" onClick={retry} className="press text-[13px] text-[var(--primary)]">
           Tentar novamente
         </button>
       </div>

@@ -8,7 +8,7 @@ import { CustomerAvatar } from "@/features/customers/components/customer-avatar"
 import type { SettingsRow } from "@/features/settings/queries";
 import { formatInTZ } from "@/lib/time";
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 
 type SettingsData = {
   settings: SettingsRow;
@@ -55,25 +55,32 @@ export function AjustesClient({ adminEmail, adminName, lastLoginAt }: Props) {
   const [data, setData] = useState<SettingsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
 
-  async function fetchData() {
-    setLoading(true);
-    setError(false);
-    try {
-      const res = await fetch("/api/admin/ajustes");
-      if (!res.ok) throw new Error("fetch failed");
-      const json = (await res.json()) as SettingsData;
-      setData(json);
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  }
+  const retry = useCallback(() => setRetryKey((k) => k + 1), []);
 
   useEffect(() => {
+    const controller = new AbortController();
+
+    async function fetchData() {
+      setLoading(true);
+      setError(false);
+      try {
+        const res = await fetch("/api/admin/ajustes", { signal: controller.signal });
+        if (!res.ok) throw new Error("fetch failed");
+        const json = (await res.json()) as SettingsData;
+        setData(json);
+      } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") return;
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     void fetchData();
-  }, []);
+    return () => controller.abort();
+  }, [retryKey]);
 
   return (
     <div className="flex h-full flex-col">
@@ -178,7 +185,7 @@ export function AjustesClient({ adminEmail, adminName, lastLoginAt }: Props) {
               <p className="text-[14px] font-medium">Erro ao carregar ajustes</p>
               <button
                 type="button"
-                onClick={() => void fetchData()}
+                onClick={retry}
                 className="press text-[13px] text-[var(--primary)]"
               >
                 Tentar novamente

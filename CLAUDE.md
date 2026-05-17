@@ -47,6 +47,9 @@ src/app/
 - **Email assíncrono**: disparo sempre em `after()` do Next 15 pós-commit. Dados passados como props — nunca releitura no callback.
 - **LGPD soft delete**: nunca deletar registros. `anonymized_at` + campos zerados.
 - **Login fora do layout protegido**: `(public)/login` evita loop de redirect infinito.
+- **Página híbrida (Server + Client)**: páginas com dados de sessão (email, `lastLoginAt`) usam Server Component fino que extrai da sessão e passa como props para Client Component — sem query ao DB, sem skeleton no primeiro render. Padrão adotado em `ajustes/page.tsx` + `ajustes-client.tsx`.
+- **`loading.tsx` e isolamento de Suspense**: rotas com fetch assíncrono têm `loading.tsx` real; rotas sem fetch exportam `export default function Loading() { return null; }` para criar boundary isolado e evitar herdar o skeleton do pai. Sem esse `null`, todas as rotas filhas herdam o `loading.tsx` mais próximo acima na árvore.
+- **`lastLoginAt` no JWT**: `authorize` em `src/lib/auth.ts` captura `new Date()` no momento do login e salva no token via callback `jwt` em `src/lib/auth.config.ts`. Disponível em `session.user.lastLoginAt` sem query ao DB. Tipos augmentados em `src/types/next-auth.d.ts`.
 
 ---
 
@@ -90,6 +93,8 @@ src/app/
 - Upload de capa: BYTEA em `landing_cover`, resize via `sharp` (1600px max, WebP 82%), servido em `/api/landing/cover` com ETag.
 - Landing pública lê `settings` via `getLandingConfig()`.
 - Migrations: `20260515032213_init`, `20260516000001_add_landing_fields_to_settings`, `20260517015343_add_photo_landing_page`.
+- **Skeleton loaders**: padrão `animate-pulse` com `--muted`/`--border`. Skeletons compartilhados em `src/features/customers/components/customer-skeleton.tsx` e `src/features/services/components/service-skeleton.tsx`. Loading states para todas as sub-páginas de ajustes em `src/app/admin/(protected)/ajustes/*/loading.tsx`.
+- **iOS Safari**: classe `.press` em `src/styles/globals.css` inclui `touch-action: manipulation` + `cursor: pointer` para confiabilidade de tap (evita conflito com swipe-back). Inputs `type="date"` e `type="time"` requerem `min-w-0 overflow-hidden` no wrapper e `min-w-0` no `Input` para respeitar largura do container.
 
 ---
 
@@ -165,3 +170,5 @@ Admin: <http://localhost:3000/admin> · seed: `julialimabarros08@gmail.com` / `1
 - **Migrations e Prisma client desincronizados**: após editar `schema.prisma`, rodar `pnpm db:migrate` + `pnpm exec prisma generate` antes de tocar nas queries.
 - **Prisma client travado no Windows**: se `prisma generate` falhar com `EPERM rename`, fechar o dev server, rodar `pnpm exec prisma generate`, reiniciar.
 - **`EXCLUDE USING gist`**: não suportado pelo Prisma Schema Language — fica em `prisma/extras/init.sql`, aplicado via `pnpm db:apply-extras`. Em produção (Supabase), rodar manualmente no SQL Editor.
+- **Skeleton herdado em todas as rotas**: se uma rota filha não tiver `loading.tsx` próprio, herda o do pai mais próximo. Rotas sem fetch assíncrono devem ter `loading.tsx` retornando `null` para isolar o boundary.
+- **`lastLoginAt` no JWT é o momento do login atual**: `authorize` usa `new Date()` (não o valor anterior do DB). Após re-login o valor atualiza; durante a sessão ativa permanece fixo no horário do login.

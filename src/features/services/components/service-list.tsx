@@ -7,7 +7,7 @@
  * eliminando o bloqueio de navegação causado pelo await no Server Component.
  * O toggle "mostrar desativados" continua gerenciado em estado local.
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ServiceCard } from "@/features/services/components/service-card";
 import { ServiceSkeleton } from "@/features/services/components/service-skeleton";
 import { I } from "@/components/shared/icons";
@@ -23,25 +23,32 @@ export function ServiceList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [showInactive, setShowInactive] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
 
-  async function fetchData() {
-    setLoading(true);
-    setError(false);
-    try {
-      const res = await fetch("/api/admin/servicos");
-      if (!res.ok) throw new Error("fetch failed");
-      const json = (await res.json()) as ServiceData;
-      setData(json);
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  }
+  const retry = useCallback(() => setRetryKey((k) => k + 1), []);
 
   useEffect(() => {
+    const controller = new AbortController();
+
+    async function fetchData() {
+      setLoading(true);
+      setError(false);
+      try {
+        const res = await fetch("/api/admin/servicos", { signal: controller.signal });
+        if (!res.ok) throw new Error("fetch failed");
+        const json = (await res.json()) as ServiceData;
+        setData(json);
+      } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") return;
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     void fetchData();
-  }, []);
+    return () => controller.abort();
+  }, [retryKey]);
 
   if (loading) return <ServiceSkeleton />;
 
@@ -49,11 +56,7 @@ export function ServiceList() {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
         <p className="text-[14px] font-medium">Erro ao carregar serviços</p>
-        <button
-          type="button"
-          onClick={() => void fetchData()}
-          className="press text-[13px] text-[var(--primary)]"
-        >
+        <button type="button" onClick={retry} className="press text-[13px] text-[var(--primary)]">
           Tentar novamente
         </button>
       </div>
