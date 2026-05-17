@@ -6,12 +6,17 @@ export const authConfig: NextAuthConfig = {
   providers: [],
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.id = user.id;
+      if (user) {
+        token.id = user.id;
+        token.lastLoginAt = (user as { lastLoginAt?: string | null }).lastLoginAt ?? null;
+      }
       return token;
     },
     async session({ session, token }) {
-      if (token.id && session.user) {
+      if (session.user) {
         (session.user as { id?: string }).id = token.id as string;
+        (session.user as { lastLoginAt?: string | null }).lastLoginAt =
+          (token.lastLoginAt as string | null) ?? null;
       }
       return session;
     },
