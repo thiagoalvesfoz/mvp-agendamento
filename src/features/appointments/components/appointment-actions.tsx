@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { I } from "@/components/shared/icons";
 import { updateAppointmentStatus } from "@/features/appointments/actions";
+import { BottomSheet } from "@/components/shared/bottom-sheet";
 import type { AppointmentStatus } from "@prisma/client";
 
 interface AppointmentActionsProps {
@@ -62,15 +63,14 @@ export function AppointmentActions({ appointmentId, status }: AppointmentActions
           </Button>
         </div>
         {error && <p className="mt-2 text-[12px] text-[var(--destructive)]">{error}</p>}
-        {confirmCancel && (
-          <CancelConfirmSheet
-            onCancel={() => setConfirmCancel(false)}
-            onConfirm={() => {
-              update("CANCELED", "cancelado pelo admin");
-              setConfirmCancel(false);
-            }}
-          />
-        )}
+        <CancelConfirmSheet
+          open={confirmCancel}
+          onCancel={() => setConfirmCancel(false)}
+          onConfirm={() => {
+            update("CANCELED", "cancelado pelo admin");
+            setConfirmCancel(false);
+          }}
+        />
       </>
     );
   }
@@ -106,35 +106,35 @@ export function AppointmentActions({ appointmentId, status }: AppointmentActions
 }
 
 function CancelConfirmSheet({
+  open,
   onCancel,
   onConfirm,
 }: {
+  open: boolean;
   onCancel: () => void;
   onConfirm: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50" onClick={onCancel}>
-      <div className="absolute inset-0 bg-black/40" />
-      <div
-        className="absolute bottom-0 left-0 right-0 mx-auto max-w-[440px] rounded-t-[20px] border-t border-[var(--border)] bg-[var(--background)] p-5"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex justify-center pb-3 pt-1">
-          <div className="h-1 w-10 rounded-full bg-[var(--border)]" />
-        </div>
-        <h3 className="text-[17px] font-semibold tracking-tight">Cancelar este agendamento?</h3>
-        <p className="mt-2 text-[13px] leading-snug text-[var(--muted-foreground)]">
-          O horário voltará a ficar disponível. Esta ação não pode ser desfeita.
-        </p>
-        <div className="mt-5 flex gap-2">
-          <Button variant="outline" className="flex-1" onClick={onCancel}>
-            Voltar
-          </Button>
-          <Button variant="danger" className="flex-1" onClick={onConfirm}>
-            Sim, cancelar
-          </Button>
-        </div>
+    <BottomSheet
+      open={open}
+      onClose={onCancel}
+      className="rounded-t-[20px] border-t border-[var(--border)] bg-[var(--background)] p-5"
+    >
+      <div className="flex justify-center pb-3 pt-1">
+        <div className="h-1 w-10 rounded-full bg-[var(--border)]" />
       </div>
-    </div>
+      <h3 className="text-[17px] font-semibold tracking-tight">Cancelar este agendamento?</h3>
+      <p className="mt-2 text-[13px] leading-snug text-[var(--muted-foreground)]">
+        O horário voltará a ficar disponível. Esta ação não pode ser desfeita.
+      </p>
+      <div className="mt-5 flex gap-2">
+        <Button variant="outline" className="flex-1" onClick={onCancel}>
+          Voltar
+        </Button>
+        <Button variant="danger" className="flex-1" onClick={onConfirm}>
+          Sim, cancelar
+        </Button>
+      </div>
+    </BottomSheet>
   );
 }

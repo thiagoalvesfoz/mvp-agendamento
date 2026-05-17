@@ -10,6 +10,7 @@ import { I } from "@/components/shared/icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { BottomSheet } from "@/components/shared/bottom-sheet";
 import { createBlockedDate, createRecurringBlock } from "@/features/settings/actions";
 import { weekdayName } from "@/lib/time";
 import { cn } from "@/lib/utils";
@@ -104,24 +105,16 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
     });
   };
 
-  if (!open) return null;
-
   return (
-    <>
-      {/* Overlay */}
-      <div className="fixed inset-0 z-40 bg-black/40" onClick={handleClose} aria-hidden="true" />
-
-      {/* Sheet */}
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="Adicionar bloqueio"
-        className={cn(
-          "fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-[440px]",
-          "rounded-t-[20px] border-t border-[var(--border)] bg-[var(--background)]",
-          "flex max-h-[85dvh] flex-col",
-        )}
-      >
+    <BottomSheet
+      open={open}
+      onClose={handleClose}
+      className={cn(
+        "rounded-t-[20px] border-t border-[var(--border)] bg-[var(--background)]",
+        "flex max-h-[85dvh] flex-col",
+      )}
+    >
+      <div role="dialog" aria-modal="true" aria-label="Adicionar bloqueio">
         {/* Handle */}
         <div className="flex justify-center pb-1 pt-3">
           <div className="h-1 w-10 rounded-full bg-[var(--border)]" />
@@ -364,6 +357,6 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
           </Button>
         </div>
       </div>
-    </>
+    </BottomSheet>
   );
 }
