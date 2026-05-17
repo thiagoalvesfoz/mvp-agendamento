@@ -1,37 +1,99 @@
+"use client";
+
 /**
  * /admin/ajustes — hub de configurações.
  *
- * Server Component: lê Settings e sessão do admin no servidor.
- * Navegação entre sub-telas via links Next.js (sem estado client).
+ * Client Component: busca settings e dados do admin via fetch no mount.
+ * A navegação (links estáticos) é renderizada imediatamente, sem esperar
+ * o fetch. O card de perfil e os três valores dinâmicos exibem skeleton
+ * enquanto os dados chegam.
  */
+import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { auth } from "@/lib/auth";
-import { getSettings } from "@/features/settings/queries";
 import { logoutAction } from "@/features/auth/actions";
 import { ListGroup, ListItem } from "@/components/shared/list-group";
 import { Card } from "@/components/ui/card";
 import { CustomerAvatar } from "@/features/customers/components/customer-avatar";
 import { I } from "@/components/shared/icons";
-import { db } from "@/lib/db";
-import { formatDateBR } from "@/lib/time";
+import { formatInTZ } from "@/lib/time";
+import type { SettingsRow } from "@/features/settings/queries";
 
-function formatLastLogin(d: Date | null): string {
-  if (!d) return "Primeiro acesso";
-  const date = formatDateBR(d);
-  const hh = String(d.getUTCHours()).padStart(2, "0");
-  const mm = String(d.getUTCMinutes()).padStart(2, "0");
-  return `Último acesso ${date} · ${hh}:${mm}`;
+// ── Tipos ────────────────────────────────────────────────────────────────────
+
+type AjustesData = {
+  settings: SettingsRow;
+  adminEmail: string;
+  adminName: string;
+  lastLoginAt: string | null;
+};
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function formatLastLogin(iso: string | null): string {
+  if (!iso) return "Primeiro acesso";
+  const d = new Date(iso);
+  return `Último acesso ${formatInTZ(d, "dd/MM/yyyy · HH:mm")}`;
 }
 
-export default async function AdminAjustesPage() {
-  const [session, settings] = await Promise.all([auth(), getSettings()]);
+// ── Skeletons ────────────────────────────────────────────────────────────────
 
-  const adminEmail = session?.user?.email ?? "—";
-  const adminName = adminEmail.split("@")[0] ?? "Admin";
-  const userId = (session?.user as { id?: string } | undefined)?.id;
-  const adminUser = userId
-    ? await db.adminUser.findUnique({ where: { id: userId }, select: { lastLoginAt: true } })
-    : null;
+function AdminCardSkeleton() {
+  return (
+    <div className="flex h-[60px] animate-pulse items-center gap-3 rounded-2xl bg-[var(--muted)] px-3.5">
+      <div className="size-9 shrink-0 rounded-full bg-[var(--border)]" />
+      <div className="flex flex-1 flex-col gap-1.5">
+        <div className="h-3.5 w-3/5 rounded bg-[var(--border)]" />
+        <div className="h-3 w-2/5 rounded bg-[var(--border)]" />
+      </div>
+      <div className="h-4 w-4 rounded bg-[var(--border)]" />
+    </div>
+  );
+}
+
+/**
+ * Linha de item "settings" com o valor substituído por skeleton.
+ * Replica a estrutura visual de ListItem sem depender do componente.
+ */
+function ListItemValueSkeleton({
+  icon,
+  title,
+  href,
+}: {
+  icon: ReactNode;
+  title: string;
+  href: string;
+}) {
+  return (
+    <Link href={href} className="press block">
+      <div className="flex items-center gap-3 px-3.5 py-3">
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[var(--muted)] text-[var(--foreground)]">
+          {icon}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-[14px] font-medium tracking-tight">{title}</div>
+        </div>
+        <div className="h-3 w-14 animate-pulse rounded bg-[var(--muted)]" />
+        <I.Chevron size={15} className="shrink-0 text-[var(--muted-foreground)]" />
+      </div>
+    </Link>
+  );
+}
+
+// ── Componente principal ──────────────────────────────────────────────────────
+
+export default function AdminAjustesPage() {
+  const [data, setData] = useState<AjustesData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/admin/ajustes")
+      .then((r) => r.json())
+      .then((json: AjustesData) => {
+        setData(json);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
 
   return (
     <div className="flex h-full flex-col">
@@ -47,20 +109,24 @@ export default async function AdminAjustesPage() {
       <div className="flex-1 overflow-y-auto pb-6">
         {/* ── Card do admin ── */}
         <div className="px-5 pb-4">
-          <Link href="/admin/ajustes/perfil" className="press block">
-            <Card className="flex items-center gap-3 p-3.5">
-              <CustomerAvatar name={adminName} size="sm" />
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-[14.5px] font-medium tracking-tight">
-                  {adminEmail}
+          {loading || !data ? (
+            <AdminCardSkeleton />
+          ) : (
+            <Link href="/admin/ajustes/perfil" className="press block">
+              <Card className="flex items-center gap-3 p-3.5">
+                <CustomerAvatar name={data.adminName} size="sm" />
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-[14.5px] font-medium tracking-tight">
+                    {data.adminEmail}
+                  </div>
+                  <div className="truncate text-[12px] text-[var(--muted-foreground)]">
+                    {formatLastLogin(data.lastLoginAt)}
+                  </div>
                 </div>
-                <div className="truncate text-[12px] text-[var(--muted-foreground)]">
-                  {formatLastLogin(adminUser?.lastLoginAt ?? null)}
-                </div>
-              </div>
-              <I.Chevron size={16} className="shrink-0 text-[var(--muted-foreground)]" />
-            </Card>
-          </Link>
+                <I.Chevron size={16} className="shrink-0 text-[var(--muted-foreground)]" />
+              </Card>
+            </Link>
+          )}
         </div>
 
         {/* ── Grupo: Agenda ── */}
@@ -97,32 +163,56 @@ export default async function AdminAjustesPage() {
               subtitle="Nome, sobre e capa exibidos ao cliente"
             />
           </Link>
-          <Link href="/admin/ajustes/endereco" className="press block">
-            <ListItem
+          {loading || !data ? (
+            <ListItemValueSkeleton
+              href="/admin/ajustes/endereco"
               icon={<I.MapPin size={17} />}
               title="Endereço da agenda"
-              value={`/${settings.publicSlug}`}
             />
-          </Link>
-          <Link href="/admin/ajustes/email" className="press block">
-            <ListItem
+          ) : (
+            <Link href="/admin/ajustes/endereco" className="press block">
+              <ListItem
+                icon={<I.MapPin size={17} />}
+                title="Endereço da agenda"
+                value={`/${data.settings.publicSlug}`}
+              />
+            </Link>
+          )}
+          {loading || !data ? (
+            <ListItemValueSkeleton
+              href="/admin/ajustes/email"
               icon={<I.Bell size={17} />}
               title="Email para notificações"
-              value={settings.notificationEmail}
             />
-          </Link>
+          ) : (
+            <Link href="/admin/ajustes/email" className="press block">
+              <ListItem
+                icon={<I.Bell size={17} />}
+                title="Email para notificações"
+                value={data.settings.notificationEmail}
+              />
+            </Link>
+          )}
         </ListGroup>
 
         {/* ── Grupo: Privacidade ── */}
         <ListGroup title="Privacidade" className="mt-2">
-          <Link href="/admin/ajustes/retencao" className="press block">
-            <ListItem
+          {loading || !data ? (
+            <ListItemValueSkeleton
+              href="/admin/ajustes/retencao"
               icon={<I.Shield size={17} />}
               title="Retenção de dados"
-              subtitle="Anonimização automática após o período"
-              value={`${settings.retentionMonths} meses`}
             />
-          </Link>
+          ) : (
+            <Link href="/admin/ajustes/retencao" className="press block">
+              <ListItem
+                icon={<I.Shield size={17} />}
+                title="Retenção de dados"
+                subtitle="Anonimização automática após o período"
+                value={`${data.settings.retentionMonths} meses`}
+              />
+            </Link>
+          )}
         </ListGroup>
 
         {/* ── Sair ── */}
