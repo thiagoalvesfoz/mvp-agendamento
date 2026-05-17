@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { I } from "@/components/shared/icons";
+import { ConfirmSheet } from "@/components/shared/confirm-sheet";
 import { removeLandingCover, updateLanding, uploadLandingCover } from "@/features/settings/actions";
 import type { LandingConfigRow } from "@/features/settings/queries";
 
@@ -33,6 +34,7 @@ export function LandingForm({ config, coverUrl }: LandingFormProps) {
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [coverError, setCoverError] = useState<string | null>(null);
   const [coverPending, startCoverTransition] = useTransition();
+  const [removeOpen, setRemoveOpen] = useState(false);
 
   // libera object URL ao trocar/limpar o arquivo
   useEffect(() => {
@@ -235,14 +237,7 @@ export function LandingForm({ config, coverUrl }: LandingFormProps) {
                 <button
                   type="button"
                   disabled={coverPending}
-                  onClick={() => {
-                    if (!confirm("Remover a imagem de capa?")) return;
-                    setCoverError(null);
-                    startCoverTransition(async () => {
-                      const result = await removeLandingCover();
-                      if (!result.ok) setCoverError(result.error);
-                    });
-                  }}
+                  onClick={() => setRemoveOpen(true)}
                   className="press rounded-[8px] border border-[var(--border)] px-3 py-2 text-[13px] font-medium text-[var(--destructive)] disabled:opacity-40"
                 >
                   Remover
@@ -330,6 +325,27 @@ export function LandingForm({ config, coverUrl }: LandingFormProps) {
           {isPending ? "Salvando..." : dirty ? "Salvar página inicial" : "Sem alterações"}
         </Button>
       </div>
+
+      <ConfirmSheet
+        open={removeOpen}
+        title="Remover capa?"
+        description="A imagem de capa atual será apagada e a landing pública volta a exibir o placeholder padrão. Você pode enviar outra imagem depois."
+        confirmLabel="Sim, remover"
+        pendingLabel="Removendo..."
+        variant="danger"
+        isPending={coverPending}
+        onCancel={() => setRemoveOpen(false)}
+        onConfirm={() => {
+          setCoverError(null);
+          startCoverTransition(async () => {
+            const result = await removeLandingCover();
+            if (!result.ok) {
+              setCoverError(result.error);
+            }
+            setRemoveOpen(false);
+          });
+        }}
+      />
     </div>
   );
 }
