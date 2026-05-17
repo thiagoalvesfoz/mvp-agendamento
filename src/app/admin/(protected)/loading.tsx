@@ -1,16 +1,21 @@
-/**
- * loading.tsx — Agenda (dashboard).
- *
- * Exibido pelo Next.js enquanto o Server Component page.tsx carrega dados.
- * Estrutura espelha o layout real: header com título + tabs + date row + cards.
- */
+import Link from "next/link";
+import { I } from "@/components/shared/icons";
+
 export default function AgendaLoading() {
   return (
-    <div className="flex h-full flex-col">
+    <div className="relative flex h-full flex-col">
       {/* ── Header ── */}
-      <div className="px-5 pb-2 pt-6">
-        {/* Título */}
-        <div className="h-7 w-28 animate-pulse rounded-md bg-[var(--muted)]" />
+      <div className="px-5 pb-3 pt-5">
+        <div className="mb-4 flex items-start justify-between">
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
+              Agenda
+            </p>
+            <h1 className="mt-0.5 text-[22px] font-semibold leading-tight tracking-tight">
+              Atendimentos
+            </h1>
+          </div>
+        </div>
 
         {/* Tabs dia/semana/mês/pendentes */}
         <div className="mt-3 flex gap-2">
@@ -39,21 +44,26 @@ export default function AgendaLoading() {
               key={i}
               className="flex h-[70px] animate-pulse items-center gap-3 rounded-2xl bg-[var(--muted)] px-4"
             >
-              {/* Hora */}
               <div className="h-4 w-10 rounded bg-[var(--border)]" />
-              {/* Divider */}
               <div className="h-10 w-px bg-[var(--border)]" />
-              {/* Conteúdo */}
               <div className="flex flex-1 flex-col gap-2">
                 <div className="h-3.5 w-3/4 rounded bg-[var(--border)]" />
                 <div className="h-3 w-1/2 rounded bg-[var(--border)]" />
               </div>
-              {/* Badge status */}
               <div className="h-6 w-16 rounded-full bg-[var(--border)]" />
             </div>
           ))}
         </div>
       </div>
+
+      {/* ── FAB ── */}
+      <Link
+        href="/admin/agenda/novo"
+        aria-label="Novo agendamento"
+        className="press absolute bottom-5 right-5 z-10 flex size-14 items-center justify-center rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] shadow-[0_10px_24px_rgba(0,0,0,0.18)]"
+      >
+        <I.Plus size={22} strokeWidth={2.2} />
+      </Link>
     </div>
   );
 }

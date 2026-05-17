@@ -58,21 +58,6 @@ export function CustomerList() {
 
   const total = customers.length;
 
-  if (loading) {
-    return (
-      <div className="flex min-h-0 flex-1 flex-col">
-        {/* Search bar placeholder */}
-        <div className="px-5 pb-3">
-          <div className="h-10 w-full animate-pulse rounded-lg bg-[var(--muted)]" />
-          <div className="mt-2 h-3 w-40 animate-pulse rounded bg-[var(--muted)]" />
-        </div>
-        <div className="flex-1 overflow-hidden px-5">
-          <CustomerSkeleton />
-        </div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center">
@@ -102,20 +87,25 @@ export function CustomerList() {
             placeholder="Buscar por nome ou telefone"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            disabled={loading}
             autoComplete="off"
             autoCorrect="off"
             spellCheck={false}
           />
         </div>
-        <p className="mt-2 text-[12px] text-[var(--muted-foreground)]">
-          {total} {total === 1 ? "cliente único" : "clientes únicos"} · histórico completo de cada
-          um
-        </p>
+        {!loading && (
+          <p className="mt-2 text-[12px] text-[var(--muted-foreground)]">
+            {total} {total === 1 ? "cliente único" : "clientes únicos"} · histórico completo de cada
+            um
+          </p>
+        )}
       </div>
 
-      {/* ── Lista / Empty state ── */}
+      {/* ── Lista / Skeleton / Empty state ── */}
       <div className="flex-1 overflow-y-auto px-5 pb-4">
-        {filtered.length === 0 ? (
+        {loading ? (
+          <CustomerSkeleton />
+        ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
             <div className="flex size-14 items-center justify-center rounded-2xl bg-[var(--muted)]">
               <I.Users size={24} className="text-[var(--muted-foreground)]" />

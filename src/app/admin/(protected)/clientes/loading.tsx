@@ -1,3 +1,5 @@
+import { Input } from "@/components/ui/input";
+import { I } from "@/components/shared/icons";
 import { CustomerSkeleton } from "@/features/customers/components/customer-skeleton";
 
 export default function ClientesLoading() {
@@ -9,10 +11,15 @@ export default function ClientesLoading() {
         <div className="mt-1.5 h-7 w-32 animate-pulse rounded-md bg-[var(--muted)]" />
       </div>
 
-      {/* ── Search bar skeleton ── */}
+      {/* ── Search bar ── */}
       <div className="px-5 pb-3">
-        <div className="h-10 w-full animate-pulse rounded-lg bg-[var(--muted)]" />
-        <div className="mt-2 h-3 w-40 animate-pulse rounded bg-[var(--muted)]" />
+        <div className="relative">
+          <I.Search
+            size={16}
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
+          />
+          <Input placeholder="Buscar por nome ou telefone" disabled className="pl-10" />
+        </div>
       </div>
 
       {/* ── Customer rows ── */}
