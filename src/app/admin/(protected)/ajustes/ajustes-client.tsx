@@ -37,7 +37,7 @@ function ListItemValueSkeleton({
         </div>
         <div className="min-w-0 flex-1">
           <div className="text-[14px] font-medium tracking-tight">{title}</div>
-          <div className="mt-0.5 h-4 w-28 animate-pulse rounded bg-[var(--muted)]" />
+          <div className="mt-0.5 h-[18px] w-28 animate-pulse rounded bg-[var(--muted)]" />
         </div>
         <I.Chevron size={15} className="shrink-0 text-[var(--muted-foreground)]" />
       </div>
