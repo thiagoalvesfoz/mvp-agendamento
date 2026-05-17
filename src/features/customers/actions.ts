@@ -49,9 +49,33 @@ export async function anonymizeCustomer(id: string): Promise<ActionResult> {
 
   const now = new Date();
 
-  await db.$transaction([
-    // 1. Anonimiza o registro do Cliente
-    db.customer.update({
+  await db.$transaction(async (tx) => {
+    // 1. Cancela agendamentos ativos — libera os slots (RN03)
+    const activeAppointments = await tx.appointment.findMany({
+      where: { customerId: id, status: { in: ["PENDING", "CONFIRMED"] } },
+      select: { id: true, status: true },
+    });
+
+    if (activeAppointments.length > 0) {
+      await tx.appointment.updateMany({
+        where: { customerId: id, status: { in: ["PENDING", "CONFIRMED"] } },
+        data: { status: "CANCELED" },
+      });
+
+      await tx.appointmentHistory.createMany({
+        data: activeAppointments.map((a) => ({
+          appointmentId: a.id,
+          eventType: "status_change",
+          statusFrom: a.status,
+          statusTo: "CANCELED",
+          changedBy: "system",
+          reason: "Cliente anonimizado (LGPD)",
+        })),
+      });
+    }
+
+    // 2. Anonimiza o registro do Cliente
+    await tx.customer.update({
       where: { id },
       data: {
         anonymizedAt: now,
@@ -61,11 +85,11 @@ export async function anonymizeCustomer(id: string): Promise<ActionResult> {
         // Mantém unicidade no campo unique sem expor o ID real na UI
         phone: `anonimizado-${id}`,
       },
-    }),
+    });
 
-    // 2. Anonimiza snapshots de todos os agendamentos deste cliente.
+    // 3. Anonimiza snapshots de todos os agendamentos deste cliente.
     //    Preserva datas, serviço, status — necessários para relatórios fiscais.
-    db.appointment.updateMany({
+    await tx.appointment.updateMany({
       where: { customerId: id },
       data: {
         anonymizedAt: now,
@@ -74,10 +98,10 @@ export async function anonymizeCustomer(id: string): Promise<ActionResult> {
         customerEmailSnapshot: null,
         customerSocialMediaSnapshot: null,
       },
-    }),
+    });
 
-    // 3. Registra a operação no histórico do cliente para auditoria
-    db.customerHistory.create({
+    // 4. Registra a operação no histórico do cliente para auditoria
+    await tx.customerHistory.create({
       data: {
         customerId: id,
         field: "anonymization",
@@ -85,9 +109,10 @@ export async function anonymizeCustomer(id: string): Promise<ActionResult> {
         newValue: "Cliente anônimo",
         changedAt: now,
       },
-    }),
-  ]);
+    });
+  });
 
+  revalidatePath("/admin");
   revalidatePath("/admin/clientes");
   revalidatePath(`/admin/clientes/${id}`);
 
