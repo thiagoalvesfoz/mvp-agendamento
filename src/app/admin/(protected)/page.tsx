@@ -12,15 +12,15 @@
  *   /admin?view=month&ym=2026-05
  *   /admin?view=pending
  */
-import { todayISO } from "@/lib/time";
+import { AgendaScreen, type AgendaView } from "@/features/appointments/components/agenda-screen";
 import {
+  getAgendaStats,
+  getAllPending,
   getAppointmentsByDateRange,
   getAppointmentsByMonth,
-  getAllPending,
-  getAgendaStats,
 } from "@/features/appointments/queries";
 import { listBlockedDatesByMonth, listBlockedDatesInRange } from "@/features/settings/queries";
-import { AgendaScreen, type AgendaView } from "@/features/appointments/components/agenda-screen";
+import { todayISO } from "@/lib/time";
 
 interface AdminAgendaPageProps {
   searchParams: Promise<{

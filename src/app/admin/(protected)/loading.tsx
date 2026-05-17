@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { I } from "@/components/shared/icons";
+import Link from "next/link";
 
 export default function AgendaLoading() {
   return (
@@ -17,12 +17,27 @@ export default function AgendaLoading() {
           </div>
         </div>
 
-        {/* Tabs dia/semana/mês/pendentes */}
-        <div className="mt-3 flex gap-2">
+        {/* Stats pills */}
+        <div className="grid grid-cols-3 gap-2">
+          {["Pendentes", "Hoje", "Esta semana"].map((label) => (
+            <div
+              key={label}
+              className="animate-pulse rounded-2xl border border-[var(--border)] bg-[var(--muted)] px-3 py-2.5"
+            >
+              <div className="h-2.5 w-10 rounded bg-[var(--border)]" />
+              <div className="mt-1.5 h-5 w-6 rounded bg-[var(--border)]" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Segmented selector ── */}
+      <div className="px-5 pb-3">
+        <div className="flex gap-2">
           {[64, 72, 52, 80].map((w, i) => (
             <div
               key={i}
-              className="h-8 animate-pulse rounded-full bg-[var(--muted)]"
+              className="h-8 flex-1 animate-pulse rounded-full bg-[var(--muted)]"
               style={{ width: w }}
             />
           ))}
