@@ -3,9 +3,9 @@
  *
  * Server Component. A navegação para /admin/clientes/[id] é via Link.
  */
-import Link from "next/link";
 import { CustomerAvatar } from "@/features/customers/components/customer-avatar";
 import type { CustomerRow } from "@/features/customers/queries";
+import Link from "next/link";
 
 /** Formata telefone BR: +55 (47) 99999-9999 → "(47) 99999-9999". */
 function fmtPhone(raw: string): string {
@@ -48,7 +48,7 @@ export function CustomerCard({ customer }: CustomerCardProps) {
       <div className="shrink-0 text-right">
         <div className="font-mono text-[13px] font-medium tracking-tight">{count}</div>
         <div className="text-[10px] uppercase tracking-[0.1em] text-[var(--muted-foreground)]">
-          {count === 1 ? "visita" : "visitas"}
+          {count === 1 ? "agendamento" : "agendamentos"}
         </div>
       </div>
     </Link>
