@@ -8,15 +8,15 @@
  * o fetch. O card de perfil e os três valores dinâmicos exibem skeleton
  * enquanto os dados chegam.
  */
-import { useEffect, useState, type ReactNode } from "react";
-import Link from "next/link";
-import { logoutAction } from "@/features/auth/actions";
+import { I } from "@/components/shared/icons";
 import { ListGroup, ListItem } from "@/components/shared/list-group";
 import { Card } from "@/components/ui/card";
+import { logoutAction } from "@/features/auth/actions";
 import { CustomerAvatar } from "@/features/customers/components/customer-avatar";
-import { I } from "@/components/shared/icons";
-import { formatInTZ } from "@/lib/time";
 import type { SettingsRow } from "@/features/settings/queries";
+import { formatInTZ } from "@/lib/time";
+import Link from "next/link";
+import { useEffect, useState, type ReactNode } from "react";
 
 // ── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -39,7 +39,7 @@ function formatLastLogin(iso: string | null): string {
 
 function AdminCardSkeleton() {
   return (
-    <div className="flex h-[60px] animate-pulse items-center gap-3 rounded-2xl bg-[var(--muted)] px-3.5">
+    <div className="flex h-[69.75px] animate-pulse items-center gap-3 rounded-2xl bg-[var(--muted)] px-3.5">
       <div className="size-9 shrink-0 rounded-full bg-[var(--border)]" />
       <div className="flex flex-1 flex-col gap-1.5">
         <div className="h-3.5 w-3/5 rounded bg-[var(--border)]" />
@@ -84,15 +84,25 @@ function ListItemValueSkeleton({
 export default function AdminAjustesPage() {
   const [data, setData] = useState<AjustesData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  async function fetchData() {
+    setLoading(true);
+    setError(false);
+    try {
+      const res = await fetch("/api/admin/ajustes");
+      if (!res.ok) throw new Error("fetch failed");
+      const json = (await res.json()) as AjustesData;
+      setData(json);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    fetch("/api/admin/ajustes")
-      .then((r) => r.json())
-      .then((json: AjustesData) => {
-        setData(json);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    void fetchData();
   }, []);
 
   return (
@@ -109,7 +119,18 @@ export default function AdminAjustesPage() {
       <div className="flex-1 overflow-y-auto pb-6">
         {/* ── Card do admin ── */}
         <div className="px-5 pb-4">
-          {loading || !data ? (
+          {error ? (
+            <div className="flex flex-col items-center gap-2 py-4 text-center">
+              <p className="text-[14px] font-medium">Erro ao carregar ajustes</p>
+              <button
+                type="button"
+                onClick={() => void fetchData()}
+                className="press text-[13px] text-[var(--primary)]"
+              >
+                Tentar novamente
+              </button>
+            </div>
+          ) : loading || !data ? (
             <AdminCardSkeleton />
           ) : (
             <Link href="/admin/ajustes/perfil" className="press block">
