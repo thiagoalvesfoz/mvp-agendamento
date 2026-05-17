@@ -17,7 +17,7 @@ import { I } from "@/components/shared/icons";
 import { StatusBadge, StatusDot } from "@/components/shared/status-badge";
 import { Card } from "@/components/ui/card";
 import type { AppointmentCard } from "@/features/appointments/types";
-import { formatDateBR, monthShort, weekdayName, weekdayShort } from "@/lib/time";
+import { formatDateBR, formatDuration, monthShort, weekdayName, weekdayShort } from "@/lib/time";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -557,7 +557,7 @@ function DayApptRow({ appt }: { appt: AppointmentCard }) {
               {appt.customerNameSnapshot}
             </span>
             <div className="mt-0.5 truncate text-[12.5px] text-[var(--muted-foreground)]">
-              {appt.serviceNameSnapshot} · {appt.durationMinutesSnapshot} min
+              {appt.serviceNameSnapshot} · {formatDuration(appt.durationMinutesSnapshot)}
             </div>
           </div>
           <StatusBadge status={appt.status} />

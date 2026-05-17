@@ -94,3 +94,16 @@ export function formatDateBR(date: Date): string {
 export function todayISO(): string {
   return formatInTimeZone(new Date(), TZ, "yyyy-MM-dd");
 }
+
+/**
+ * Formata duração em minutos para "Xh Ymin" / "Xh" / "Ymin".
+ * Ex.: 30 → "30min", 60 → "1h", 90 → "1h 30min", 150 → "2h 30min".
+ */
+export function formatDuration(totalMinutes: number): string {
+  const safe = Math.max(0, Math.trunc(totalMinutes));
+  const hours = Math.floor(safe / 60);
+  const minutes = safe % 60;
+  if (hours === 0) return `${minutes}min`;
+  if (minutes === 0) return `${hours}h`;
+  return `${hours}h ${minutes}min`;
+}

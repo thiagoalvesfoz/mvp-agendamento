@@ -10,7 +10,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { I } from "@/components/shared/icons";
-import { formatInTZ, weekdayName } from "@/lib/time";
+import { formatDuration, formatInTZ, weekdayName } from "@/lib/time";
 import { getAppointmentById } from "@/features/appointments/queries";
 import { AppointmentActions } from "@/features/appointments/components/appointment-actions";
 import { DurationAdjuster } from "@/features/appointments/components/duration-adjuster";
@@ -128,7 +128,7 @@ export default async function AppointmentDetailPage({ params }: AppointmentDetai
                 {appt.serviceNameSnapshot}
               </div>
               <div className="text-[12px] text-[var(--muted-foreground)]">
-                {appt.durationMinutesSnapshot} min
+                {formatDuration(appt.durationMinutesSnapshot)}
                 {appt.bufferPreSnapshot > 0 && ` · buffer pré ${appt.bufferPreSnapshot}min`}
                 {appt.bufferPosSnapshot > 0 && ` · pós ${appt.bufferPosSnapshot}min`}
               </div>
@@ -163,7 +163,7 @@ export default async function AppointmentDetailPage({ params }: AppointmentDetai
               <div className="mt-4 flex items-center gap-2.5 border-t border-[var(--border)] pt-3.5 text-[13.5px]">
                 <I.Edit size={15} className="text-[var(--muted-foreground)]" />
                 <span className="w-16 text-[var(--muted-foreground)]">Real</span>
-                <span>{appt.actualDurationMinutes} min</span>
+                <span>{formatDuration(appt.actualDurationMinutes)}</span>
               </div>
             )
           )}

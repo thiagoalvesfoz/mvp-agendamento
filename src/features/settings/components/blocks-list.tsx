@@ -6,7 +6,7 @@
  * Exibe datas pontuais bloqueadas e bloqueios recorrentes.
  * Remoção via Server Actions com useTransition para feedback visual.
  */
-import { useTransition, useState } from "react";
+import { useTransition } from "react";
 import { I } from "@/components/shared/icons";
 import { cn } from "@/lib/utils";
 import { weekdayName, monthShort } from "@/lib/time";
@@ -96,21 +96,12 @@ interface BlocksListProps {
 }
 
 export function BlocksList({ blockedDates, recurringBlocks }: BlocksListProps) {
-  const [localDates, setLocalDates] = useState(blockedDates);
-  const [localRecurring, setLocalRecurring] = useState(recurringBlocks);
-
   const handleDeleteDate = async (id: string) => {
-    const result = await deleteBlockedDate(id);
-    if (result.ok) {
-      setLocalDates((prev) => prev.filter((d) => d.id !== id));
-    }
+    await deleteBlockedDate(id);
   };
 
   const handleDeleteRecurring = async (id: string) => {
-    const result = await deleteRecurringBlock(id);
-    if (result.ok) {
-      setLocalRecurring((prev) => prev.filter((r) => r.id !== id));
-    }
+    await deleteRecurringBlock(id);
   };
 
   return (
@@ -121,13 +112,13 @@ export function BlocksList({ blockedDates, recurringBlocks }: BlocksListProps) {
           Próximas datas bloqueadas
         </div>
 
-        {localDates.length === 0 ? (
+        {blockedDates.length === 0 ? (
           <p className="py-8 text-center text-[13px] text-[var(--muted-foreground)]">
             Nenhuma data bloqueada.
           </p>
         ) : (
           <div className="space-y-1.5">
-            {localDates.map((b) => {
+            {blockedDates.map((b) => {
               const { month, day, weekday, full } = formatBlockedDateLabel(b.date);
               return (
                 <div
@@ -169,13 +160,13 @@ export function BlocksList({ blockedDates, recurringBlocks }: BlocksListProps) {
           Bloqueios recorrentes
         </div>
 
-        {localRecurring.length === 0 ? (
+        {recurringBlocks.length === 0 ? (
           <p className="py-8 text-center text-[13px] text-[var(--muted-foreground)]">
             Nenhum bloqueio recorrente.
           </p>
         ) : (
           <div className="space-y-1.5">
-            {localRecurring.map((r) => {
+            {recurringBlocks.map((r) => {
               const { title, subtitle } = recurringLabel(r);
               return (
                 <div

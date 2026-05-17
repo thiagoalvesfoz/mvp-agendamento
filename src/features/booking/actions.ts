@@ -3,8 +3,10 @@
 import { db } from "@/lib/db";
 import { createAppointmentSchema, type CreateAppointmentInput } from "./schemas";
 import { Prisma } from "@prisma/client";
-import { fromZonedTime } from "date-fns-tz";
-import { TZ } from "@/lib/time";
+import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
+import { addDays, addHours } from "date-fns";
+import { TZ, combineDateAndTimeInTZ } from "@/lib/time";
+import { getSettings } from "@/features/settings/queries";
 
 export type CreateAppointmentResult =
   | {
@@ -67,6 +69,31 @@ export async function createAppointment(
     phone = normalizePhone(data.phone);
   } catch {
     return { ok: false, error: "Telefone inválido" };
+  }
+
+  // Regras do estúdio (antecedência mínima e limite máximo no futuro).
+  // Validamos aqui também porque a UI confia nos slots filtrados, mas o
+  // endpoint é público — não dá pra confiar só no cliente.
+  const settings = await getSettings();
+  const now = new Date();
+  const slotStart = combineDateAndTimeInTZ(data.date, data.startTime);
+  const earliestStart = addHours(now, settings.minimumScheduleNoticeHours);
+  if (slotStart < earliestStart) {
+    return {
+      ok: false,
+      error: `Agendamentos exigem ao menos ${settings.minimumScheduleNoticeHours}h de antecedência.`,
+    };
+  }
+  const latestISO = formatInTimeZone(
+    addDays(now, settings.maximumScheduleDaysAhead),
+    TZ,
+    "yyyy-MM-dd",
+  );
+  if (data.date > latestISO) {
+    return {
+      ok: false,
+      error: `Só aceitamos agendamentos até ${settings.maximumScheduleDaysAhead} dias à frente.`,
+    };
   }
 
   // Busca serviço

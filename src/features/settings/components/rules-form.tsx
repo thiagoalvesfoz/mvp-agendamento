@@ -56,7 +56,13 @@ export function RulesForm({ settings }: RulesFormProps) {
         <div className="space-y-4">
           <Card className="p-4">
             <Label hint="horas">Antecedência mínima</Label>
-            <DurationStepper value={minNoticeHours} onChange={setMinNoticeHours} step={1} min={1} />
+            <DurationStepper
+              value={minNoticeHours}
+              onChange={setMinNoticeHours}
+              step={1}
+              min={1}
+              unit="h"
+            />
             <p className="mt-2 text-[12px] text-[var(--muted-foreground)]">
               Cliente só consegue agendar com pelo menos {minNoticeHours}h de antecedência.
             </p>
@@ -64,7 +70,13 @@ export function RulesForm({ settings }: RulesFormProps) {
 
           <Card className="p-4">
             <Label hint="dias">Limite máximo no futuro</Label>
-            <DurationStepper value={maxDaysAhead} onChange={setMaxDaysAhead} step={5} min={1} />
+            <DurationStepper
+              value={maxDaysAhead}
+              onChange={setMaxDaysAhead}
+              step={5}
+              min={1}
+              unit="dias"
+            />
             <p className="mt-2 text-[12px] text-[var(--muted-foreground)]">
               Não aceitar pedidos com mais de {maxDaysAhead} dias à frente.
             </p>
@@ -77,6 +89,7 @@ export function RulesForm({ settings }: RulesFormProps) {
               onChange={setExpirationHours}
               step={6}
               min={1}
+              unit="h"
             />
             <p className="mt-2 text-[12px] text-[var(--muted-foreground)]">
               Se você não confirmar em {expirationHours}h, o pedido expira e o horário fica livre de

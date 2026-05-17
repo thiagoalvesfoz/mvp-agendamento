@@ -6,16 +6,18 @@ import { cn } from "@/lib/utils";
 interface DurationStepperProps {
   value: number;
   onChange: (value: number) => void;
-  /** Passo em minutos (padrão: 15) */
+  /** Passo (padrão: 15) */
   step?: number;
   /** Valor mínimo (padrão: 0 — permite buffer zerado) */
   min?: number;
+  /** Sufixo exibido ao lado do valor (padrão: "min") */
+  unit?: string;
   label?: string;
   className?: string;
 }
 
 /**
- * Stepper de duração em minutos, incrementando de 15 em 15.
+ * Stepper numérico genérico (default em minutos de 15 em 15).
  * Mantém o valor na faixa [min, ∞) e em múltiplos de `step`.
  */
 export function DurationStepper({
@@ -23,6 +25,7 @@ export function DurationStepper({
   onChange,
   step = 15,
   min = 0,
+  unit = "min",
   className,
 }: DurationStepperProps) {
   const decrement = () => {
@@ -50,7 +53,7 @@ export function DurationStepper({
       </button>
 
       <div className="flex-1 select-none text-center font-mono text-[15px] font-medium tabular-nums">
-        {value} min
+        {value} {unit}
       </div>
 
       <button

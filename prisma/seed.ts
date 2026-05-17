@@ -18,16 +18,16 @@ async function main() {
   console.info("🌱 Iniciando seed...");
 
   // --- Admin ---
-  const passwordHash = await bcrypt.hash("admin123", 12);
+  const passwordHash = await bcrypt.hash("123123", 12);
   await db.adminUser.upsert({
     where: { email: "admin@example.com" },
     update: {},
     create: {
-      email: "admin@example.com",
+      email: "julialimabarros08@gmail.com",
       passwordHash,
     },
   });
-  console.info("✓ Admin: admin@example.com / admin123");
+  console.info("✓ Admin: julialimabarros08@gmail.com / 123123");
 
   // --- Settings ---
   await db.settings.upsert({
@@ -35,7 +35,7 @@ async function main() {
     update: {},
     create: {
       id: 1,
-      notificationEmail: "admin@example.com",
+      notificationEmail: "julialimabarros08@gmail.com",
       publicSlug: "minha-agenda",
     },
   });

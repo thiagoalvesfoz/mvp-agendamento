@@ -1,7 +1,16 @@
 import "server-only";
 import { db } from "@/lib/db";
-import { addDays, format } from "date-fns";
+import { addDays, addHours, format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
+import { TZ, combineDateAndTimeInTZ } from "@/lib/time";
 import type { BlockedDateEntry } from "./components/calendar-picker";
+
+export type SlotRules = {
+  /** Mínimo de horas entre agora e o início do slot. */
+  minNoticeHours?: number;
+  /** Janela máxima (em dias corridos) a partir de hoje. */
+  maxDaysAhead?: number;
+};
 
 export type ServiceForBooking = {
   id: string;
@@ -41,13 +50,23 @@ export async function getActiveServices(): Promise<ServiceForBooking[]> {
  *  - blocked_dates parciais (startTime/endTime preenchidos) — dias inteiros já são bloqueados no calendário via getBlockedDatesForCalendar
  *  - recurring_blocks (weekly/yearly)
  *  - buffer pré/pós dos agendamentos existentes (usar snapshots)
- *  - antecedência mínima e limite máximo (settings)
  *  - calcular usando America/Sao_Paulo (Temporal/date-fns-tz)
+ *
+ * Regras opcionais (passadas pelo caller público; admin não passa para não restringir):
+ *  - minNoticeHours: antecedência mínima entre agora e o início do slot
+ *  - maxDaysAhead: janela máxima em dias a partir de hoje
  */
 export async function getAvailableSlotsForDate(
   serviceId: string,
   dateIso: string, // YYYY-MM-DD
+  rules?: SlotRules,
 ): Promise<string[]> {
+  // Janela máxima: rejeita data inteira fora do limite
+  if (rules?.maxDaysAhead != null) {
+    const latestISO = formatInTimeZone(addDays(new Date(), rules.maxDaysAhead), TZ, "yyyy-MM-dd");
+    if (dateIso > latestISO) return [];
+  }
+
   const service = await db.service.findUnique({
     where: { id: serviceId },
     select: { durationMinutes: true },
@@ -79,6 +98,10 @@ export async function getAvailableSlotsForDate(
     occupied.add(`${a.startTime}-${a.endTime}`);
   }
 
+  // Antecedência mínima: instante mais cedo aceitável para início do slot
+  const earliestStart =
+    rules?.minNoticeHours != null ? addHours(new Date(), rules.minNoticeHours) : null;
+
   // Gera slots de 30 em 30
   const SLOT_STEP = 30;
   const slots: string[] = [];
@@ -94,7 +117,9 @@ export async function getAvailableSlotsForDate(
         if (!s || !e) return false;
         return overlaps(startStr, endStr, s, e);
       });
-      if (!overlap) slots.push(startStr);
+      const beforeMinNotice =
+        earliestStart != null && combineDateAndTimeInTZ(dateIso, startStr) < earliestStart;
+      if (!overlap && !beforeMinNotice) slots.push(startStr);
       cur += SLOT_STEP;
     }
   }
@@ -139,7 +164,10 @@ export async function getBlockedDatesForCalendar(): Promise<BlockedDateEntry[]> 
   });
 
   return rows.map((r) => ({
-    date: r.date,
+    // @db.Date é uma data calendário pura; Prisma a devolve como Date à
+    // meia-noite UTC. Os componentes calendário só estão corretos nos
+    // slots UTC — qualquer conversão de fuso desloca o dia.
+    date: r.date.toISOString().slice(0, 10),
     reason: r.reason ?? undefined,
   }));
 }

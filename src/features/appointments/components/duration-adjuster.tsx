@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { I } from "@/components/shared/icons";
 import { updateAppointmentDuration } from "@/features/appointments/actions";
+import { formatDuration } from "@/lib/time";
 
 interface DurationAdjusterProps {
   appointmentId: string;
@@ -86,11 +87,11 @@ export function DurationAdjuster({
             Duração atual
           </div>
           <div className="mt-0.5 text-[14px] font-medium tracking-tight">
-            {baseDuration} min
+            {formatDuration(baseDuration)}
             {baseDuration !== durationSnapshot && (
               <span className="ml-2 text-[12px] font-normal text-[var(--muted-foreground)]">
-                ({baseDuration > durationSnapshot ? "+" : ""}
-                {baseDuration - durationSnapshot} min vs. estimado)
+                ({baseDuration > durationSnapshot ? "+" : "−"}
+                {formatDuration(Math.abs(baseDuration - durationSnapshot))} vs. estimado)
               </span>
             )}
           </div>
@@ -126,7 +127,9 @@ export function DurationAdjuster({
           <span className="text-[18px] leading-none">–</span>
         </button>
         <div className="flex-1 text-center">
-          <div className="font-mono text-[20px] font-medium tracking-tight">{duration} min</div>
+          <div className="font-mono text-[20px] font-medium tracking-tight">
+            {formatDuration(duration)}
+          </div>
           <div className="text-[11px] text-[var(--muted-foreground)]">
             término{" "}
             <span className={changed ? "font-medium text-[var(--primary)]" : undefined}>
@@ -135,8 +138,8 @@ export function DurationAdjuster({
             {deltaVsSnapshot !== 0 && (
               <>
                 {" "}
-                · {deltaVsSnapshot > 0 ? "+" : ""}
-                {deltaVsSnapshot} min vs. estimado
+                · {deltaVsSnapshot > 0 ? "+" : "−"}
+                {formatDuration(Math.abs(deltaVsSnapshot))} vs. estimado
               </>
             )}
           </div>

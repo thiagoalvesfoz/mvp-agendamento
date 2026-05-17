@@ -2,6 +2,9 @@
 
 import { I } from "@/components/shared/icons";
 import { cn } from "@/lib/utils";
+import { addDays, addHours, format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
+import { TZ } from "@/lib/time";
 import { useMemo, useState } from "react";
 
 const MESES = [
@@ -51,7 +54,8 @@ function sameDay(a: Date, b: Date): boolean {
 }
 
 export type BlockedDateEntry = {
-  date: Date;
+  /** Data no fuso da agenda, no formato YYYY-MM-DD. */
+  date: string;
   reason?: string;
 };
 
@@ -62,6 +66,13 @@ interface CalendarPickerProps {
   isDayDisabled?: (d: Date) => boolean;
   /** Datas bloqueadas pelo admin (futuro: vem do servidor). */
   blockedDates?: BlockedDateEntry[];
+  /**
+   * Antecedência mínima em horas. Se informado, desabilita dias inteiramente
+   * anteriores ao limite (slot-level filtra os horários parciais do dia-limite).
+   */
+  minNoticeHours?: number;
+  /** Janela máxima em dias corridos a partir de hoje. */
+  maxDaysAhead?: number;
 }
 
 export function CalendarPicker({
@@ -69,6 +80,8 @@ export function CalendarPicker({
   onChange,
   isDayDisabled,
   blockedDates = [],
+  minNoticeHours,
+  maxDaysAhead,
 }: CalendarPickerProps) {
   // Regra default — domingo bloqueado (no seed atual, dom não tem availability)
   const disabledFn = isDayDisabled ?? ((d: Date) => d.getDay() === 0);
@@ -82,23 +95,32 @@ export function CalendarPicker({
   const [pickerYear, setPickerYear] = useState(view.getFullYear());
 
   const blockedKeySet = useMemo(() => {
-    const s = new Set<string>();
-    blockedDates.forEach((b) => {
-      const d = b.date;
-      s.add(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`);
-    });
-    return s;
+    return new Set(blockedDates.map((b) => b.date));
   }, [blockedDates]);
 
   const blockedReasonMap = useMemo(() => {
     const m = new Map<string, string>();
     blockedDates.forEach((b) => {
-      if (b.reason) {
-        m.set(`${b.date.getFullYear()}-${b.date.getMonth()}-${b.date.getDate()}`, b.reason);
-      }
+      if (b.reason) m.set(b.date, b.reason);
     });
     return m;
   }, [blockedDates]);
+
+  // Janela permitida pelas regras de agenda (calculada no fuso do estúdio para
+  // espelhar a regra aplicada no servidor — independe do TZ do browser).
+  const { earliestISO, latestISO } = useMemo(() => {
+    const now = new Date();
+    return {
+      earliestISO:
+        minNoticeHours != null
+          ? formatInTimeZone(addHours(now, minNoticeHours), TZ, "yyyy-MM-dd")
+          : null,
+      latestISO:
+        maxDaysAhead != null
+          ? formatInTimeZone(addDays(now, maxDaysAhead), TZ, "yyyy-MM-dd")
+          : null,
+    };
+  }, [minNoticeHours, maxDaysAhead]);
 
   const year = view.getFullYear();
   const month = view.getMonth();
@@ -117,8 +139,11 @@ export function CalendarPicker({
   }
 
   const canGoBack = startOfDay(first) > today;
+  // Bloqueia avançar quando o próximo mês inteiro fica além de maxDaysAhead.
+  const canGoForward =
+    latestISO == null || format(new Date(year, month + 1, 1), "yyyy-MM-dd") <= latestISO;
   const prevMonth = () => canGoBack && setView(new Date(year, month - 1, 1));
-  const nextMonth = () => setView(new Date(year, month + 1, 1));
+  const nextMonth = () => canGoForward && setView(new Date(year, month + 1, 1));
 
   const openPicker = () => {
     setPickerYear(year);
@@ -167,10 +192,10 @@ export function CalendarPicker({
 
         <button
           onClick={nextMonth}
-          disabled={picker}
+          disabled={picker || !canGoForward}
           className={cn(
             "press flex size-9 items-center justify-center rounded-full",
-            picker
+            picker || !canGoForward
               ? "text-muted-foreground/30 cursor-not-allowed"
               : "text-foreground hover:bg-muted",
           )}
@@ -262,14 +287,17 @@ export function CalendarPicker({
               <div key={ri} className="grid grid-cols-7 gap-1">
                 {row.map((d, ci) => {
                   if (!d) return <div key={ci} className="h-10" />;
-                  const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+                  const key = format(d, "yyyy-MM-dd");
                   const isPast = startOfDay(d) < today;
                   const isOff = disabledFn(d);
                   const isBlocked = blockedKeySet.has(key);
                   const reason = blockedReasonMap.get(key);
                   const isSel = value ? sameDay(d, value) : false;
                   const isToday = sameDay(d, today);
-                  const disabled = isPast || isOff || isBlocked;
+                  const isBeforeMinNotice = earliestISO != null && key < earliestISO;
+                  const isAfterMaxAhead = latestISO != null && key > latestISO;
+                  const disabled =
+                    isPast || isOff || isBlocked || isBeforeMinNotice || isAfterMaxAhead;
                   return (
                     <button
                       key={ci}
@@ -287,6 +315,11 @@ export function CalendarPicker({
                           isOff &&
                           !isPast &&
                           !isBlocked &&
+                          "text-muted-foreground/35 cursor-not-allowed opacity-40",
+                        !isSel &&
+                          !isPast &&
+                          !isBlocked &&
+                          (isBeforeMinNotice || isAfterMaxAhead) &&
                           "text-muted-foreground/35 cursor-not-allowed opacity-40",
                         !isSel &&
                           isBlocked &&

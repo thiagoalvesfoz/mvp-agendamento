@@ -26,6 +26,7 @@ import { searchCustomersAction } from "@/features/customers/client-actions";
 import type { CustomerSuggestion } from "@/features/customers/queries";
 import type { ServiceRow } from "@/features/services/queries";
 import { maskPhoneBR } from "@/lib/phone";
+import { formatDuration } from "@/lib/time";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -250,7 +251,7 @@ export function CreateAppointmentForm({
                   {service.name}
                 </div>
                 <div className="text-[11.5px] text-[var(--muted-foreground)]">
-                  {service.durationMinutes} min · buffer +{service.bufferPosMinutes}
+                  {formatDuration(service.durationMinutes)} · buffer +{service.bufferPosMinutes}
                 </div>
               </div>
             </>
@@ -551,7 +552,7 @@ export function CreateAppointmentForm({
                               {s.name}
                             </div>
                             <div className="text-[11.5px] text-[var(--muted-foreground)]">
-                              {s.durationMinutes} min · buffer +{s.bufferPosMinutes}
+                              {formatDuration(s.durationMinutes)} · buffer +{s.bufferPosMinutes}
                             </div>
                           </div>
                           {selected && (

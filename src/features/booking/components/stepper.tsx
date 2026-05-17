@@ -19,7 +19,7 @@ import { createAppointment } from "../actions";
 import { maskPhoneBR } from "@/lib/phone";
 import type { ServiceForBooking } from "../queries";
 import type { BlockedDateEntry } from "./calendar-picker";
-import { getSlotsAction } from "../client-actions";
+import { getPublicSlotsAction } from "../client-actions";
 
 const TOTAL_STEPS = 4;
 
@@ -27,6 +27,8 @@ interface BookingStepperProps {
   studioName: string;
   services: ServiceForBooking[];
   blockedDates: BlockedDateEntry[];
+  minNoticeHours: number;
+  maxDaysAhead: number;
 }
 
 function dateToIso(d: Date): string {
@@ -46,7 +48,13 @@ function addMinutesToHHmm(hhmm: string, minutes: number): string {
   return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
 }
 
-export function BookingStepper({ studioName, services, blockedDates }: BookingStepperProps) {
+export function BookingStepper({
+  studioName,
+  services,
+  blockedDates,
+  minNoticeHours,
+  maxDaysAhead,
+}: BookingStepperProps) {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [service, setService] = useState<ServiceForBooking | null>(null);
@@ -90,7 +98,7 @@ export function BookingStepper({ studioName, services, blockedDates }: BookingSt
     if (!service) return;
     setSlotsLoading(true);
     try {
-      const result = await getSlotsAction(service.id, iso);
+      const result = await getPublicSlotsAction(service.id, iso);
       setSlots(result);
     } finally {
       setSlotsLoading(false);
@@ -167,6 +175,8 @@ export function BookingStepper({ studioName, services, blockedDates }: BookingSt
                 value={date ? new Date(`${date}T12:00:00`) : null}
                 onChange={handleSelectDate}
                 blockedDates={blockedDates}
+                minNoticeHours={minNoticeHours}
+                maxDaysAhead={maxDaysAhead}
               />
             </div>
 

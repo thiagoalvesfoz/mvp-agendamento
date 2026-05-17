@@ -42,7 +42,13 @@ export function RetentionForm({ settings }: RetentionFormProps) {
 
         <Card className="p-4">
           <Label hint="meses">Retenção de dados (LGPD)</Label>
-          <DurationStepper value={retentionMonths} onChange={setRetentionMonths} step={1} min={1} />
+          <DurationStepper
+            value={retentionMonths}
+            onChange={setRetentionMonths}
+            step={1}
+            min={1}
+            unit="meses"
+          />
           <p className="mt-2 text-[12px] text-[var(--muted-foreground)]">
             Dados de clientes são elegíveis para anonimização após {retentionMonths} meses sem
             agendamento.
