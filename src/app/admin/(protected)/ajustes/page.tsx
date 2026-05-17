@@ -12,12 +12,26 @@ import { ListGroup, ListItem } from "@/components/shared/list-group";
 import { Card } from "@/components/ui/card";
 import { CustomerAvatar } from "@/features/customers/components/customer-avatar";
 import { I } from "@/components/shared/icons";
+import { db } from "@/lib/db";
+import { formatDateBR } from "@/lib/time";
+
+function formatLastLogin(d: Date | null): string {
+  if (!d) return "Primeiro acesso";
+  const date = formatDateBR(d);
+  const hh = String(d.getUTCHours()).padStart(2, "0");
+  const mm = String(d.getUTCMinutes()).padStart(2, "0");
+  return `Último acesso ${date} · ${hh}:${mm}`;
+}
 
 export default async function AdminAjustesPage() {
   const [session, settings] = await Promise.all([auth(), getSettings()]);
 
   const adminEmail = session?.user?.email ?? "—";
   const adminName = adminEmail.split("@")[0] ?? "Admin";
+  const userId = (session?.user as { id?: string } | undefined)?.id;
+  const adminUser = userId
+    ? await db.adminUser.findUnique({ where: { id: userId }, select: { lastLoginAt: true } })
+    : null;
 
   return (
     <div className="flex h-full flex-col">
@@ -41,7 +55,7 @@ export default async function AdminAjustesPage() {
                   {adminEmail}
                 </div>
                 <div className="truncate text-[12px] text-[var(--muted-foreground)]">
-                  Ver perfil
+                  {formatLastLogin(adminUser?.lastLoginAt ?? null)}
                 </div>
               </div>
               <I.Chevron size={16} className="shrink-0 text-[var(--muted-foreground)]" />

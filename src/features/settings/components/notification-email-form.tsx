@@ -1,14 +1,12 @@
 "use client";
 
-/**
- * NotificationEmailForm — email para notificações administrativas.
- */
 import { useState, useTransition } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updateNotificationEmail } from "@/features/settings/actions";
+import { TestEmailButton } from "@/features/settings/components/test-email-button";
 import type { SettingsRow } from "@/features/settings/queries";
 
 interface NotificationEmailFormProps {
@@ -21,16 +19,31 @@ export function NotificationEmailForm({ settings }: NotificationEmailFormProps) 
   const [success, setSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
 
+  const isDirty = email !== settings.notificationEmail;
+
   const handleSave = () => {
     setError(null);
     setSuccess(false);
-
     startTransition(async () => {
       const result = await updateNotificationEmail({ notificationEmail: email });
       if (!result.ok) setError(result.error);
       else setSuccess(true);
     });
   };
+
+  const saveFirst = (): Promise<boolean> =>
+    new Promise((resolve) => {
+      startTransition(async () => {
+        const result = await updateNotificationEmail({ notificationEmail: email });
+        if (!result.ok) {
+          setError(result.error);
+          resolve(false);
+        } else {
+          setSuccess(true);
+          resolve(true);
+        }
+      });
+    });
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -53,10 +66,18 @@ export function NotificationEmailForm({ settings }: NotificationEmailFormProps) 
           />
         </Card>
 
-        {error && <p className="mt-4 text-center text-[13px] text-[var(--destructive)]">{error}</p>}
+        {error && <p className="mt-3 text-center text-[13px] text-[var(--destructive)]">{error}</p>}
         {success && (
-          <p className="mt-4 text-center text-[13px] text-green-600">Email atualizado.</p>
+          <p className="mt-3 text-center text-[13px] text-green-600">Email atualizado.</p>
         )}
+
+        <Card className="mt-4 p-4">
+          <p className="mb-1 text-[13px] font-medium">Testar configuração</p>
+          <p className="mb-4 text-[13px] text-[var(--muted-foreground)]">
+            Envia um email de teste para <strong>{settings.notificationEmail}</strong>.
+          </p>
+          <TestEmailButton isDirty={isDirty} onSaveFirst={saveFirst} />
+        </Card>
       </div>
 
       <div className="border-t border-[var(--border)] bg-[var(--background)] px-5 py-3.5">

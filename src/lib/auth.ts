@@ -43,8 +43,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const ok = await bcrypt.compare(parsed.data.password, user.passwordHash);
         if (!ok) return null;
 
-        // Atualiza last_login_at fora do return para não atrasar a resposta
-        void db.adminUser.update({
+        await db.adminUser.update({
           where: { id: user.id },
           data: { lastLoginAt: new Date() },
         });

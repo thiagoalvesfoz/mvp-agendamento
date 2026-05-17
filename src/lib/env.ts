@@ -18,15 +18,12 @@ const serverSchema = z
     AUTH_TRUST_HOST: z.string().optional(),
     RESEND_API_KEY: z.string().optional(),
     EMAIL_FROM: z.string().email().optional(),
-    EMAIL_NOTIFICATION_TO: z.string().email().optional(),
-    // Quando "true", envia TODOS os emails para EMAIL_DEV_TO em vez do destinatário real.
-    // Use em desenvolvimento com onboarding@resend.dev (sandbox do Resend) para não
-    // spammar clientes reais. Em prod, deixe "false".
+    // Quando "true", redireciona TODO email para o notificationEmail configurado no painel.
+    // Use em desenvolvimento para não spammar clientes reais. Em prod, deixe "false".
     EMAIL_DEV_MODE: z
       .enum(["true", "false"])
       .optional()
       .transform((v) => v === "true"),
-    EMAIL_DEV_TO: z.string().email().optional(),
     TURNSTILE_SECRET_KEY: z.string().optional(),
     UPSTASH_REDIS_REST_URL: z.string().url().optional().or(z.literal("")),
     UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
@@ -43,13 +40,6 @@ const serverSchema = z
         path: ["EMAIL_FROM"],
       });
     }
-    if (data.EMAIL_DEV_MODE && !data.EMAIL_DEV_TO) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "EMAIL_DEV_TO é obrigatório quando EMAIL_DEV_MODE=true",
-        path: ["EMAIL_DEV_TO"],
-      });
-    }
   });
 
 const clientSchema = z.object({
@@ -64,9 +54,7 @@ const processEnv = {
   AUTH_TRUST_HOST: process.env.AUTH_TRUST_HOST,
   RESEND_API_KEY: process.env.RESEND_API_KEY,
   EMAIL_FROM: process.env.EMAIL_FROM,
-  EMAIL_NOTIFICATION_TO: process.env.EMAIL_NOTIFICATION_TO,
   EMAIL_DEV_MODE: process.env.EMAIL_DEV_MODE,
-  EMAIL_DEV_TO: process.env.EMAIL_DEV_TO,
   TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY,
   UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
   UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,

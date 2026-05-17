@@ -32,7 +32,15 @@ export async function sendEmail({ to, subject, react, tag }: SendEmailParams): P
     return;
   }
 
-  const effectiveTo = env.EMAIL_DEV_MODE && env.EMAIL_DEV_TO ? env.EMAIL_DEV_TO : to;
+  let effectiveTo = to;
+  if (env.EMAIL_DEV_MODE) {
+    const { db } = await import("@/lib/db");
+    const settings = await db.settings.findUnique({
+      where: { id: 1 },
+      select: { notificationEmail: true },
+    });
+    effectiveTo = settings?.notificationEmail ?? to;
+  }
 
   try {
     const result = await resend.emails.send({

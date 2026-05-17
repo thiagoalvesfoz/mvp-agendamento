@@ -344,3 +344,29 @@ export async function removeLandingCover(): Promise<ActionResult> {
   revalidatePath("/");
   return { ok: true };
 }
+
+// ── Email — teste de envio ────────────────────────────────────────────────────
+
+export async function sendTestEmail(): Promise<ActionResult> {
+  const guard = await requireAuth();
+  if (!guard.ok) return guard;
+
+  const { sendEmail } = await import("@/lib/email/send");
+  const { isEmailEnabled } = await import("@/lib/email/client");
+
+  if (!isEmailEnabled) {
+    return { ok: false, error: "Email não configurado. Verifique RESEND_API_KEY e EMAIL_FROM." };
+  }
+
+  const settings = await db.settings.findUniqueOrThrow({ where: { id: 1 } });
+  const { EmailTest } = await import("@/lib/email/templates/email-test");
+
+  await sendEmail({
+    to: settings.notificationEmail,
+    subject: "Teste de email — Agenda",
+    react: EmailTest({ adminEmail: settings.notificationEmail }),
+    tag: "settings.test",
+  });
+
+  return { ok: true };
+}
