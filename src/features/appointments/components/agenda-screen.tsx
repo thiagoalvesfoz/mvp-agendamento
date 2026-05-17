@@ -79,7 +79,7 @@ function dbDateKey(value: Date): string {
   return `${d.getUTCFullYear()}-${d.getUTCMonth()}-${d.getUTCDate()}`;
 }
 
-function sameDay(a: Date, b: Date): boolean {
+function _sameDay(a: Date, b: Date): boolean {
   return (
     a.getFullYear() === b.getFullYear() &&
     a.getMonth() === b.getMonth() &&

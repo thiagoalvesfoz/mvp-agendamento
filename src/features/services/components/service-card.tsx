@@ -16,7 +16,7 @@ export function ServiceCard({ service }: ServiceCardProps) {
   const totalMinutes =
     service.durationMinutes + service.bufferPreMinutes + service.bufferPosMinutes;
 
-  const bufferLabel = (() => {
+  const _bufferLabel = (() => {
     const parts: string[] = [];
     if (service.bufferPreMinutes > 0) parts.push(`pré ${formatDuration(service.bufferPreMinutes)}`);
     if (service.bufferPosMinutes > 0) parts.push(`pós ${formatDuration(service.bufferPosMinutes)}`);

@@ -39,7 +39,7 @@ export function ServiceForm({ service }: ServiceFormProps) {
   const [active, setActive] = useState(service?.active ?? true);
 
   const [error, setError] = useState<string | null>(null);
-  const [deactivating, setDeactivating] = useState(false);
+  const [_deactivating, setDeactivating] = useState(false);
 
   const totalMinutes = durationMinutes + bufferPreMinutes + bufferPosMinutes;
   const canSave = name.trim().length > 0 && durationMinutes >= 15;
