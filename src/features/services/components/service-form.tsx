@@ -19,6 +19,7 @@ import { I } from "@/components/shared/icons";
 import { DurationStepper } from "@/features/services/components/duration-stepper";
 import { createService, updateService, deactivateService } from "@/features/services/actions";
 import type { ServiceRow } from "@/features/services/queries";
+import { formatDuration } from "@/lib/time";
 
 interface ServiceFormProps {
   /** Undefined = modo criação; definido = modo edição */
@@ -122,19 +123,34 @@ export function ServiceForm({ service }: ServiceFormProps) {
         {/* Duração e buffers */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label hint="minutos">Duração</Label>
-            <DurationStepper value={durationMinutes} onChange={setDurationMinutes} min={15} />
+            <Label hint="passo de 15 min">Duração</Label>
+            <DurationStepper
+              value={durationMinutes}
+              onChange={setDurationMinutes}
+              min={15}
+              formatValue={formatDuration}
+            />
           </div>
           <div>
             <Label hint="antes do atendimento">Buffer pré</Label>
-            <DurationStepper value={bufferPreMinutes} onChange={setBufferPreMinutes} min={0} />
+            <DurationStepper
+              value={bufferPreMinutes}
+              onChange={setBufferPreMinutes}
+              min={0}
+              formatValue={formatDuration}
+            />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label hint="depois do atendimento">Buffer pós</Label>
-            <DurationStepper value={bufferPosMinutes} onChange={setBufPosMinutes} min={0} />
+            <DurationStepper
+              value={bufferPosMinutes}
+              onChange={setBufPosMinutes}
+              min={0}
+              formatValue={formatDuration}
+            />
           </div>
         </div>
 
@@ -144,8 +160,10 @@ export function ServiceForm({ service }: ServiceFormProps) {
             <I.Info size={15} className="mt-0.5 shrink-0 text-[var(--muted-foreground)]" />
             <p className="text-[12px] leading-snug text-[var(--muted-foreground)]">
               O sistema reserva{" "}
-              <span className="font-medium text-[var(--foreground)]">{totalMinutes} min</span> ao
-              todo no calendário (atendimento + buffers), evitando agendamentos colados.
+              <span className="font-medium text-[var(--foreground)]">
+                {formatDuration(totalMinutes)}
+              </span>{" "}
+              ao todo no calendário (atendimento + buffers), evitando agendamentos colados.
             </p>
           </div>
         </Card>

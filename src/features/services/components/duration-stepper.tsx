@@ -10,8 +10,10 @@ interface DurationStepperProps {
   step?: number;
   /** Valor mínimo (padrão: 0 — permite buffer zerado) */
   min?: number;
-  /** Sufixo exibido ao lado do valor (padrão: "min") */
+  /** Sufixo exibido ao lado do valor (padrão: "min"). Ignorado se `formatValue` for passado. */
   unit?: string;
+  /** Se informado, substitui o display "value unit" pelo retorno desta função. */
+  formatValue?: (value: number) => string;
   label?: string;
   className?: string;
 }
@@ -26,6 +28,7 @@ export function DurationStepper({
   step = 15,
   min = 0,
   unit = "min",
+  formatValue,
   className,
 }: DurationStepperProps) {
   const decrement = () => {
@@ -53,7 +56,7 @@ export function DurationStepper({
       </button>
 
       <div className="flex-1 select-none text-center font-mono text-[15px] font-medium tabular-nums">
-        {value} {unit}
+        {formatValue ? formatValue(value) : `${value} ${unit}`}
       </div>
 
       <button

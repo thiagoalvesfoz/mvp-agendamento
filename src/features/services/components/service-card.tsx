@@ -2,10 +2,11 @@
  * Card de serviço — Server Component.
  * Recebe dados serializáveis via props; navegação via Link do Next.
  */
-import Link from "next/link";
 import { I } from "@/components/shared/icons";
-import { cn } from "@/lib/utils";
 import type { ServiceRow } from "@/features/services/queries";
+import { formatDuration } from "@/lib/time";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface ServiceCardProps {
   service: ServiceRow;
@@ -17,8 +18,8 @@ export function ServiceCard({ service }: ServiceCardProps) {
 
   const bufferLabel = (() => {
     const parts: string[] = [];
-    if (service.bufferPreMinutes > 0) parts.push(`pré ${service.bufferPreMinutes} min`);
-    if (service.bufferPosMinutes > 0) parts.push(`pós ${service.bufferPosMinutes} min`);
+    if (service.bufferPreMinutes > 0) parts.push(`pré ${formatDuration(service.bufferPreMinutes)}`);
+    if (service.bufferPosMinutes > 0) parts.push(`pós ${formatDuration(service.bufferPosMinutes)}`);
     return parts.length > 0 ? `buffer ${parts.join(" · ")}` : null;
   })();
 
@@ -55,19 +56,13 @@ export function ServiceCard({ service }: ServiceCardProps) {
           <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] text-[var(--muted-foreground)]">
             <span className="inline-flex items-center gap-1">
               <I.Clock size={13} />
-              {service.durationMinutes} min
+              {formatDuration(service.durationMinutes)}
             </span>
-            {bufferLabel && (
-              <>
-                <span>·</span>
-                <span>{bufferLabel}</span>
-              </>
-            )}
             {totalMinutes !== service.durationMinutes && (
               <>
                 <span>·</span>
                 <span className="font-medium text-[var(--foreground)]">
-                  {totalMinutes} min reservados
+                  {formatDuration(totalMinutes)} reservados
                 </span>
               </>
             )}
