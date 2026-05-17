@@ -228,6 +228,23 @@ model Settings {
   @@map("settings")
 }
 
+// ============================================================
+// Imagem de capa da landing (singleton, id=1)
+// ============================================================
+//
+// Tabela separada de `settings` para evitar arrastar o BYTEA em
+// queries não relacionadas à imagem. Lida apenas pelo route
+// handler /api/landing/cover e pela DAL específica.
+
+model LandingCover {
+  id        Int      @id @default(1)
+  data      Bytes
+  mimeType  String   @map("mime_type")
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("landing_cover")
+}
+
 model AdminUser {
   id           String    @id @default(uuid()) @db.Uuid
   email        String    @unique

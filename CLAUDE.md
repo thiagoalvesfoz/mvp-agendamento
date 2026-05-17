@@ -44,10 +44,18 @@ Fase: **descoberta / pré-MVP**. Estrutura base, login + shell do admin + abas S
 - **Novos ícones**: `Plus`, `Edit`, `Ban`, `Search`, `Trash`, `Home`, `Bell`, `Repeat` em `src/components/shared/icons.tsx`.
 - **Novos helpers** em `src/lib/time.ts`: `weekdayName`, `weekdayShort`, `monthShort`, `formatDateBR`, `todayISO`.
 - **Booking público** scaffold em `src/app/agendar/` + `src/features/booking/`.
-- **Prisma**: schema + 2 migrations:
+- **Prisma**: schema + 3 migrations:
   - `20260515032213_init` — schema base.
-  - `20260516000001_add_landing_fields_to_settings` — colunas `landing_*` em `settings` (**PENDENTE de aplicação — ver Gotchas**).
+  - `20260516000001_add_landing_fields_to_settings` — colunas `landing_*` em `settings`.
+  - `20260516000002_add_landing_cover_table` — tabela singleton `landing_cover` (BYTEA + mime_type + updated_at) para imagem de capa da landing.
   - Seed cria admin + 5 serviços + disponibilidade semanal + settings. Extras com `EXCLUDE USING gist` em `appointments`.
+- **Upload de capa da landing** — `/admin/ajustes/landing`:
+  - Tabela `landing_cover` (singleton id=1) com BYTEA + mime_type.
+  - Server Actions `uploadLandingCover` / `removeLandingCover` (`features/settings/actions.ts`): valida magic bytes, redimensiona com `sharp` para 1600px máx, converte para WebP (qualidade 82).
+  - Route handler público `GET /api/landing/cover` (`src/app/api/landing/cover/route.ts`) serve o binário com `Cache-Control` curto + ETag por `updated_at`.
+  - Landing pública usa `<Image>` quando há capa, cai no `<PhotoPlaceholder>` quando não há.
+  - `next.config.mjs`: `serverActions.bodySizeLimit: '6mb'` para acomodar multipart de até 5 MB.
+  - Dep adicionada: `sharp`.
 - **Tooling**: ESLint, Prettier, Husky, Vitest, Playwright configurados.
 
 ### Estrutura de rotas
@@ -121,22 +129,16 @@ Admin: <http://localhost:3000/admin> · seed: `admin@example.com` / `admin123`.
 - **JWTSessionError "no matching decryption secret"**: cookie `authjs.session-token` ficou stale depois de troca de `AUTH_SECRET`. Limpar cookie no DevTools ou usar aba anônima.
 - **Loop em `/admin/login`**: garantir que login fica em `(public)/` fora do layout protegido.
 - **`useEffect` import**: lembre que `useEffect` precisa de import explícito mesmo dentro de `"use client"`.
-- **Migration landing pendente**: `20260516000001_add_landing_fields_to_settings` foi criada manualmente (SQL). Para aplicar:
-  ```bash
-  pnpm db:migrate   # aplica a migration ao banco
-  pnpm exec prisma generate  # regenera o Prisma client com os novos campos
-  ```
-  Enquanto a migration não for aplicada, a landing pública continua usando os valores estáticos de fallback definidos em `src/features/settings/queries.ts`. As ações `updateLanding` e `getLandingConfig` usam cast `as any` limitado até a regeneração — remover o cast após `prisma generate` ser bem-sucedido.
+- **Migrations e Prisma client desincronizados**: se você editar `schema.prisma` e adicionar uma migration SQL manual, lembre de rodar `pnpm db:migrate` + `pnpm exec prisma generate` antes de tocar nas queries — senão o TS não enxerga o novo model/coluna. Em código de produção, evite carregar com `as any`: corrija o client primeiro.
 - **Prisma client travado no Windows**: se `prisma generate` falhar com `EPERM rename`, o dev server está usando a DLL. Feche o servidor (`Ctrl+C`), rode `pnpm exec prisma generate`, depois reinicie com `pnpm dev`.
 
 ## Próximos passos sugeridos
 
-1. **Aplicar migration landing**: `pnpm db:migrate` + `pnpm exec prisma generate` (fechar dev server antes no Windows). Depois remover os casts `as any` de `features/settings/queries.ts` e `features/settings/actions.ts`.
-2. **Agenda** dia/semana/mês ligando em `features/appointments/`.
-3. **Recuperação de senha** por email (Resend).
-4. (Opcional) Seed para campos landing — marcar TODO no seed.ts quando migration estiver aplicada.
-5. (Opcional) Adicionar campos `icon`, `tag`, `starting` em `services` — ver seção "Fora do MVP" acima.
-6. (Opcional) Job de anonimização automática após `retentionMonths` (configurável em Settings — já editável em `/admin/ajustes/regras`).
+1. **Agenda** dia/semana/mês ligando em `features/appointments/`.
+2. **Recuperação de senha** por email (Resend).
+3. (Opcional) Seed para campos landing — marcar TODO no seed.ts.
+4. (Opcional) Adicionar campos `icon`, `tag`, `starting` em `services` — ver seção "Fora do MVP" acima.
+5. (Opcional) Job de anonimização automática após `retentionMonths` (configurável em Settings — já editável em `/admin/ajustes/regras`).
 
 ## Convenções
 

@@ -6,11 +6,12 @@
  */
 import Link from "next/link";
 import { I } from "@/components/shared/icons";
-import { getLandingConfig } from "@/features/settings/queries";
+import { getLandingConfig, getLandingCoverMeta } from "@/features/settings/queries";
 import { LandingForm } from "@/features/settings/components/landing-form";
 
 export default async function LandingEditorPage() {
-  const config = await getLandingConfig();
+  const [config, cover] = await Promise.all([getLandingConfig(), getLandingCoverMeta()]);
+  const coverUrl = cover ? `/api/landing/cover?v=${cover.updatedAt.getTime()}` : null;
 
   return (
     <div className="flex h-full flex-col">
@@ -32,7 +33,7 @@ export default async function LandingEditorPage() {
       </div>
 
       {/* ── Form com preview (Client Component) ── */}
-      <LandingForm config={config} />
+      <LandingForm config={config} coverUrl={coverUrl} />
     </div>
   );
 }

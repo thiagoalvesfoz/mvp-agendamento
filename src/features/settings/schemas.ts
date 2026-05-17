@@ -187,3 +187,26 @@ export const updateLandingSchema = z.object({
 });
 
 export type UpdateLandingInput = z.infer<typeof updateLandingSchema>;
+
+// ── Landing — upload de capa ─────────────────────────────────────────────────
+
+export const LANDING_COVER_MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+export const LANDING_COVER_ACCEPTED_MIME = ["image/jpeg", "image/png", "image/webp"] as const;
+
+/**
+ * Valida o `File` recebido via FormData no Server Action.
+ * Magic bytes são validados separadamente em `uploadLandingCover`,
+ * pois o `type` do browser pode ser forjado.
+ */
+export const uploadCoverSchema = z.object({
+  file: z
+    .instanceof(File, { message: "Arquivo obrigatório" })
+    .refine((f) => f.size > 0, "Arquivo vazio")
+    .refine((f) => f.size <= LANDING_COVER_MAX_BYTES, "Imagem maior que 5 MB")
+    .refine(
+      (f) => (LANDING_COVER_ACCEPTED_MIME as readonly string[]).includes(f.type),
+      "Formato inválido. Use JPG, PNG ou WebP",
+    ),
+});
+
+export type UploadCoverInput = z.infer<typeof uploadCoverSchema>;

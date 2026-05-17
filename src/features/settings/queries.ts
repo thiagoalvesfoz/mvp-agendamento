@@ -171,41 +171,23 @@ const LANDING_DEFAULTS: LandingConfigRow = {
 };
 
 /**
- * Tipo interno que representa as colunas de landing em Settings.
- *
- * IMPORTANTE: O Prisma client precisa ser regenerado (pnpm exec prisma generate)
- * após aplicar a migration `add_landing_fields_to_settings` para que esses campos
- * apareçam nos tipos gerados. Até lá usamos cast limitado a esta função.
- */
-type SettingsWithLanding = {
-  landingName: string | null;
-  landingTagline: string | null;
-  landingHandle: string | null;
-  landingCity: string | null;
-  landingAbout: string | null;
-  landingCallout: string | null;
-  landingCoverLabel: string | null;
-  landingCtaLabel: string | null;
-};
-
-/**
  * Carrega configurações da landing page do banco.
  * Aplica fallback aos valores padrão para campos ainda não preenchidos.
- *
- * NOTA: as colunas landing* foram adicionadas à tabela settings via
- * migration `add_landing_fields_to_settings`. Após aplicar a migration,
- * rode `pnpm exec prisma generate` para regenerar os tipos do client.
- * O cast abaixo garante typecheck limpo mesmo antes da regeneração.
  */
 export async function getLandingConfig(): Promise<LandingConfigRow> {
-  // Cast necessário porque o Prisma client ainda não foi regenerado após a migration.
-  // Seguro em runtime desde que a migration tenha sido aplicada ao banco.
-  const raw = await db.settings.findUnique({
+  const settings = await db.settings.findUnique({
     where: { id: 1 },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
-
-  const settings = raw as SettingsWithLanding | null;
+    select: {
+      landingName: true,
+      landingTagline: true,
+      landingHandle: true,
+      landingCity: true,
+      landingAbout: true,
+      landingCallout: true,
+      landingCoverLabel: true,
+      landingCtaLabel: true,
+    },
+  });
 
   if (!settings) return LANDING_DEFAULTS;
 
@@ -218,5 +200,42 @@ export async function getLandingConfig(): Promise<LandingConfigRow> {
     landingCallout: settings.landingCallout || LANDING_DEFAULTS.landingCallout,
     landingCoverLabel: settings.landingCoverLabel || LANDING_DEFAULTS.landingCoverLabel,
     landingCtaLabel: settings.landingCtaLabel || LANDING_DEFAULTS.landingCtaLabel,
+  };
+}
+
+// ── Landing cover ─────────────────────────────────────────────────────────────
+
+export type LandingCoverMeta = { updatedAt: Date; mimeType: string };
+
+/**
+ * Retorna metadados da capa SEM ler o BYTEA. Usado por componentes
+ * que só precisam saber se existe imagem e montar a URL com cache-buster.
+ */
+export async function getLandingCoverMeta(): Promise<LandingCoverMeta | null> {
+  const row = await db.landingCover.findUnique({
+    where: { id: 1 },
+    select: { updatedAt: true, mimeType: true },
+  });
+
+  if (!row) return null;
+  return row;
+}
+
+/**
+ * Retorna o blob completo da capa. Usado APENAS pelo route handler
+ * GET /api/landing/cover. Não chamar de Server Components — carrega o BYTEA.
+ */
+export async function getLandingCoverBinary(): Promise<{
+  data: Buffer;
+  mimeType: string;
+  updatedAt: Date;
+} | null> {
+  const row = await db.landingCover.findUnique({ where: { id: 1 } });
+
+  if (!row) return null;
+  return {
+    data: Buffer.from(row.data),
+    mimeType: row.mimeType,
+    updatedAt: row.updatedAt,
   };
 }

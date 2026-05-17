@@ -7,24 +7,43 @@
  * Preview ao vivo no topo reflete as alterações do draft antes de salvar.
  * Submit via Server Action updateLanding.
  */
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { I } from "@/components/shared/icons";
-import { updateLanding } from "@/features/settings/actions";
+import { removeLandingCover, updateLanding, uploadLandingCover } from "@/features/settings/actions";
 import type { LandingConfigRow } from "@/features/settings/queries";
 
 interface LandingFormProps {
   config: LandingConfigRow;
+  coverUrl: string | null;
 }
 
-export function LandingForm({ config }: LandingFormProps) {
+export function LandingForm({ config, coverUrl }: LandingFormProps) {
   const [draft, setDraft] = useState<LandingConfigRow>({ ...config });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  // ── Estado próprio do upload de capa (fluxo separado do form de texto) ──
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [coverError, setCoverError] = useState<string | null>(null);
+  const [coverPending, startCoverTransition] = useTransition();
+
+  // libera object URL ao trocar/limpar o arquivo
+  useEffect(() => {
+    if (!coverFile) {
+      setCoverPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(coverFile);
+    setCoverPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [coverFile]);
 
   const dirty = JSON.stringify(draft) !== JSON.stringify(config);
 
@@ -145,17 +164,109 @@ export function LandingForm({ config }: LandingFormProps) {
           </div>
 
           <div>
-            <Label hint="texto exibido sobre a capa">Legenda da capa</Label>
+            <Label>Imagem de capa</Label>
+            <div className="bg-[var(--muted)]/30 relative h-[180px] w-full overflow-hidden rounded-[10px] border border-dashed border-[var(--border)]">
+              {(coverPreview || coverUrl) && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={coverPreview ?? coverUrl ?? ""}
+                  alt="Capa atual"
+                  className="h-full w-full object-cover"
+                />
+              )}
+              {!coverPreview && !coverUrl && (
+                <div className="flex h-full w-full items-center justify-center text-[12px] text-[var(--muted-foreground)]">
+                  Nenhuma imagem enviada
+                </div>
+              )}
+            </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={(e) => {
+                setCoverError(null);
+                const f = e.target.files?.[0] ?? null;
+                if (f && f.size > 5 * 1024 * 1024) {
+                  setCoverError("Imagem maior que 5 MB");
+                  e.target.value = "";
+                  return;
+                }
+                setCoverFile(f);
+              }}
+            />
+
+            <div className="mt-2 flex gap-2">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={coverPending}
+                className="press flex-1 rounded-[8px] border border-[var(--border)] py-2 text-[13px] font-medium disabled:opacity-40"
+              >
+                {coverPreview || coverUrl ? "Trocar imagem" : "Escolher imagem"}
+              </button>
+              {coverFile && (
+                <button
+                  type="button"
+                  disabled={coverPending}
+                  onClick={() => {
+                    setCoverError(null);
+                    setCoverError(null);
+                    startCoverTransition(async () => {
+                      const fd = new FormData();
+                      fd.append("file", coverFile);
+                      const result = await uploadLandingCover(fd);
+                      if (!result.ok) {
+                        setCoverError(result.error);
+                      } else {
+                        setCoverFile(null);
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                      }
+                    });
+                  }}
+                  className="press flex-1 rounded-[8px] bg-[var(--primary)] py-2 text-[13px] font-medium text-[var(--primary-foreground)] disabled:opacity-40"
+                >
+                  {coverPending ? "Enviando..." : "Enviar capa"}
+                </button>
+              )}
+              {!coverFile && coverUrl && (
+                <button
+                  type="button"
+                  disabled={coverPending}
+                  onClick={() => {
+                    if (!confirm("Remover a imagem de capa?")) return;
+                    setCoverError(null);
+                    startCoverTransition(async () => {
+                      const result = await removeLandingCover();
+                      if (!result.ok) setCoverError(result.error);
+                    });
+                  }}
+                  className="press rounded-[8px] border border-[var(--border)] px-3 py-2 text-[13px] font-medium text-[var(--destructive)] disabled:opacity-40"
+                >
+                  Remover
+                </button>
+              )}
+            </div>
+            <p className="mt-2 text-[11.5px] text-[var(--muted-foreground)]">
+              JPG, PNG ou WebP · até 5 MB · redimensionada para 1600px e convertida em WebP.
+            </p>
+            {coverError && (
+              <p className="mt-2 text-[12.5px] text-[var(--destructive)]">{coverError}</p>
+            )}
+          </div>
+
+          <div>
+            <Label hint="texto exibido sobre a capa quando não houver imagem">
+              Legenda da capa
+            </Label>
             <Input
               value={draft.landingCoverLabel}
               onChange={(e) => set("landingCoverLabel", e.target.value)}
               placeholder="capa do estúdio"
             />
           </div>
-
-          <p className="text-[11.5px] text-[var(--muted-foreground)]">
-            Upload de imagem de capa será liberado em versão futura.
-          </p>
         </div>
 
         {/* ── Conteúdo ── */}

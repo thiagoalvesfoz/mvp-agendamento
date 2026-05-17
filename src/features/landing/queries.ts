@@ -1,5 +1,5 @@
 import "server-only";
-import { getLandingConfig } from "@/features/settings/queries";
+import { getLandingConfig, getLandingCoverMeta } from "@/features/settings/queries";
 
 export type StudioInfo = {
   name: string;
@@ -10,6 +10,8 @@ export type StudioInfo = {
   callout: string;
   coverLabel: string;
   ctaLabel: string;
+  /** URL do route handler com cache-buster; null quando não há imagem. */
+  coverUrl: string | null;
 };
 
 /**
@@ -22,7 +24,7 @@ export type StudioInfo = {
  * Para editar pelo admin: /admin/ajustes/landing
  */
 export async function getStudioInfo(): Promise<StudioInfo> {
-  const config = await getLandingConfig();
+  const [config, cover] = await Promise.all([getLandingConfig(), getLandingCoverMeta()]);
 
   return {
     name: config.landingName,
@@ -33,5 +35,6 @@ export async function getStudioInfo(): Promise<StudioInfo> {
     callout: config.landingCallout,
     coverLabel: config.landingCoverLabel,
     ctaLabel: config.landingCtaLabel,
+    coverUrl: cover ? `/api/landing/cover?v=${cover.updatedAt.getTime()}` : null,
   };
 }

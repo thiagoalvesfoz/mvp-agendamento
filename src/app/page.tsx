@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PhotoPlaceholder } from "@/components/shared/photo-placeholder";
@@ -30,7 +31,21 @@ export default async function LandingPage() {
         </section>
 
         <section className="mt-5 px-5">
-          <PhotoPlaceholder label={studio.coverLabel} className="h-[200px] w-full" />
+          {studio.coverUrl ? (
+            <div className="relative h-[200px] w-full overflow-hidden rounded-[10px]">
+              <Image
+                src={studio.coverUrl}
+                alt={studio.coverLabel || "Capa do estúdio"}
+                fill
+                priority
+                sizes="(max-width: 440px) 100vw, 440px"
+                className="object-cover"
+                unoptimized
+              />
+            </div>
+          ) : (
+            <PhotoPlaceholder label={studio.coverLabel} className="h-[200px] w-full" />
+          )}
         </section>
 
         {studio.about && (

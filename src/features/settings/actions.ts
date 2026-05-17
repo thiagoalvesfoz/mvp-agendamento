@@ -18,6 +18,7 @@ import {
   updateNotificationEmailSchema,
   updateRetentionSchema,
   updateLandingSchema,
+  uploadCoverSchema,
 } from "@/features/settings/schemas";
 
 type ActionResult<T = undefined> = { ok: true; data?: T } | { ok: false; error: string };
@@ -242,9 +243,102 @@ export async function updateLanding(payload: unknown): Promise<ActionResult> {
     return { ok: false, error: first };
   }
 
-  // Cast necessário até o Prisma client ser regenerado após a migration landing.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (db.settings.update as any)({ where: { id: 1 }, data: parsed.data });
+  await db.settings.update({ where: { id: 1 }, data: parsed.data });
+
+  revalidatePath("/admin/ajustes/landing");
+  revalidatePath("/");
+  return { ok: true };
+}
+
+// ── Landing — upload de capa ─────────────────────────────────────────────────
+
+/**
+ * Detecta o formato real a partir dos primeiros bytes do arquivo.
+ * Defesa contra renomeação de extensão / mime forjado pelo cliente.
+ */
+function detectImageFormat(buf: Buffer): "jpeg" | "png" | "webp" | null {
+  if (buf.length < 12) return null;
+  // JPEG: FF D8 FF
+  if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return "jpeg";
+  // PNG: 89 50 4E 47 0D 0A 1A 0A
+  if (
+    buf[0] === 0x89 &&
+    buf[1] === 0x50 &&
+    buf[2] === 0x4e &&
+    buf[3] === 0x47 &&
+    buf[4] === 0x0d &&
+    buf[5] === 0x0a &&
+    buf[6] === 0x1a &&
+    buf[7] === 0x0a
+  )
+    return "png";
+  // WebP: "RIFF"....."WEBP"
+  if (
+    buf[0] === 0x52 &&
+    buf[1] === 0x49 &&
+    buf[2] === 0x46 &&
+    buf[3] === 0x46 &&
+    buf[8] === 0x57 &&
+    buf[9] === 0x45 &&
+    buf[10] === 0x42 &&
+    buf[11] === 0x50
+  )
+    return "webp";
+  return null;
+}
+
+export async function uploadLandingCover(formData: FormData): Promise<ActionResult> {
+  const guard = await requireAuth();
+  if (!guard.ok) return guard;
+
+  const file = formData.get("file");
+  const parsed = uploadCoverSchema.safeParse({ file });
+  if (!parsed.success) {
+    const first = parsed.error.errors[0]?.message ?? "Arquivo inválido";
+    return { ok: false, error: first };
+  }
+
+  const raw = Buffer.from(await parsed.data.file.arrayBuffer());
+
+  const format = detectImageFormat(raw);
+  if (!format) {
+    return { ok: false, error: "Arquivo não é uma imagem JPG, PNG ou WebP válida" };
+  }
+
+  // Import dinâmico para isolar o binário nativo do bundling do server bundle inicial.
+  const sharp = (await import("sharp")).default;
+
+  let optimized: Buffer;
+  try {
+    optimized = await sharp(raw)
+      .rotate() // respeita EXIF
+      .resize({ width: 1600, withoutEnlargement: true })
+      .webp({ quality: 82 })
+      .toBuffer();
+  } catch {
+    return { ok: false, error: "Falha ao processar a imagem" };
+  }
+
+  // Prisma tipa Bytes como Uint8Array<ArrayBuffer>; Buffer do Node é
+  // Uint8Array<ArrayBufferLike>. Conversão é zero-copy.
+  const bytes = new Uint8Array(optimized);
+
+  await db.landingCover.upsert({
+    where: { id: 1 },
+    create: { id: 1, data: bytes, mimeType: "image/webp" },
+    update: { data: bytes, mimeType: "image/webp" },
+  });
+
+  revalidatePath("/admin/ajustes/landing");
+  revalidatePath("/");
+  return { ok: true };
+}
+
+export async function removeLandingCover(): Promise<ActionResult> {
+  const guard = await requireAuth();
+  if (!guard.ok) return guard;
+
+  await db.landingCover.deleteMany({ where: { id: 1 } });
 
   revalidatePath("/admin/ajustes/landing");
   revalidatePath("/");

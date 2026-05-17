@@ -5,6 +5,10 @@ const nextConfig = {
   devIndicators: false,
   experimental: {
     typedRoutes: true,
+    serverActions: {
+      // Acomoda upload da capa da landing (até 5 MB no input + overhead multipart).
+      bodySizeLimit: "6mb",
+    },
   },
   images: {
     remotePatterns: [
