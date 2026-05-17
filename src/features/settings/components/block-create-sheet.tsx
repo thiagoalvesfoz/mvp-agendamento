@@ -226,7 +226,7 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
                     onChange={(e) => setWeekDay(Number(e.target.value))}
                     className={cn(
                       "h-9 w-full rounded-[8px] border border-[var(--input)] bg-[var(--background)]",
-                      "px-3 text-[14px] text-[var(--foreground)]",
+                      "px-3 text-[16px] text-[var(--foreground)]",
                       "focus:outline-none focus-visible:border-[var(--ring)]",
                     )}
                   >
@@ -249,7 +249,7 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
                       onChange={(e) => setMonth(Number(e.target.value))}
                       className={cn(
                         "h-9 w-full rounded-[8px] border border-[var(--input)] bg-[var(--background)]",
-                        "px-3 text-[14px] text-[var(--foreground)]",
+                        "px-3 text-[16px] text-[var(--foreground)]",
                         "focus:outline-none focus-visible:border-[var(--ring)]",
                       )}
                     >

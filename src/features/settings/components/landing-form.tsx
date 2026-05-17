@@ -277,7 +277,7 @@ export function LandingForm({ config, coverUrl }: LandingFormProps) {
               onChange={(e) => set("landingAbout", e.target.value)}
               placeholder="Conte em um parágrafo curto o que você faz, para quem e onde atende."
               rows={4}
-              className="w-full resize-none rounded-[8px] border border-[var(--input)] bg-[var(--background)] px-3 py-2.5 text-[14px] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus-visible:border-[var(--ring)] focus-visible:ring-[3px] focus-visible:ring-[oklch(0.708_0_0_/_0.5)]"
+              className="w-full resize-none rounded-[8px] border border-[var(--input)] bg-[var(--background)] px-3 py-2.5 text-[16px] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus-visible:border-[var(--ring)] focus-visible:ring-[3px] focus-visible:ring-[oklch(0.708_0_0_/_0.5)]"
             />
           </div>
 
@@ -288,7 +288,7 @@ export function LandingForm({ config, coverUrl }: LandingFormProps) {
               onChange={(e) => set("landingCallout", e.target.value)}
               placeholder="Ex.: valores alinhados pelo WhatsApp após a solicitação."
               rows={3}
-              className="w-full resize-none rounded-[8px] border border-[var(--input)] bg-[var(--background)] px-3 py-2.5 text-[14px] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus-visible:border-[var(--ring)] focus-visible:ring-[3px] focus-visible:ring-[oklch(0.708_0_0_/_0.5)]"
+              className="w-full resize-none rounded-[8px] border border-[var(--input)] bg-[var(--background)] px-3 py-2.5 text-[16px] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus-visible:border-[var(--ring)] focus-visible:ring-[3px] focus-visible:ring-[oklch(0.708_0_0_/_0.5)]"
             />
             <p className="mt-1 text-[11.5px] text-[var(--muted-foreground)]">
               Deixe em branco para ocultar a caixa de aviso.

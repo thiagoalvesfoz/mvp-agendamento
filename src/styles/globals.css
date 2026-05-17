@@ -72,6 +72,16 @@
     text-rendering: optimizeLegibility;
     overscroll-behavior: none;
   }
+
+  /* Evita auto-zoom do iOS Safari ao focar campos editáveis.
+     iOS faz zoom automático quando o font-size computado é < 16px.
+     Tailwind utilities como text-[Npx] ainda podem sobrescrever
+     localmente — use sempre >= 16px nesses elementos. */
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
 }
 
 @layer components {

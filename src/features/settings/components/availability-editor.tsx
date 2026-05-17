@@ -173,7 +173,7 @@ export function AvailabilityEditor({ rows }: AvailabilityEditorProps) {
                         }
                         className={cn(
                           "h-10 flex-1 rounded-lg border border-[var(--input)] bg-[var(--background)]",
-                          "px-3 font-mono text-[13.5px] text-[var(--foreground)]",
+                          "px-3 font-mono text-[16px] text-[var(--foreground)]",
                           "focus:outline-none focus-visible:border-[var(--ring)]",
                         )}
                       />
@@ -186,7 +186,7 @@ export function AvailabilityEditor({ rows }: AvailabilityEditorProps) {
                         }
                         className={cn(
                           "h-10 flex-1 rounded-lg border border-[var(--input)] bg-[var(--background)]",
-                          "px-3 font-mono text-[13.5px] text-[var(--foreground)]",
+                          "px-3 font-mono text-[16px] text-[var(--foreground)]",
                           "focus:outline-none focus-visible:border-[var(--ring)]",
                         )}
                       />

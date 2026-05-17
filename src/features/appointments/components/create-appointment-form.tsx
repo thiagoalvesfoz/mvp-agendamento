@@ -441,7 +441,7 @@ export function CreateAppointmentForm({
               rows={3}
               className={cn(
                 "w-full rounded-[8px] border border-[var(--input)] bg-[var(--background)]",
-                "px-3 py-2 text-[14px] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]",
+                "px-3 py-2 text-[16px] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]",
                 "focus:outline-none focus-visible:border-[var(--ring)] focus-visible:ring-[3px] focus-visible:ring-[oklch(0.708_0_0_/_0.5)]",
                 "resize-none",
               )}
