@@ -38,9 +38,9 @@ export default async function LandingPage() {
                 alt={studio.coverLabel || "Capa do estúdio"}
                 fill
                 priority
-                sizes="(max-width: 440px) 100vw, 440px"
+                fetchPriority="high"
+                sizes="(max-width: 440px) calc(100vw - 40px), 400px"
                 className="object-cover"
-                unoptimized
               />
             </div>
           ) : (

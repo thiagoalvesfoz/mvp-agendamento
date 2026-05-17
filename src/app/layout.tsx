@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Agenda de Agendamentos",
+    default: "Agenda Fácil",
     template: "%s · Agenda",
   },
   description: "Sistema de agenda online — agende serviços de forma simples e rápida",

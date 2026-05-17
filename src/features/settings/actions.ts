@@ -312,7 +312,7 @@ export async function uploadLandingCover(formData: FormData): Promise<ActionResu
   try {
     optimized = await sharp(raw)
       .rotate() // respeita EXIF
-      .resize({ width: 1600, withoutEnlargement: true })
+      .resize({ width: 800, withoutEnlargement: true })
       .webp({ quality: 82 })
       .toBuffer();
   } catch {
