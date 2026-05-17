@@ -2,6 +2,7 @@
 
 import { I } from "@/components/shared/icons";
 import { cn } from "@/lib/utils";
+import { formatDuration } from "@/lib/time";
 import type { ServiceForBooking } from "../queries";
 
 interface ServiceRowProps {
@@ -39,7 +40,7 @@ export function ServiceRow({ service, selected, onSelect }: ServiceRowProps) {
         <div className="mt-1 flex items-center gap-3 text-[12px] text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <I.Clock size={13} />
-            {service.durationMinutes} min
+            {formatDuration(service.durationMinutes)}
           </span>
         </div>
       </div>
