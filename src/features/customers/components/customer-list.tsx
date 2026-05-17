@@ -1,57 +1,27 @@
 "use client";
 
-/**
- * CustomerList — Client Component.
- *
- * Busca os dados de clientes internamente via fetch client-side ao montar,
- * eliminando o bloqueio de navegação causado pelo await no Server Component.
- * O campo de busca continua filtrando em memória sobre a lista completa —
- * sem round-trip ao servidor a cada keystroke.
- *
- * Decisão de trade-off: busca local (memória) vs. query param (server search).
- * Mantida como local porque:
- *  - O número de clientes de um negócio pequeno raramente passa de alguns centenas.
- *  - Evita round-trip ao servidor a cada keystroke.
- *  - Simplifica o código (sem useSearchParams + Suspense boundary).
- */
-import { useState, useEffect, useMemo, useCallback } from "react";
+import useSWR from "swr";
+import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { I } from "@/components/shared/icons";
 import { CustomerCard } from "@/features/customers/components/customer-card";
 import { CustomerSkeleton } from "@/features/customers/components/customer-skeleton";
 import type { CustomerRow } from "@/features/customers/queries";
 
+const fetcher = (url: string) =>
+  fetch(url).then((r) => {
+    if (!r.ok) throw new Error("fetch failed");
+    return r.json() as Promise<{ customers: CustomerRow[] }>;
+  });
+
 export function CustomerList() {
-  const [customers, setCustomers] = useState<CustomerRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const { data, error, mutate } = useSWR("/api/admin/clientes", fetcher, {
+    revalidateOnFocus: false,
+  });
   const [query, setQuery] = useState("");
-  const [retryKey, setRetryKey] = useState(0);
 
-  const retry = useCallback(() => setRetryKey((k) => k + 1), []);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function fetchData() {
-      setLoading(true);
-      setError(false);
-      try {
-        const res = await fetch("/api/admin/clientes", { signal: controller.signal });
-        if (!res.ok) throw new Error("fetch failed");
-        const json = (await res.json()) as { customers: CustomerRow[] };
-        setCustomers(json.customers);
-      } catch (err) {
-        if (err instanceof Error && err.name === "AbortError") return;
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    void fetchData();
-    return () => controller.abort();
-  }, [retryKey]);
+  const loading = !data && !error;
+  const customers = data?.customers ?? [];
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -63,13 +33,15 @@ export function CustomerList() {
     );
   }, [query, customers]);
 
-  const total = customers.length;
-
   if (error) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center">
         <p className="text-[14px] font-medium">Erro ao carregar clientes</p>
-        <button type="button" onClick={retry} className="press text-[13px] text-[var(--primary)]">
+        <button
+          type="button"
+          onClick={() => void mutate()}
+          className="press text-[13px] text-[var(--primary)]"
+        >
           Tentar novamente
         </button>
       </div>
@@ -98,8 +70,8 @@ export function CustomerList() {
         </div>
         {!loading && (
           <p className="mt-2 text-[12px] text-[var(--muted-foreground)]">
-            {total} {total === 1 ? "cliente único" : "clientes únicos"} · histórico completo de cada
-            um
+            {customers.length} {customers.length === 1 ? "cliente único" : "clientes únicos"} ·
+            histórico completo de cada um
           </p>
         )}
       </div>
