@@ -17,15 +17,26 @@ CREATE EXTENSION IF NOT EXISTS btree_gist;
 -- CONSTRAINT CRÍTICA: impede sobreposição de agendamentos ativos.
 -- É a rede de proteção final contra race conditions (RN01 / RN23).
 -- Aplica apenas aos status que ocupam slot: PENDING, CONFIRMED, COMPLETED.
+--
+-- Nota: tsrange() com cast de texto não é IMMUTABLE diretamente,
+-- então usamos uma função wrapper para satisfazer o PostgreSQL.
 -- =========================================================
+CREATE OR REPLACE FUNCTION appointment_range(d date, s text, e text)
+RETURNS tsrange
+LANGUAGE sql
+IMMUTABLE STRICT
+AS $$
+  SELECT tsrange(
+    (d + s::time)::timestamp,
+    (d + e::time)::timestamp
+  )
+$$;
+
 ALTER TABLE appointments
   ADD CONSTRAINT appointments_no_overlap
   EXCLUDE USING gist (
     date WITH =,
-    tsrange(
-      (date + start_time::time)::timestamp,
-      (date + end_time::time)::timestamp
-    ) WITH &&
+    appointment_range(date, start_time, end_time) WITH &&
   )
   WHERE (status IN ('PENDING', 'CONFIRMED', 'COMPLETED'));
 
