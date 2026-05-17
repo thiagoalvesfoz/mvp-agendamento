@@ -1,19 +1,17 @@
 /**
  * /admin/clientes — listagem de clientes ativos.
  *
- * Server Component: busca via DAL e passa dados serializáveis para o
- * CustomerList (Client Component que gerencia a busca local).
+ * Shell estático: renderiza imediatamente o layout fixo (header).
+ * Os dados são buscados pelo CustomerList internamente via fetch client-side,
+ * o que elimina o atraso de navegação percebido pelo usuário.
  *
- * Clientes anonimizados são excluídos da listagem — eles permanecem no banco
- * como soft delete (anonymizedAt não nulo) e aparecem apenas no histórico
- * de agendamentos antigos.
+ * Clientes anonimizados são excluídos pela query — permanecem no banco como
+ * soft delete (anonymizedAt não nulo) e aparecem apenas no histórico de
+ * agendamentos antigos.
  */
-import { listActiveCustomers } from "@/features/customers/queries";
 import { CustomerList } from "@/features/customers/components/customer-list";
 
-export default async function AdminClientesPage() {
-  const customers = await listActiveCustomers();
-
+export default function AdminClientesPage() {
   return (
     <div className="flex h-full flex-col">
       {/* ── Header ── */}
@@ -24,8 +22,8 @@ export default async function AdminClientesPage() {
         <h1 className="text-[22px] font-semibold leading-tight tracking-tight">Lista única</h1>
       </div>
 
-      {/* ── Busca + Lista (Client Component, gerencia filtro) ── */}
-      <CustomerList customers={customers} />
+      {/* ── Busca + Lista (Client Component, busca e gerencia dados internamente) ── */}
+      <CustomerList />
     </div>
   );
 }

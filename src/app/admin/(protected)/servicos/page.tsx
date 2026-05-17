@@ -1,22 +1,15 @@
 /**
  * /admin/servicos — listagem de serviços.
  *
- * Server Component: busca todos os serviços (ativos + inativos) via DAL
- * e passa dados serializáveis para o ServiceList (Client Component que
- * gerencia o toggle "mostrar desativados").
+ * Shell estático: renderiza imediatamente o layout fixo (header + área de lista).
+ * Os dados são buscados pelo ServiceList internamente via fetch client-side,
+ * o que elimina o atraso de navegação percebido pelo usuário.
  */
 import Link from "next/link";
 import { I } from "@/components/shared/icons";
-import { listServices } from "@/features/services/queries";
 import { ServiceList } from "@/features/services/components/service-list";
 
-export default async function AdminServicosPage() {
-  // Carrega tudo de uma vez — o toggle no client apenas filtra o que já veio
-  const allServices = await listServices({ includeInactive: true });
-
-  const active = allServices.filter((s) => s.active);
-  const inactive = allServices.filter((s) => !s.active);
-
+export default function AdminServicosPage() {
   return (
     <div className="flex h-full flex-col">
       {/* ── Header ── */}
@@ -36,17 +29,9 @@ export default async function AdminServicosPage() {
         </Link>
       </div>
 
-      {/* ── Subtítulo ── */}
-      <div className="px-5 pb-2">
-        <p className="text-[13px] text-[var(--muted-foreground)]">
-          {active.length} {active.length === 1 ? "serviço ativo" : "serviços ativos"}. Cadastre
-          nome, duração e intervalo entre atendimentos.
-        </p>
-      </div>
-
-      {/* ── Lista (Client Component, gerencia toggle) ── */}
+      {/* ── Lista (Client Component, busca e gerencia dados internamente) ── */}
       <div className="mt-3 flex-1 overflow-y-auto px-5 pb-4">
-        <ServiceList active={active} inactive={inactive} />
+        <ServiceList />
       </div>
     </div>
   );

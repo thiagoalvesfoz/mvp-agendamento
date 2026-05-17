@@ -3,23 +3,84 @@
 /**
  * ServiceList — Client Component.
  *
- * Precisa ser Client porque o toggle "mostrar desativados" exige estado local.
- * Os dados já chegam pré-carregados do Server Component pai (page.tsx),
- * evitando fetch desnecessário no cliente.
+ * Busca os dados de serviços internamente via fetch client-side ao montar,
+ * eliminando o bloqueio de navegação causado pelo await no Server Component.
+ * O toggle "mostrar desativados" continua gerenciado em estado local.
  */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ServiceCard } from "@/features/services/components/service-card";
 import { I } from "@/components/shared/icons";
 import type { ServiceRow } from "@/features/services/queries";
 
-interface ServiceListProps {
+type ServiceData = {
   active: ServiceRow[];
   inactive: ServiceRow[];
+};
+
+function ServiceSkeleton() {
+  return (
+    <div className="space-y-2.5">
+      {[1, 2, 3].map((i) => (
+        <div
+          key={i}
+          className="flex h-[80px] animate-pulse items-center gap-3 rounded-2xl bg-[var(--muted)] px-4"
+        >
+          <div className="flex flex-1 flex-col gap-2">
+            <div className="h-4 w-2/3 rounded bg-[var(--border)]" />
+            <div className="h-3 w-1/2 rounded bg-[var(--border)]" />
+            <div className="h-3 w-1/3 rounded bg-[var(--border)]" />
+          </div>
+          <div className="h-4 w-4 rounded bg-[var(--border)]" />
+        </div>
+      ))}
+    </div>
+  );
 }
 
-export function ServiceList({ active, inactive }: ServiceListProps) {
+export function ServiceList() {
+  const [data, setData] = useState<ServiceData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [showInactive, setShowInactive] = useState(false);
 
+  async function fetchData() {
+    setLoading(true);
+    setError(false);
+    try {
+      const res = await fetch("/api/admin/servicos");
+      if (!res.ok) throw new Error("fetch failed");
+      const json = (await res.json()) as ServiceData;
+      setData(json);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void fetchData();
+  }, []);
+
+  if (loading) return <ServiceSkeleton />;
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+        <p className="text-[14px] font-medium">Erro ao carregar serviços</p>
+        <button
+          type="button"
+          onClick={() => void fetchData()}
+          className="press text-[13px] text-[var(--primary)]"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
+
+  const active = data?.active ?? [];
+  const inactive = data?.inactive ?? [];
   const hasInactive = inactive.length > 0;
   const visibleInactive = showInactive ? inactive : [];
 
@@ -39,6 +100,12 @@ export function ServiceList({ active, inactive }: ServiceListProps) {
 
   return (
     <div>
+      {/* ── Subtítulo dinâmico (movido para cá porque depende dos dados) ── */}
+      <p className="mb-3 text-[13px] text-[var(--muted-foreground)]">
+        {active.length} {active.length === 1 ? "serviço ativo" : "serviços ativos"}. Cadastre nome,
+        duração e intervalo entre atendimentos.
+      </p>
+
       {active.length === 0 && (
         <p className="py-4 text-center text-[13px] text-[var(--muted-foreground)]">
           Nenhum serviço ativo no momento.
