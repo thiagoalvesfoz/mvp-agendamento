@@ -37,8 +37,8 @@ function ListItemValueSkeleton({
         </div>
         <div className="min-w-0 flex-1">
           <div className="text-[14px] font-medium tracking-tight">{title}</div>
+          <div className="mt-0.5 h-3 w-28 animate-pulse rounded bg-[var(--muted)]" />
         </div>
-        <div className="h-3 w-14 animate-pulse rounded bg-[var(--muted)]" />
         <I.Chevron size={15} className="shrink-0 text-[var(--muted-foreground)]" />
       </div>
     </Link>
@@ -150,7 +150,7 @@ export function AjustesClient({ adminEmail, adminName, lastLoginAt }: Props) {
               <ListItem
                 icon={<I.MapPin size={17} />}
                 title="Endereço da agenda"
-                value={`/${data.settings.publicSlug}`}
+                subtitle={`/${data.settings.publicSlug}`}
               />
             </Link>
           )}
@@ -165,7 +165,7 @@ export function AjustesClient({ adminEmail, adminName, lastLoginAt }: Props) {
               <ListItem
                 icon={<I.Bell size={17} />}
                 title="Email para notificações"
-                value={data.settings.notificationEmail}
+                subtitle={data.settings.notificationEmail}
               />
             </Link>
           )}
@@ -195,8 +195,7 @@ export function AjustesClient({ adminEmail, adminName, lastLoginAt }: Props) {
               <ListItem
                 icon={<I.Shield size={17} />}
                 title="Retenção de dados"
-                subtitle="Anonimização automática após o período"
-                value={`${data.settings.retentionMonths} meses`}
+                subtitle={`${data.settings.retentionMonths} meses`}
               />
             </Link>
           )}
