@@ -174,11 +174,13 @@ export function AgendaScreen({
           <StatPill
             label="Hoje"
             value={stats.today}
+            active={view === "day"}
             onClick={() => navigate({ view: "day", date: todayISO })}
           />
           <StatPill
             label="Esta semana"
             value={stats.week}
+            active={view === "week"}
             onClick={() => navigate({ view: "week", date: todayISO })}
           />
         </div>
@@ -261,23 +263,30 @@ function StatPill({ label, value, accent, active, onClick }: StatPillProps) {
       className={cn(
         "press rounded-2xl border px-3 py-2.5 text-left transition-colors",
         active
-          ? "border-[var(--primary)] bg-[var(--primary)] text-[var(--primary-foreground)]"
+          ? "border-violet-200 bg-violet-100 text-violet-950"
           : "border-[var(--border)] bg-[var(--card)] text-[var(--foreground)]",
+        accent && active && "border-orange-400 bg-orange-100",
       )}
     >
       <div
         className={cn(
           "text-[10px] uppercase tracking-[0.12em]",
-          active ? "text-[var(--primary-foreground)]/80" : "text-[var(--muted-foreground)]",
+          active ? "text-violet-950/70" : "text-[var(--muted-foreground)]",
+          accent && active && "text-orange-700",
         )}
       >
         {label}
       </div>
       <div className="mt-0.5 flex items-baseline gap-1">
-        <span className="text-[22px] font-semibold tabular-nums tracking-tight">{value}</span>
-        {accent && !active && value > 0 && (
-          <span className="size-1.5 rounded-full bg-[var(--primary)]" />
-        )}
+        <span
+          className={cn(
+            "text-[22px] font-semibold tabular-nums tracking-tight",
+            accent && active && "text-orange-950",
+          )}
+        >
+          {value}
+        </span>
+        {accent && !active && value > 0 && <span className="size-1.5 rounded-full bg-orange-500" />}
       </div>
     </button>
   );
@@ -302,7 +311,7 @@ function Segmented<T extends string>({ value, onChange, options }: SegmentedProp
             className={cn(
               "press flex-1 rounded-full px-2 py-1.5 text-[12.5px] font-medium tracking-tight transition-colors",
               active
-                ? "bg-[var(--card)] text-[var(--foreground)] shadow-sm"
+                ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-sm"
                 : "text-[var(--muted-foreground)]",
             )}
           >
