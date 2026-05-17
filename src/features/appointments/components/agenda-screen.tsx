@@ -265,28 +265,19 @@ function StatPill({ label, value, accent, active, onClick }: StatPillProps) {
         active
           ? "border-violet-200 bg-violet-100 text-violet-950"
           : "border-[var(--border)] bg-[var(--card)] text-[var(--foreground)]",
-        accent && active && "border-orange-400 bg-orange-100",
       )}
     >
       <div
         className={cn(
           "text-[10px] uppercase tracking-[0.12em]",
-          active ? "text-violet-950/70" : "text-[var(--muted-foreground)]",
-          accent && active && "text-orange-700",
+          active ? "text-violet-950" : "text-[var(--muted-foreground)]",
         )}
       >
         {label}
       </div>
       <div className="mt-0.5 flex items-baseline gap-1">
-        <span
-          className={cn(
-            "text-[22px] font-semibold tabular-nums tracking-tight",
-            accent && active && "text-orange-950",
-          )}
-        >
-          {value}
-        </span>
-        {accent && !active && value > 0 && <span className="size-1.5 rounded-full bg-orange-500" />}
+        <span className={cn("text-[22px] font-semibold tabular-nums tracking-tight")}>{value}</span>
+        {accent && value > 0 && <span className="size-1.5 rounded-full bg-orange-500" />}
       </div>
     </button>
   );
