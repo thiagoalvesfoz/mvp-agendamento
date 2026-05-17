@@ -56,6 +56,16 @@ Fase: **descoberta / pré-MVP**. Estrutura base, login + shell do admin + abas S
   - Landing pública usa `<Image>` quando há capa, cai no `<PhotoPlaceholder>` quando não há.
   - `next.config.mjs`: `serverActions.bodySizeLimit: '6mb'` para acomodar multipart de até 5 MB.
   - Dep adicionada: `sharp`.
+- **Email transacional (Resend)** — `src/lib/email/`:
+  - `client.ts` — Resend singleton + flag `isEmailEnabled` (true se `RESEND_API_KEY` + `EMAIL_FROM` setados).
+  - `send.ts` — `sendEmail({to, subject, react, tag})` com try/catch interno. NUNCA rejeita; falha vira `console.error`. Em `EMAIL_DEV_MODE=true`, redireciona pro `EMAIL_DEV_TO` (sandbox).
+  - 3 templates em `templates/` (React Email): `booking-pending-admin`, `booking-received-customer`, `booking-confirmed-customer`. Componentes síncronos puros — `@react-email/render` não suporta async.
+  - Gatilhos:
+    - `features/booking/notify.ts` — admin (sempre) + cliente (se forneceu email) quando booking público cria PENDING. Disparo via `after()` do Next 15 pós-commit.
+    - `features/appointments/notify.ts` — cliente quando admin move pra CONFIRMED (se houver `customerEmailSnapshot`). Também via `after()`.
+  - **Decisão de produto (PO)**: emails de CANCELED/EXPIRED para cliente NÃO entram no MVP — cancelamento é tratado por WhatsApp; email vira ruído.
+  - **Decisão arquitetural**: `lib/env.ts` faz `superRefine` exigindo `EMAIL_FROM` quando `RESEND_API_KEY` está setada. Falha rápida em prod evita no-op silencioso.
+  - Dados do email são SEMPRE passados como props — nunca releitura no callback `after()`. Snapshots do appointment cobrem o caso de mutação posterior.
 - **Tooling**: ESLint, Prettier, Husky, Vitest, Playwright configurados.
 
 ### Estrutura de rotas
@@ -135,10 +145,11 @@ Admin: <http://localhost:3000/admin> · seed: `admin@example.com` / `admin123`.
 ## Próximos passos sugeridos
 
 1. **Agenda** dia/semana/mês ligando em `features/appointments/`.
-2. **Recuperação de senha** por email (Resend).
+2. **Recuperação de senha** por email (Resend já configurado — falta o fluxo de token + página).
 3. (Opcional) Seed para campos landing — marcar TODO no seed.ts.
 4. (Opcional) Adicionar campos `icon`, `tag`, `starting` em `services` — ver seção "Fora do MVP" acima.
 5. (Opcional) Job de anonimização automática após `retentionMonths` (configurável em Settings — já editável em `/admin/ajustes/regras`).
+6. (Opcional) Lembretes D-1 e T-2h via cron — usar mesma infra de email já implementada.
 
 ## Convenções
 

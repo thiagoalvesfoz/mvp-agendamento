@@ -1,12 +1,14 @@
 "use server";
 
+import { after } from "next/server";
 import { db } from "@/lib/db";
 import { createAppointmentSchema, type CreateAppointmentInput } from "./schemas";
 import { Prisma } from "@prisma/client";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { addDays, addHours } from "date-fns";
-import { TZ, combineDateAndTimeInTZ } from "@/lib/time";
-import { getSettings } from "@/features/settings/queries";
+import { TZ, combineDateAndTimeInTZ, formatDateBR } from "@/lib/time";
+import { getSettings, getLandingConfig } from "@/features/settings/queries";
+import { notifyAdminPending, notifyCustomerReceived } from "./notify";
 
 export type CreateAppointmentResult =
   | {
@@ -176,6 +178,39 @@ export async function createAppointment(
       });
 
       return appt.id;
+    });
+
+    // Emails pós-commit. Tudo passado como valor (sem releitura no callback).
+    // Falha de email NÃO derruba o agendamento — sendEmail loga e segue.
+    const dateFormatted = formatDateBR(fromZonedTime(`${data.date}T12:00:00`, TZ));
+    const landing = await getLandingConfig();
+
+    after(async () => {
+      await notifyAdminPending({
+        protocol,
+        serviceName: service.name,
+        dateFormatted,
+        startTime: data.startTime,
+        customerName: data.name,
+        customerPhone: phone,
+        customerEmail: data.email || null,
+        customerInstagram: data.instagram || null,
+        briefing: data.briefing || null,
+        appointmentId,
+        adminEmail: settings.notificationEmail,
+      });
+
+      if (data.email) {
+        await notifyCustomerReceived({
+          protocol,
+          customerName: data.name,
+          customerEmail: data.email,
+          serviceName: service.name,
+          dateFormatted,
+          startTime: data.startTime,
+          studioName: landing.landingName,
+        });
+      }
     });
 
     return { ok: true, protocol, appointmentId };

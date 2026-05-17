@@ -10,19 +10,47 @@
  */
 import { z } from "zod";
 
-const serverSchema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  DATABASE_URL: z.string().url(),
-  AUTH_SECRET: z.string().min(32, "AUTH_SECRET deve ter no mínimo 32 caracteres"),
-  AUTH_TRUST_HOST: z.string().optional(),
-  RESEND_API_KEY: z.string().optional(),
-  EMAIL_FROM: z.string().email().optional(),
-  EMAIL_NOTIFICATION_TO: z.string().email().optional(),
-  TURNSTILE_SECRET_KEY: z.string().optional(),
-  UPSTASH_REDIS_REST_URL: z.string().url().optional().or(z.literal("")),
-  UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
-  CRON_SECRET: z.string().optional(),
-});
+const serverSchema = z
+  .object({
+    NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+    DATABASE_URL: z.string().url(),
+    AUTH_SECRET: z.string().min(32, "AUTH_SECRET deve ter no mínimo 32 caracteres"),
+    AUTH_TRUST_HOST: z.string().optional(),
+    RESEND_API_KEY: z.string().optional(),
+    EMAIL_FROM: z.string().email().optional(),
+    EMAIL_NOTIFICATION_TO: z.string().email().optional(),
+    // Quando "true", envia TODOS os emails para EMAIL_DEV_TO em vez do destinatário real.
+    // Use em desenvolvimento com onboarding@resend.dev (sandbox do Resend) para não
+    // spammar clientes reais. Em prod, deixe "false".
+    EMAIL_DEV_MODE: z
+      .enum(["true", "false"])
+      .optional()
+      .transform((v) => v === "true"),
+    EMAIL_DEV_TO: z.string().email().optional(),
+    TURNSTILE_SECRET_KEY: z.string().optional(),
+    UPSTASH_REDIS_REST_URL: z.string().url().optional().or(z.literal("")),
+    UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+    CRON_SECRET: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    // Contrato de email: ou tudo está vazio (no-op em dev), ou ambos
+    // RESEND_API_KEY e EMAIL_FROM estão setados. Não deixe meio-termo —
+    // habilita o serviço e depois descobre que falta o remetente.
+    if (data.RESEND_API_KEY && !data.EMAIL_FROM) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "EMAIL_FROM é obrigatório quando RESEND_API_KEY está definido",
+        path: ["EMAIL_FROM"],
+      });
+    }
+    if (data.EMAIL_DEV_MODE && !data.EMAIL_DEV_TO) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "EMAIL_DEV_TO é obrigatório quando EMAIL_DEV_MODE=true",
+        path: ["EMAIL_DEV_TO"],
+      });
+    }
+  });
 
 const clientSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url(),
@@ -37,6 +65,8 @@ const processEnv = {
   RESEND_API_KEY: process.env.RESEND_API_KEY,
   EMAIL_FROM: process.env.EMAIL_FROM,
   EMAIL_NOTIFICATION_TO: process.env.EMAIL_NOTIFICATION_TO,
+  EMAIL_DEV_MODE: process.env.EMAIL_DEV_MODE,
+  EMAIL_DEV_TO: process.env.EMAIL_DEV_TO,
   TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY,
   UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
   UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
@@ -47,12 +77,22 @@ const processEnv = {
 
 const isServer = typeof window === "undefined";
 
-const merged = serverSchema.merge(clientSchema);
-const parsed = isServer ? merged.safeParse(processEnv) : clientSchema.safeParse(processEnv);
+// No client, só validamos o subset público — server vars seriam undefined no bundle.
+const parsed = isServer
+  ? z
+      .object({
+        ...clientSchema.shape,
+      })
+      .and(serverSchema)
+      .safeParse(processEnv)
+  : clientSchema.safeParse(processEnv);
 
 if (!parsed.success) {
   console.error("❌ Variáveis de ambiente inválidas:", parsed.error.flatten().fieldErrors);
   throw new Error("Variáveis de ambiente inválidas — confira .env");
 }
 
-export const env = parsed.data as z.infer<typeof merged>;
+type ServerEnv = z.infer<typeof serverSchema> & z.infer<typeof clientSchema>;
+type ClientEnv = z.infer<typeof clientSchema>;
+
+export const env = parsed.data as ServerEnv & ClientEnv;

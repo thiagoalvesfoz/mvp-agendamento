@@ -14,11 +14,14 @@
  */
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { fromZonedTime } from "date-fns-tz";
-import { TZ } from "@/lib/time";
+import { TZ, formatDateBR } from "@/lib/time";
+import { getLandingConfig } from "@/features/settings/queries";
+import { notifyCustomerConfirmed } from "./notify";
 import {
   adminCreateAppointmentSchema,
   updateStatusSchema,
@@ -241,10 +244,19 @@ export async function updateAppointmentStatus(input: UpdateStatusInput): Promise
 
   const { appointmentId, status, reason } = parsed.data;
 
-  // Busca o status atual para registrar a transição
+  // Busca dados atuais — `status` para registrar a transição e snapshots
+  // para possíveis notificações pós-commit (sem reler banco no after()).
   const current = await db.appointment.findUnique({
     where: { id: appointmentId },
-    select: { status: true },
+    select: {
+      status: true,
+      protocol: true,
+      serviceNameSnapshot: true,
+      customerNameSnapshot: true,
+      customerEmailSnapshot: true,
+      date: true,
+      startTime: true,
+    },
   });
 
   if (!current) return { ok: false, error: "Agendamento não encontrado" };
@@ -268,6 +280,25 @@ export async function updateAppointmentStatus(input: UpdateStatusInput): Promise
 
   revalidatePath("/admin");
   revalidatePath(`/admin/agenda/${appointmentId}`);
+
+  // Email pós-commit. Só CONFIRMED notifica cliente no MVP.
+  // Skip se cliente não informou email no booking.
+  if (status === "CONFIRMED" && current.customerEmailSnapshot) {
+    const dateFormatted = formatDateBR(current.date);
+    const landing = await getLandingConfig();
+
+    after(async () => {
+      await notifyCustomerConfirmed({
+        protocol: current.protocol,
+        customerName: current.customerNameSnapshot,
+        customerEmail: current.customerEmailSnapshot!,
+        serviceName: current.serviceNameSnapshot,
+        dateFormatted,
+        startTime: current.startTime,
+        studioName: landing.landingName,
+      });
+    });
+  }
 
   return { ok: true };
 }
