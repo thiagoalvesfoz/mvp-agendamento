@@ -8,14 +8,11 @@ import { db } from "@/lib/db";
 import { I } from "@/components/shared/icons";
 import { Card } from "@/components/ui/card";
 import { CustomerAvatar } from "@/features/customers/components/customer-avatar";
-import { formatDateBR } from "@/lib/time";
+import { formatInTZ } from "@/lib/time";
 
 function formatDateTime(d: Date | null): string {
   if (!d) return "—";
-  const date = formatDateBR(d);
-  const hh = String(d.getUTCHours()).padStart(2, "0");
-  const mm = String(d.getUTCMinutes()).padStart(2, "0");
-  return `${date} · ${hh}:${mm}`;
+  return formatInTZ(d, "dd/MM/yyyy · HH:mm");
 }
 
 export default async function PerfilPage() {
