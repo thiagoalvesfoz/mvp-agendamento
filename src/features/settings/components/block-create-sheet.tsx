@@ -6,14 +6,14 @@
  * Sheet (modal bottom-sheet) para criação de bloqueio pontual ou recorrente.
  * Fecha ao salvar com sucesso e dispara onCreated para o pai atualizar o estado.
  */
-import { useState, useTransition } from "react";
+import { I } from "@/components/shared/icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { I } from "@/components/shared/icons";
-import { cn } from "@/lib/utils";
-import { weekdayName } from "@/lib/time";
 import { createBlockedDate, createRecurringBlock } from "@/features/settings/actions";
+import { weekdayName } from "@/lib/time";
+import { cn } from "@/lib/utils";
+import { useState, useTransition } from "react";
 
 const MONTHS = [
   "Janeiro",
@@ -174,12 +174,13 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
 
           {/* Campos condicionais por tipo */}
           {type === "single" ? (
-            <div className="min-w-0">
+            <div className="flex min-w-0 flex-col">
               <Label htmlFor="block-date">Data</Label>
               <Input
                 id="block-date"
                 type="date"
                 value={date}
+                className="w-auto"
                 onChange={(e) => setDate(e.target.value)}
                 min={new Date().toISOString().split("T")[0]}
               />
@@ -278,7 +279,7 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
 
           {/* Horários (opcionais) */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="min-w-0">
+            <div className="flex min-w-0 flex-col">
               <div className="mb-1.5 flex items-baseline justify-between">
                 <label
                   htmlFor="block-start"
@@ -302,10 +303,11 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
                 id="block-start"
                 type="time"
                 value={startTime}
+                className="w-auto"
                 onChange={(e) => setStartTime(e.target.value)}
               />
             </div>
-            <div className="min-w-0">
+            <div className="flex min-w-0 flex-col">
               <div className="mb-1.5 flex items-baseline justify-between">
                 <label
                   htmlFor="block-end"
@@ -329,6 +331,7 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
                 id="block-end"
                 type="time"
                 value={endTime}
+                className="w-auto"
                 onChange={(e) => setEndTime(e.target.value)}
               />
             </div>
