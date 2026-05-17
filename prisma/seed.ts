@@ -27,7 +27,7 @@ async function main() {
       passwordHash,
     },
   });
-  console.info("✓ Admin: julialimabarros08@gmail.com / 123123");
+  console.info("✓ Admin: julialimabarros08@gmail.com");
 
   // --- Settings ---
   await db.settings.upsert({
