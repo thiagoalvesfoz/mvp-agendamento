@@ -174,7 +174,7 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
 
           {/* Campos condicionais por tipo */}
           {type === "single" ? (
-            <div>
+            <div className="min-w-0">
               <Label htmlFor="block-date">Data</Label>
               <Input
                 id="block-date"
@@ -278,7 +278,7 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
 
           {/* Horários (opcionais) */}
           <div className="grid grid-cols-2 gap-3">
-            <div>
+            <div className="min-w-0">
               <Label htmlFor="block-start" hint="opcional">
                 Das
               </Label>
@@ -289,7 +289,7 @@ export function BlockCreateSheet({ open, onClose, onCreated }: BlockCreateSheetP
                 onChange={(e) => setStartTime(e.target.value)}
               />
             </div>
-            <div>
+            <div className="min-w-0">
               <Label htmlFor="block-end" hint="opcional">
                 Até
               </Label>
