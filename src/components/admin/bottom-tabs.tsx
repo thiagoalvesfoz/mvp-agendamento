@@ -4,6 +4,7 @@ import { I } from "@/components/shared/icons";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { PendingBadge } from "./pending-badge";
 
 const TABS = [
   {
@@ -32,7 +33,7 @@ const TABS = [
   },
 ] as const;
 
-export function BottomTabs({ pendingCount }: { pendingCount: number }) {
+export function BottomTabs() {
   const pathname = usePathname();
 
   return (
@@ -44,7 +45,6 @@ export function BottomTabs({ pendingCount }: { pendingCount: number }) {
         {TABS.map((t) => {
           const active = t.match.test(pathname);
           const Icon = t.icon;
-          const showBadge = t.href === "/admin" && pendingCount > 0;
           return (
             <Link
               key={t.href}
@@ -56,9 +56,7 @@ export function BottomTabs({ pendingCount }: { pendingCount: number }) {
             >
               <div className="relative">
                 <Icon size={20} strokeWidth={active ? 2 : 1.7} />
-                {showBadge && (
-                  <span className="absolute -right-1 -top-1 size-2.5 rounded-full bg-destructive" />
-                )}
+                {t.href === "/admin" && <PendingBadge />}
               </div>
               <span
                 className={cn(

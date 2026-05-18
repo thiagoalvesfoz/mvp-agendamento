@@ -21,7 +21,7 @@ export function CustomerList() {
   const [query, setQuery] = useState("");
 
   const loading = !data && !error;
-  const customers = data?.customers ?? [];
+  const customers = useMemo(() => data?.customers ?? [], [data]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
