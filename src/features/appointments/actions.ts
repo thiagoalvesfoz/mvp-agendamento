@@ -97,8 +97,6 @@ export async function adminCreateAppointment(
       id: true,
       name: true,
       durationMinutes: true,
-      bufferPreMinutes: true,
-      bufferPosMinutes: true,
       active: true,
     },
   });
@@ -144,8 +142,6 @@ export async function adminCreateAppointment(
           // Snapshots de serviço — imutáveis após INSERT
           serviceNameSnapshot: service.name,
           durationMinutesSnapshot: service.durationMinutes,
-          bufferPreSnapshot: service.bufferPreMinutes,
-          bufferPosSnapshot: service.bufferPosMinutes,
           // Snapshots de cliente — imutáveis após INSERT
           customerNameSnapshot: data.customerName,
           customerContactSnapshot: phone,

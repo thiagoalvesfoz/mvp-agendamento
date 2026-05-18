@@ -129,8 +129,10 @@ export default async function AppointmentDetailPage({ params }: AppointmentDetai
               </div>
               <div className="text-[12px] text-[var(--muted-foreground)]">
                 {formatDuration(appt.durationMinutesSnapshot)}
-                {appt.bufferPreSnapshot > 0 && ` · buffer pré ${appt.bufferPreSnapshot}min`}
-                {appt.bufferPosSnapshot > 0 && ` · pós ${appt.bufferPosSnapshot}min`}
+                {appt.service.bufferPreMinutes > 0 &&
+                  ` · buffer pré ${formatDuration(appt.service.bufferPreMinutes)}`}
+                {appt.service.bufferPosMinutes > 0 &&
+                  ` · pós ${formatDuration(appt.service.bufferPosMinutes)}`}
               </div>
             </div>
           </div>

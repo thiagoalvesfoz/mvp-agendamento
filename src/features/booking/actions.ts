@@ -79,8 +79,6 @@ export async function createAppointment(
       id: true,
       name: true,
       durationMinutes: true,
-      bufferPreMinutes: true,
-      bufferPosMinutes: true,
       active: true,
     },
   });
@@ -122,8 +120,6 @@ export async function createAppointment(
           customerId: customer.id,
           serviceNameSnapshot: service.name,
           durationMinutesSnapshot: service.durationMinutes,
-          bufferPreSnapshot: service.bufferPreMinutes,
-          bufferPosSnapshot: service.bufferPosMinutes,
           customerNameSnapshot: data.name,
           customerContactSnapshot: phone,
           customerEmailSnapshot: data.email || null,

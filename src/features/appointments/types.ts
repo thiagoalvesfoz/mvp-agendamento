@@ -42,8 +42,9 @@ export type AppointmentDetail = {
   // Snapshots de serviço
   serviceNameSnapshot: string;
   durationMinutesSnapshot: number;
-  bufferPreSnapshot: number;
-  bufferPosSnapshot: number;
+
+  // Buffer atual do serviço (não snapshotado — usa valor corrente)
+  service: { bufferPreMinutes: number; bufferPosMinutes: number };
 
   // Snapshots de cliente
   customerNameSnapshot: string;

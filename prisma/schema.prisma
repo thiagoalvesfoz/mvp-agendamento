@@ -132,8 +132,6 @@ model Appointment {
   // Snapshots (RN15) — refletem o ACORDO atual
   serviceNameSnapshot         String  @map("service_name_snapshot")
   durationMinutesSnapshot     Int     @map("duration_minutes_snapshot")
-  bufferPreSnapshot           Int     @default(0) @map("buffer_pre_snapshot")
-  bufferPosSnapshot           Int     @default(0) @map("buffer_pos_snapshot")
   customerNameSnapshot        String  @map("customer_name_snapshot")
   customerContactSnapshot     String  @map("customer_contact_snapshot")
   customerEmailSnapshot       String? @map("customer_email_snapshot")

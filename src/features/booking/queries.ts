@@ -65,7 +65,7 @@ export async function getAvailableSlotsForDate(
 
   const service = await db.service.findUnique({
     where: { id: serviceId },
-    select: { durationMinutes: true },
+    select: { durationMinutes: true, bufferPreMinutes: true, bufferPosMinutes: true },
   });
   if (!service) return [];
 
@@ -90,8 +90,7 @@ export async function getAvailableSlotsForDate(
       select: {
         startTime: true,
         endTime: true,
-        bufferPreSnapshot: true,
-        bufferPosSnapshot: true,
+        service: { select: { bufferPreMinutes: true, bufferPosMinutes: true } },
       },
     }),
     db.blockedDate.findMany({
@@ -132,8 +131,8 @@ export async function getAvailableSlotsForDate(
     appointments: existingAppts.map((a) => ({
       startTime: a.startTime,
       endTime: a.endTime,
-      bufferPre: a.bufferPreSnapshot ?? 0,
-      bufferPos: a.bufferPosSnapshot ?? 0,
+      bufferPre: a.service.bufferPreMinutes,
+      bufferPos: a.service.bufferPosMinutes,
     })),
     blockedRanges: [
       ...partialBlocks.flatMap((b) =>
