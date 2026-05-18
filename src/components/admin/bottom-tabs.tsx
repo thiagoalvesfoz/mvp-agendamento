@@ -8,12 +8,6 @@ import { PendingBadge } from "./pending-badge";
 
 const TABS = [
   {
-    href: "/admin",
-    label: "Agenda",
-    match: /^\/admin(\/agenda(\/.*)?)?\/?$/,
-    icon: I.Calendar,
-  },
-  {
     href: "/admin/servicos",
     label: "Serviços",
     match: /^\/admin\/servicos/,
@@ -24,6 +18,12 @@ const TABS = [
     label: "Clientes",
     match: /^\/admin\/clientes/,
     icon: I.Users,
+  },
+  {
+    href: "/admin",
+    label: "Agenda",
+    match: /^\/admin(\/agenda(\/.*)?)?\/?$/,
+    icon: I.Calendar,
   },
   {
     href: "/admin/ajustes",
