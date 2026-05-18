@@ -223,7 +223,7 @@ export async function getLandingCoverMeta(): Promise<LandingCoverMeta | null> {
 
 /**
  * Retorna o blob completo da capa. Usado APENAS pelo route handler
- * GET /api/landing/cover. Não chamar de Server Components — carrega o BYTEA.
+ * GET /api/landing/cover quando o ETag não bate. Não chamar de Server Components.
  */
 export async function getLandingCoverBinary(): Promise<{
   data: Buffer;

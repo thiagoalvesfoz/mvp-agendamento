@@ -10,22 +10,23 @@
  *    o cache-buster `?v=<timestamp>` na URL garante atualização imediata.
  */
 import { NextResponse } from "next/server";
-import { getLandingCoverBinary } from "@/features/settings/queries";
+import { getLandingCoverMeta, getLandingCoverBinary } from "@/features/settings/queries";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
-  const cover = await getLandingCoverBinary();
+  // Estágio 1: só metadado — evita carregar o BYTEA para responder 304.
+  const meta = await getLandingCoverMeta();
+  if (!meta) return new NextResponse(null, { status: 404 });
 
-  if (!cover) {
-    return new NextResponse(null, { status: 404 });
-  }
-
-  const etag = `"${cover.updatedAt.getTime().toString(36)}"`;
-  const ifNoneMatch = request.headers.get("if-none-match");
-  if (ifNoneMatch === etag) {
+  const etag = `"${meta.updatedAt.getTime().toString(36)}"`;
+  if (request.headers.get("if-none-match") === etag) {
     return new NextResponse(null, { status: 304, headers: { ETag: etag } });
   }
+
+  // Estágio 2: ETag não bateu — carrega o binário completo.
+  const cover = await getLandingCoverBinary();
+  if (!cover) return new NextResponse(null, { status: 404 });
 
   return new NextResponse(new Uint8Array(cover.data), {
     status: 200,
