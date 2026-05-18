@@ -39,22 +39,17 @@ export async function getActiveServices(): Promise<ServiceForBooking[]> {
 }
 
 /**
- * Slots disponíveis para um serviço em uma data específica.
+ * Slots disponíveis para um serviço em uma data específica (RN13 completo).
  *
- * VERSÃO DESCOBERTA — simplificada:
- *  - Considera apenas o horário base de availability do dia da semana
- *  - Considera agendamentos PENDING/CONFIRMED/COMPLETED como ocupados
- *  - Gera slots de 30 em 30 minutos
+ * Considera:
+ *  - Horário base de availability do dia da semana
+ *  - Agendamentos PENDING/CONFIRMED/COMPLETED com buffer pré/pós (snapshots)
+ *  - BlockedDates parciais (startTime/endTime preenchidos)
+ *  - RecurringBlocks weekly/yearly — parciais ou dia inteiro
+ *  - Antecedência mínima (minNoticeHours) e janela máxima (maxDaysAhead)
  *
- * TODO (RN13 completo):
- *  - blocked_dates parciais (startTime/endTime preenchidos) — dias inteiros já são bloqueados no calendário via getBlockedDatesForCalendar
- *  - recurring_blocks (weekly/yearly)
- *  - buffer pré/pós dos agendamentos existentes (usar snapshots)
- *  - calcular usando America/Sao_Paulo (Temporal/date-fns-tz)
- *
- * Regras opcionais (passadas pelo caller público; admin não passa para não restringir):
- *  - minNoticeHours: antecedência mínima entre agora e o início do slot
- *  - maxDaysAhead: janela máxima em dias a partir de hoje
+ * Retorno vazio [] significa dia indisponível (sem availability, dia bloqueado,
+ * ou todos os slots ocupados).
  */
 export async function getAvailableSlotsForDate(
   serviceId: string,
@@ -76,50 +71,102 @@ export async function getAvailableSlotsForDate(
   // Dia da semana 0=domingo...6=sábado
   const date = new Date(`${dateIso}T12:00:00`);
   const weekDay = date.getDay();
+  const [, monthStr, dayStr] = dateIso.split("-");
+  const month = parseInt(monthStr ?? "0", 10); // 1-12
+  const dayOfMonth = parseInt(dayStr ?? "0", 10); // 1-31
 
-  const ranges = await db.availability.findMany({
-    where: { weekDay },
-    orderBy: { startTime: "asc" },
-  });
+  // Busca em paralelo: availability + agendamentos + bloqueios parciais + recorrentes
+  const [ranges, existingAppts, partialBlocks, recurringBlocks] = await Promise.all([
+    db.availability.findMany({
+      where: { weekDay },
+      orderBy: { startTime: "asc" },
+    }),
+    db.appointment.findMany({
+      where: {
+        date,
+        status: { in: ["PENDING", "CONFIRMED", "COMPLETED"] },
+      },
+      select: {
+        startTime: true,
+        endTime: true,
+        bufferPreSnapshot: true,
+        bufferPosSnapshot: true,
+      },
+    }),
+    db.blockedDate.findMany({
+      where: {
+        date: new Date(dateIso),
+        startTime: { not: null },
+        endTime: { not: null },
+      },
+      select: { startTime: true, endTime: true },
+    }),
+    db.recurringBlock.findMany({
+      select: {
+        pattern: true,
+        weekDay: true,
+        month: true,
+        dayOfMonth: true,
+        startTime: true,
+        endTime: true,
+      },
+    }),
+  ]);
 
   if (ranges.length === 0) return [];
 
-  // Agendamentos ativos no dia
-  const existing = await db.appointment.findMany({
-    where: {
-      date,
-      status: { in: ["PENDING", "CONFIRMED", "COMPLETED"] },
-    },
-    select: { startTime: true, endTime: true },
-  });
-
-  const occupied = new Set<string>();
-  for (const a of existing) {
-    occupied.add(`${a.startTime}-${a.endTime}`);
+  // Bloqueios de dia inteiro por RecurringBlock (retorna imediatamente)
+  for (const rb of recurringBlocks) {
+    const applies =
+      (rb.pattern === "weekly" && rb.weekDay === weekDay) ||
+      (rb.pattern === "yearly" && rb.month === month && rb.dayOfMonth === dayOfMonth);
+    if (applies && !rb.startTime && !rb.endTime) return [];
   }
 
-  // Antecedência mínima: instante mais cedo aceitável para início do slot
+  // Constrói lista de intervalos bloqueados (em minutos)
+  type Interval = { start: number; end: number };
+  const blocked: Interval[] = [];
+
+  for (const appt of existingAppts) {
+    blocked.push({
+      start: toMinutes(appt.startTime) - (appt.bufferPreSnapshot ?? 0),
+      end: toMinutes(appt.endTime) + (appt.bufferPosSnapshot ?? 0),
+    });
+  }
+
+  for (const b of partialBlocks) {
+    if (b.startTime && b.endTime) {
+      blocked.push({ start: toMinutes(b.startTime), end: toMinutes(b.endTime) });
+    }
+  }
+
+  for (const rb of recurringBlocks) {
+    const applies =
+      (rb.pattern === "weekly" && rb.weekDay === weekDay) ||
+      (rb.pattern === "yearly" && rb.month === month && rb.dayOfMonth === dayOfMonth);
+    if (applies && rb.startTime && rb.endTime) {
+      blocked.push({ start: toMinutes(rb.startTime), end: toMinutes(rb.endTime) });
+    }
+  }
+
+  // Antecedência mínima
   const earliestStart =
     rules?.minNoticeHours != null ? addHours(new Date(), rules.minNoticeHours) : null;
 
-  // Gera slots de 30 em 30
   const SLOT_STEP = 30;
   const slots: string[] = [];
 
   for (const r of ranges) {
     let cur = toMinutes(r.startTime);
-    const end = toMinutes(r.endTime);
-    while (cur + service.durationMinutes <= end) {
-      const startStr = toHHmm(cur);
-      const endStr = toHHmm(cur + service.durationMinutes);
-      const overlap = Array.from(occupied).some((slot) => {
-        const [s, e] = slot.split("-");
-        if (!s || !e) return false;
-        return overlaps(startStr, endStr, s, e);
-      });
-      const beforeMinNotice =
-        earliestStart != null && combineDateAndTimeInTZ(dateIso, startStr) < earliestStart;
-      if (!overlap && !beforeMinNotice) slots.push(startStr);
+    const rangeEnd = toMinutes(r.endTime);
+
+    while (cur + service.durationMinutes <= rangeEnd) {
+      const slotEnd = cur + service.durationMinutes;
+      const isBlocked = blocked.some(({ start, end }) => cur < end && start < slotEnd);
+      const tooEarly =
+        earliestStart != null && combineDateAndTimeInTZ(dateIso, toHHmm(cur)) < earliestStart;
+
+      if (!isBlocked && !tooEarly) slots.push(toHHmm(cur));
       cur += SLOT_STEP;
     }
   }
@@ -136,10 +183,6 @@ function toHHmm(minutes: number): string {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-}
-
-function overlaps(aStart: string, aEnd: string, bStart: string, bEnd: string): boolean {
-  return toMinutes(aStart) < toMinutes(bEnd) && toMinutes(bStart) < toMinutes(aEnd);
 }
 
 /**

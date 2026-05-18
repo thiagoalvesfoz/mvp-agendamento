@@ -1,13 +1,4 @@
-/**
- * Configuração do Auth.js (NextAuth v5).
- *
- * Usa Credentials provider (email/senha) + Prisma adapter.
- * A página de login fica em /admin/login.
- *
- * Uso:
- *   import { auth } from "@/lib/auth";
- *   const session = await auth();  // em Server Components / Route Handlers
- */
+import "server-only";
 import { authConfig } from "@/lib/auth.config";
 import { db } from "@/lib/db";
 import { PrismaAdapter } from "@auth/prisma-adapter";
