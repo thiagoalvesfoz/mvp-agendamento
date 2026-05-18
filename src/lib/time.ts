@@ -96,6 +96,18 @@ export function todayISO(): string {
 }
 
 /**
+ * Soma minutos a um horário no formato HH:mm.
+ * Ex.: addMinutesToHHmm("09:00", 90) → "10:30"
+ */
+export function addMinutesToHHmm(hhmm: string, minutes: number): string {
+  const [h, m] = hhmm.split(":").map(Number);
+  const total = (h ?? 0) * 60 + (m ?? 0) + minutes;
+  const nh = Math.floor(total / 60);
+  const nm = total % 60;
+  return `${String(nh).padStart(2, "0")}:${String(nm).padStart(2, "0")}`;
+}
+
+/**
  * Formata duração em minutos para "Xh Ymin" / "Xh" / "Ymin".
  * Ex.: 30 → "30min", 60 → "1h", 90 → "1h 30min", 150 → "2h 30min".
  */

@@ -14,6 +14,7 @@ const serverSchema = z
   .object({
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
     DATABASE_URL: z.string().url(),
+    DIRECT_URL: z.string().url(),
     AUTH_SECRET: z.string().min(32, "AUTH_SECRET deve ter no mínimo 32 caracteres"),
     AUTH_TRUST_HOST: z.string().optional(),
     RESEND_API_KEY: z.string().optional(),
@@ -50,6 +51,7 @@ const clientSchema = z.object({
 const processEnv = {
   NODE_ENV: process.env.NODE_ENV,
   DATABASE_URL: process.env.DATABASE_URL,
+  DIRECT_URL: process.env.DIRECT_URL,
   AUTH_SECRET: process.env.AUTH_SECRET,
   AUTH_TRUST_HOST: process.env.AUTH_TRUST_HOST,
   RESEND_API_KEY: process.env.RESEND_API_KEY,

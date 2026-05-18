@@ -6,6 +6,15 @@
  * vai formando os blocos conforme o usuário digita. Limita a 11 dígitos
  * (o componente que usa também deve limitar `maxLength` no input).
  */
+/** Normaliza telefone para 5599999999999 (DDI 55 + DDD + número). */
+export function normalizePhone(raw: string): string {
+  const digits = raw.replace(/\D/g, "");
+  if (digits.length === 13 && digits.startsWith("55")) return digits;
+  if (digits.length === 11) return `55${digits}`;
+  if (digits.length === 10) return `55${digits}`;
+  throw new Error("Telefone inválido");
+}
+
 export function maskPhoneBR(raw: string): string {
   const digits = raw.replace(/\D/g, "").slice(0, 11);
   const len = digits.length;

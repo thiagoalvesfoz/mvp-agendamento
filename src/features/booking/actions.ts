@@ -6,7 +6,9 @@ import { createAppointmentSchema, type CreateAppointmentInput } from "./schemas"
 import { Prisma } from "@prisma/client";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { addDays, addHours } from "date-fns";
-import { TZ, combineDateAndTimeInTZ, formatDateBR } from "@/lib/time";
+import { TZ, combineDateAndTimeInTZ, formatDateBR, addMinutesToHHmm } from "@/lib/time";
+import { normalizePhone } from "@/lib/phone";
+import { generateProtocol } from "@/lib/protocol";
 import { getSettings, getLandingConfig } from "@/features/settings/queries";
 import { notifyAdminPending, notifyCustomerReceived } from "./notify";
 
@@ -21,35 +23,6 @@ export type CreateAppointmentResult =
       error: string;
       fieldErrors?: Record<string, string[]>;
     };
-
-/** Normaliza telefone para 5599999999999 (DDI 55 + DDD + número). */
-function normalizePhone(raw: string): string {
-  const digits = raw.replace(/\D/g, "");
-  if (digits.length === 13 && digits.startsWith("55")) return digits;
-  if (digits.length === 11) return `55${digits}`;
-  if (digits.length === 10) return `55${digits}`; // sem 9 inicial
-  throw new Error("Telefone inválido");
-}
-
-/** Gera protocolo no formato AG-YYYYMMDD-XXXX (Crockford-ish, sem 0/O/I/L). */
-function generateProtocol(): string {
-  const ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ"; // 31 chars
-  const today = new Date();
-  const ymd = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, "0")}${String(today.getDate()).padStart(2, "0")}`;
-  let suffix = "";
-  for (let i = 0; i < 4; i++) {
-    suffix += ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
-  }
-  return `AG-${ymd}-${suffix}`;
-}
-
-function addMinutesToHHmm(hhmm: string, minutes: number): string {
-  const [h, m] = hhmm.split(":").map(Number);
-  const total = (h ?? 0) * 60 + (m ?? 0) + minutes;
-  const nh = Math.floor(total / 60);
-  const nm = total % 60;
-  return `${String(nh).padStart(2, "0")}:${String(nm).padStart(2, "0")}`;
-}
 
 export async function createAppointment(
   input: CreateAppointmentInput,

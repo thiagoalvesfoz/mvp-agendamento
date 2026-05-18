@@ -4,6 +4,7 @@
  * Só leitura. Importar somente em Server Components / Server Actions.
  * Nunca re-exportar instâncias do Prisma ou tipos não-serializáveis.
  */
+import "server-only";
 import { db } from "@/lib/db";
 import type { AppointmentStatus } from "@prisma/client";
 

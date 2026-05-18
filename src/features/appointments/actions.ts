@@ -19,7 +19,9 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { fromZonedTime } from "date-fns-tz";
-import { TZ, formatDateBR } from "@/lib/time";
+import { TZ, formatDateBR, addMinutesToHHmm } from "@/lib/time";
+import { normalizePhone } from "@/lib/phone";
+import { generateProtocol } from "@/lib/protocol";
 import { getLandingConfig } from "@/features/settings/queries";
 import { notifyCustomerConfirmed } from "./notify";
 import {
@@ -40,35 +42,6 @@ async function requireAuth(): Promise<{ ok: true; userId: string } | { ok: false
   const session = await auth();
   if (!session?.user?.email) return { ok: false, error: "Não autorizado" };
   return { ok: true, userId: session.user.email };
-}
-
-/** Normaliza telefone para 5599999999999 (DDI 55 + DDD + número). */
-function normalizePhone(raw: string): string {
-  const digits = raw.replace(/\D/g, "");
-  if (digits.length === 13 && digits.startsWith("55")) return digits;
-  if (digits.length === 11) return `55${digits}`;
-  if (digits.length === 10) return `55${digits}`;
-  throw new Error("Telefone inválido");
-}
-
-/** Gera protocolo no formato AG-YYYYMMDD-XXXX (Crockford-ish, sem 0/O/I/L). */
-function generateProtocol(): string {
-  const ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
-  const today = new Date();
-  const ymd = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, "0")}${String(today.getDate()).padStart(2, "0")}`;
-  let suffix = "";
-  for (let i = 0; i < 4; i++) {
-    suffix += ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
-  }
-  return `AG-${ymd}-${suffix}`;
-}
-
-function addMinutesToHHmm(hhmm: string, minutes: number): string {
-  const [h, m] = hhmm.split(":").map(Number);
-  const total = (h ?? 0) * 60 + (m ?? 0) + minutes;
-  const nh = Math.floor(total / 60);
-  const nm = total % 60;
-  return `${String(nh).padStart(2, "0")}:${String(nm).padStart(2, "0")}`;
 }
 
 /** Detecta se o erro é uma violação da constraint EXCLUDE (anti-sobreposição). */
