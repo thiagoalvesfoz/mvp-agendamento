@@ -20,6 +20,7 @@ import { maskPhoneBR } from "@/lib/phone";
 import type { ServiceForBooking } from "../queries";
 import type { BlockedDateEntry } from "./calendar-picker";
 import { getPublicSlotsAction } from "../client-actions";
+import { formatDuration } from "@/lib/time";
 
 const TOTAL_STEPS = 4;
 
@@ -174,7 +175,7 @@ export function BookingStepper({
         {step === 2 && service && (
           <div className="slide-in">
             <div className="text-[12px] uppercase tracking-[0.16em] text-muted-foreground">
-              {service.name} · {service.durationMinutes} min
+              {service.name} · {formatDuration(service.durationMinutes)}
             </div>
             <h1 className="mt-2 text-[26px] font-semibold leading-[1.1] tracking-tight">
               Escolha data e horário
