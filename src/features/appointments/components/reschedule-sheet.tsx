@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { I } from "@/components/shared/icons";
 import { BottomSheet } from "@/components/shared/bottom-sheet";
+import { I } from "@/components/shared/icons";
+import { Button } from "@/components/ui/button";
+import { adminRescheduleAppointment } from "@/features/appointments/actions";
+import { getSlotsAction } from "@/features/booking/client-actions";
 import { CalendarPicker } from "@/features/booking/components/calendar-picker";
 import { TimeGrid } from "@/features/booking/components/time-grid";
-import { getSlotsAction } from "@/features/booking/client-actions";
-import { adminRescheduleAppointment } from "@/features/appointments/actions";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 
 interface RescheduleSheetProps {
   appointmentId: string;
@@ -78,7 +78,7 @@ export function RescheduleSheet({
 
   return (
     <>
-      <Button variant="outline" className="w-full" onClick={handleOpen}>
+      <Button variant="outline" size="lg" className="w-full" onClick={handleOpen}>
         <I.Calendar size={16} /> Remarcar
       </Button>
 

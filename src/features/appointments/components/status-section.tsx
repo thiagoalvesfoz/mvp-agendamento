@@ -78,7 +78,7 @@ export function StatusSection({ appointmentId, status }: StatusSectionProps) {
         </div>
         <Button
           variant="outline"
-          size="sm"
+          size="lg"
           className="mt-3.5 w-full"
           onClick={() => setOpen(true)}
           disabled={isPending}
