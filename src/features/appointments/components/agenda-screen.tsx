@@ -226,7 +226,7 @@ function StatPill({ label, value, accent, active, onClick }: StatPillProps) {
       </div>
       <div className="mt-0.5 flex items-baseline gap-1">
         <span className={cn("text-[22px] font-semibold tabular-nums tracking-tight")}>{value}</span>
-        {accent && value > 0 && <span className="size-1.5 rounded-full bg-[oklch(0.72_0.15_75)]" />}
+        {accent && value > 0 && <span className="size-1.5 rounded-full bg-destructive" />}
       </div>
     </button>
   );

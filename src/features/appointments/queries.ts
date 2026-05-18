@@ -235,6 +235,10 @@ export async function getAgendaStats(todayISOStr: string): Promise<{
   return { pending, today, week };
 }
 
+export async function getPendingCount(): Promise<number> {
+  return db.appointment.count({ where: { status: "PENDING" } });
+}
+
 /**
  * Agendamentos de um mês — para a view de mês (apenas dots e contagens).
  *
