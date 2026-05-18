@@ -83,6 +83,7 @@ export default async function AppointmentDetailPage({ params }: AppointmentDetai
     appt.status === "CANCELED" ||
     appt.status === "EXPIRED" ||
     appt.status === "NO_SHOW";
+  const isAnonymized = !!appt.anonymizedAt;
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col">
@@ -115,7 +116,7 @@ export default async function AppointmentDetailPage({ params }: AppointmentDetai
         </div>
 
         {/* Status — destaque + override */}
-        <StatusSection appointmentId={appt.id} status={appt.status} />
+        {!isAnonymized && <StatusSection appointmentId={appt.id} status={appt.status} />}
 
         {/* Serviço + quando */}
         <Card className="mt-3 p-4">
@@ -172,42 +173,44 @@ export default async function AppointmentDetailPage({ params }: AppointmentDetai
         </Card>
 
         {/* Contato */}
-        <Card className="mt-3 p-4">
-          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
-            Contato
-          </div>
-          <div className="mt-3 space-y-2.5">
-            <ContactRow
-              icon={<I.MessageCircle size={15} />}
-              label="WhatsApp"
-              value={formatPhone(appt.customerContactSnapshot)}
-              href={whatsappLink(appt.customerContactSnapshot)}
-              actionLabel="Abrir conversa"
-            />
-            {appt.customerEmailSnapshot && (
+        {!isAnonymized && (
+          <Card className="mt-3 p-4">
+            <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
+              Contato
+            </div>
+            <div className="mt-3 space-y-2.5">
               <ContactRow
-                icon={<I.Mail size={15} />}
-                label="Email"
-                value={appt.customerEmailSnapshot}
-                href={`mailto:${appt.customerEmailSnapshot}`}
+                icon={<I.MessageCircle size={15} />}
+                label="WhatsApp"
+                value={formatPhone(appt.customerContactSnapshot)}
+                href={whatsappLink(appt.customerContactSnapshot)}
+                actionLabel="Abrir conversa"
               />
-            )}
-            {appt.customerSocialMediaSnapshot && (
-              <ContactRow
-                icon={<I.Instagram size={15} />}
-                label="Social"
-                value={appt.customerSocialMediaSnapshot}
-              />
-            )}
-          </div>
-          <div className="my-3 h-px bg-[var(--border)]" />
-          <Link
-            href={`/admin/clientes/${appt.customerId}`}
-            className="press inline-flex items-center gap-1 text-[12px] font-medium text-[var(--primary)]"
-          >
-            Ver perfil do cliente <I.ArrowRight size={12} />
-          </Link>
-        </Card>
+              {appt.customerEmailSnapshot && (
+                <ContactRow
+                  icon={<I.Mail size={15} />}
+                  label="Email"
+                  value={appt.customerEmailSnapshot}
+                  href={`mailto:${appt.customerEmailSnapshot}`}
+                />
+              )}
+              {appt.customerSocialMediaSnapshot && (
+                <ContactRow
+                  icon={<I.Instagram size={15} />}
+                  label="Social"
+                  value={appt.customerSocialMediaSnapshot}
+                />
+              )}
+            </div>
+            <div className="my-3 h-px bg-[var(--border)]" />
+            <Link
+              href={`/admin/clientes/${appt.customerId}`}
+              className="press inline-flex items-center gap-1 text-[12px] font-medium text-[var(--primary)]"
+            >
+              Ver perfil do cliente <I.ArrowRight size={12} />
+            </Link>
+          </Card>
+        )}
 
         {/* Briefing */}
         {appt.briefing && (

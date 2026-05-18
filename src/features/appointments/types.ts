@@ -59,6 +59,7 @@ export type AppointmentDetail = {
 
   createdAt: Date;
   updatedAt: Date;
+  anonymizedAt: Date | null;
 
   history: AppointmentHistoryEntry[];
 };

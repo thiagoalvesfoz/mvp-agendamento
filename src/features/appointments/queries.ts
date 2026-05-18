@@ -157,6 +157,7 @@ export async function getAppointmentById(id: string): Promise<AppointmentDetail 
       rescheduledToId: true,
       createdAt: true,
       updatedAt: true,
+      anonymizedAt: true,
       history: {
         select: {
           id: true,
