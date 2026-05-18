@@ -1,0 +1,25 @@
+name: Expire pending appointments
+
+on:
+  schedule:
+    # A cada 30 minutos (UTC). Ajuste conforme o pendingExpirationHours configurado.
+    - cron: "*/30 * * * *"
+  workflow_dispatch: # permite disparo manual pelo GitHub UI
+
+jobs:
+  expire:
+    name: Expire stale PENDING appointments
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call expire-pending endpoint
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${{ secrets.APP_URL }}/api/cron/expire-pending" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json")
+          echo "HTTP status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "Endpoint returned $STATUS — failing job"
+            exit 1
+          fi
