@@ -11,6 +11,7 @@ import { normalizePhone } from "@/lib/phone";
 import { generateProtocol } from "@/lib/protocol";
 import { getSettings, getLandingConfig } from "@/features/settings/queries";
 import { notifyAdminPending, notifyCustomerReceived } from "./notify";
+import { log } from "@/lib/logger";
 
 export type CreateAppointmentResult =
   | {
@@ -186,6 +187,17 @@ export async function createAppointment(
       }
     });
 
+    log.info(
+      {
+        appointmentId,
+        protocol,
+        serviceId: service.id,
+        date: data.date,
+        startTime: data.startTime,
+      },
+      "appointment.created",
+    );
+
     return { ok: true, protocol, appointmentId };
   } catch (err) {
     // Constraint EXCLUDE violada → 409 conceitual
@@ -201,7 +213,7 @@ export async function createAppointment(
         error: "Esse horário acabou de ser reservado. Escolha outro disponível.",
       };
     }
-    console.error("createAppointment failed", err);
+    log.error({ err }, "createAppointment failed");
     return {
       ok: false,
       error: "Não foi possível criar o agendamento. Tente novamente.",

@@ -17,6 +17,7 @@ import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { log } from "@/lib/logger";
 import { Prisma } from "@prisma/client";
 import { fromZonedTime } from "date-fns-tz";
 import { TZ, formatDateBR, addMinutesToHHmm } from "@/lib/time";
@@ -188,7 +189,7 @@ export async function adminCreateAppointment(
         error: "Esse horário já está ocupado. Escolha outro horário disponível.",
       };
     }
-    console.error("adminCreateAppointment failed", err);
+    log.error({ err }, "adminCreateAppointment failed");
     return {
       ok: false,
       error: "Não foi possível criar o agendamento. Tente novamente.",
@@ -250,6 +251,11 @@ export async function updateAppointmentStatus(input: UpdateStatusInput): Promise
       },
     }),
   ]);
+
+  log.info(
+    { appointmentId, statusFrom: current.status, statusTo: status, changedBy: guard.userId },
+    "appointment.status_changed",
+  );
 
   revalidatePath("/admin");
   revalidatePath(`/admin/agenda/${appointmentId}`);
@@ -407,7 +413,7 @@ export async function updateAppointmentDuration(
         error: "A nova duração conflita com outro agendamento. Reduza o tempo ou remarque.",
       };
     }
-    console.error("updateAppointmentDuration failed", err);
+    log.error({ err }, "updateAppointmentDuration failed");
     return {
       ok: false,
       error: "Não foi possível ajustar a duração. Tente novamente.",

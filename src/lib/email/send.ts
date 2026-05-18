@@ -2,6 +2,7 @@ import "server-only";
 import type { ReactElement } from "react";
 import { resend, isEmailEnabled, EMAIL_FROM } from "./client";
 import { env } from "@/lib/env";
+import { log } from "@/lib/logger";
 
 interface SendEmailParams {
   to: string;
@@ -28,7 +29,7 @@ interface SendEmailParams {
  */
 export async function sendEmail({ to, subject, react, tag }: SendEmailParams): Promise<void> {
   if (!isEmailEnabled || !resend) {
-    console.info(`[email:${tag}] skipped (disabled) → to=${to} subject="${subject}"`);
+    log.info({ tag, to, subject }, "email.skipped");
     return;
   }
 
@@ -52,20 +53,12 @@ export async function sendEmail({ to, subject, react, tag }: SendEmailParams): P
     });
 
     if (result.error) {
-      console.error(`[email:${tag}] resend error`, {
-        to: effectiveTo,
-        subject,
-        error: result.error,
-      });
+      log.warn({ tag, to: effectiveTo, subject, error: result.error }, "email.resend_error");
       return;
     }
 
-    console.info(`[email:${tag}] sent`, { to: effectiveTo, id: result.data?.id });
+    log.info({ tag, to: effectiveTo, id: result.data?.id }, "email.sent");
   } catch (err) {
-    console.error(`[email:${tag}] exception`, {
-      to: effectiveTo,
-      subject,
-      error: err instanceof Error ? err.message : err,
-    });
+    log.error({ err, tag, to: effectiveTo, subject }, "email.exception");
   }
 }

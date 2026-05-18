@@ -12,6 +12,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { idParamSchema } from "@/features/customers/schemas";
+import { log } from "@/lib/logger";
 
 type ActionResult<T = undefined> = { ok: true; data?: T } | { ok: false; error: string };
 
@@ -111,6 +112,8 @@ export async function anonymizeCustomer(id: string): Promise<ActionResult> {
       },
     });
   });
+
+  log.info({ customerId: id }, "customer.anonymized");
 
   revalidatePath("/admin");
   revalidatePath("/admin/clientes");
