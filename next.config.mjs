@@ -1,4 +1,5 @@
 import { withSentryConfig } from "@sentry/nextjs";
+import "./src/lib/env.js";
 /** @type {import('next').NextConfig} */
 const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },

@@ -72,6 +72,7 @@ export function BookingStepper({
   });
   const [protocol, setProtocol] = useState<string>("");
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [slotTakenError, setSlotTakenError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const back = () => {
@@ -95,6 +96,7 @@ export function BookingStepper({
     const iso = dateToIso(d);
     setDate(iso);
     setStartTime(null);
+    setSlotTakenError(null);
     if (!service) return;
     setSlotsLoading(true);
     try {
@@ -109,6 +111,18 @@ export function BookingStepper({
     if (!service || !date || !startTime) return;
     setSubmitError(null);
     startTransition(async () => {
+      // Verifica se o slot ainda está disponível antes de submeter
+      const currentSlots = await getPublicSlotsAction(service.id, date);
+      if (!currentSlots.includes(startTime)) {
+        setSlotTakenError(
+          "Esse horário foi reservado enquanto você preenchia os dados. Escolha outro.",
+        );
+        setStartTime(null);
+        setSlots(currentSlots);
+        setStep(2);
+        return;
+      }
+
       const result = await createAppointment({
         serviceId: service.id,
         date,
@@ -179,6 +193,12 @@ export function BookingStepper({
                 maxDaysAhead={maxDaysAhead}
               />
             </div>
+
+            {slotTakenError && (
+              <div className="border-destructive/30 bg-destructive/5 mt-4 rounded-[10px] border p-3 text-[13px] text-destructive">
+                {slotTakenError}
+              </div>
+            )}
 
             {date && (
               <div className="mt-6">
