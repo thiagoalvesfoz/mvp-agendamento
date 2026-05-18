@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import useSWR from "swr";
 
 // ─── Tipos públicos ─────────────────────────────────────────────────────────
 
@@ -72,6 +73,14 @@ export function AgendaScreen({
   const router = useRouter();
   const [, startTransition] = useTransition();
 
+  const { data: pendingData } = useSWR(
+    "/api/admin/agendamentos/pending-count",
+    (url: string) => fetch(url).then((r) => r.json() as Promise<{ count: number }>),
+    { refreshInterval: 10_000, revalidateOnFocus: true },
+  );
+
+  const pendingCount = pendingData?.count ?? stats.pending;
+
   function navigate(next: {
     view?: AgendaView;
     date?: string;
@@ -115,7 +124,7 @@ export function AgendaScreen({
         <div className="grid grid-cols-3 gap-2">
           <StatPill
             label="Pendentes"
-            value={stats.pending}
+            value={pendingCount}
             active={view === "pending"}
             accent
             onClick={() => navigate({ view: view === "pending" ? "day" : "pending" })}

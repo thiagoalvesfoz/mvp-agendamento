@@ -19,6 +19,7 @@ import { STATUS_THEME } from "@/lib/status-theme";
 import type { AppointmentStatus } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { mutate } from "swr";
 
 interface StatusSectionProps {
   appointmentId: string;
@@ -59,6 +60,7 @@ export function StatusSection({ appointmentId, status }: StatusSectionProps) {
         return;
       }
       setOpen(false);
+      mutate("/api/admin/agendamentos/pending-count");
       router.refresh();
     });
   }
