@@ -1,0 +1,1 @@
+ALTER TABLE "settings" ADD COLUMN "slot_step_minutes" INTEGER NOT NULL DEFAULT 60;

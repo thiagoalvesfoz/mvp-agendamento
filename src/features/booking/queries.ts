@@ -11,6 +11,8 @@ export type SlotRules = {
   minNoticeHours?: number;
   /** Janela máxima (em dias corridos) a partir de hoje. */
   maxDaysAhead?: number;
+  /** Intervalo entre slots em minutos (padrão: 60). */
+  slotStep?: number;
 };
 
 export type ServiceForBooking = {
@@ -127,6 +129,7 @@ export async function getAvailableSlotsForDate(
 
   return computeSlots({
     durationMinutes: service.durationMinutes,
+    slotStep: rules?.slotStep,
     availabilities: ranges,
     appointments: existingAppts.map((a) => ({
       startTime: a.startTime,

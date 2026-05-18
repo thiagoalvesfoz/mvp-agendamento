@@ -26,6 +26,7 @@ export type SettingsRow = Pick<
   | "minimumScheduleNoticeHours"
   | "maximumScheduleDaysAhead"
   | "pendingExpirationHours"
+  | "slotStepMinutes"
   | "retentionMonths"
   | "notificationEmail"
   | "publicSlug"
@@ -145,6 +146,7 @@ export async function getSettings(): Promise<SettingsRow> {
       minimumScheduleNoticeHours: true,
       maximumScheduleDaysAhead: true,
       pendingExpirationHours: true,
+      slotStepMinutes: true,
       retentionMonths: true,
       notificationEmail: true,
       publicSlug: true,

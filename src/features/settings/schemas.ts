@@ -138,6 +138,10 @@ export const updateRulesSchema = z.object({
   minimumScheduleNoticeHours: positiveInt("Antecedência mínima deve ser maior que zero"),
   maximumScheduleDaysAhead: positiveInt("Limite máximo deve ser maior que zero"),
   pendingExpirationHours: positiveInt("Expiração deve ser maior que zero"),
+  slotStepMinutes: z
+    .number({ invalid_type_error: "Informe um número" })
+    .int()
+    .min(15, "Mínimo 15 minutos"),
 });
 
 export type UpdateRulesInput = z.infer<typeof updateRulesSchema>;

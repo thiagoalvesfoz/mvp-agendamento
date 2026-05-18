@@ -205,6 +205,7 @@ model Settings {
   minimumScheduleNoticeHours Int      @default(12) @map("minimum_schedule_notice_hours")
   maximumScheduleDaysAhead   Int      @default(60) @map("maximum_schedule_days_ahead")
   pendingExpirationHours     Int      @default(48) @map("pending_expiration_hours")
+  slotStepMinutes            Int      @default(60) @map("slot_step_minutes")
   retentionMonths            Int      @default(24) @map("retention_months")
   notificationEmail          String   @map("notification_email")
   publicSlug                 String   @unique @map("public_slug")

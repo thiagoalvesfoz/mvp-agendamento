@@ -12,7 +12,7 @@ import { Card } from "@/components/ui/card";
 import { I } from "@/components/shared/icons";
 import { formatDuration, formatInTZ, weekdayName } from "@/lib/time";
 import { getAppointmentById } from "@/features/appointments/queries";
-import { AppointmentActions } from "@/features/appointments/components/appointment-actions";
+import { RescheduleSheet } from "@/features/appointments/components/reschedule-sheet";
 import { DurationAdjuster } from "@/features/appointments/components/duration-adjuster";
 import { StatusSection } from "@/features/appointments/components/status-section";
 
@@ -256,7 +256,13 @@ export default async function AppointmentDetailPage({ params }: AppointmentDetai
             Voltar para a agenda
           </Link>
         ) : (
-          <AppointmentActions appointmentId={appt.id} status={appt.status} />
+          <RescheduleSheet
+            appointmentId={appt.id}
+            serviceId={appt.serviceId}
+            durationMinutes={appt.durationMinutesSnapshot}
+            currentDate={appt.date}
+            currentStartTime={appt.startTime}
+          />
         )}
       </div>
     </div>

@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { DurationStepper } from "@/features/services/components/duration-stepper";
 import { updateRules } from "@/features/settings/actions";
+import { formatDuration } from "@/lib/time";
 import type { SettingsRow } from "@/features/settings/queries";
 
 interface RulesFormProps {
@@ -22,6 +23,7 @@ export function RulesForm({ settings }: RulesFormProps) {
   const [minNoticeHours, setMinNoticeHours] = useState(settings.minimumScheduleNoticeHours);
   const [maxDaysAhead, setMaxDaysAhead] = useState(settings.maximumScheduleDaysAhead);
   const [expirationHours, setExpirationHours] = useState(settings.pendingExpirationHours);
+  const [slotStep, setSlotStep] = useState(settings.slotStepMinutes);
 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -36,6 +38,7 @@ export function RulesForm({ settings }: RulesFormProps) {
         minimumScheduleNoticeHours: minNoticeHours,
         maximumScheduleDaysAhead: maxDaysAhead,
         pendingExpirationHours: expirationHours,
+        slotStepMinutes: slotStep,
       });
 
       if (!result.ok) {
@@ -79,6 +82,21 @@ export function RulesForm({ settings }: RulesFormProps) {
             />
             <p className="mt-2 text-[12px] text-[var(--muted-foreground)]">
               Não aceitar pedidos com mais de {maxDaysAhead} dias à frente.
+            </p>
+          </Card>
+
+          <Card className="p-4">
+            <Label hint="minutos">Intervalo entre horários</Label>
+            <DurationStepper
+              value={slotStep}
+              onChange={setSlotStep}
+              step={15}
+              min={15}
+              formatValue={formatDuration}
+            />
+            <p className="mt-2 text-[12px] text-[var(--muted-foreground)]">
+              Horários disponíveis são exibidos de {formatDuration(slotStep)} em{" "}
+              {formatDuration(slotStep)}.
             </p>
           </Card>
 

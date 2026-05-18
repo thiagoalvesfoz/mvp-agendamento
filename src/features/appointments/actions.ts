@@ -421,3 +421,60 @@ export async function updateAppointmentDuration(
 
   return { ok: true, data: { endTime: newEndTime } };
 }
+
+/**
+ * Realoca data e horário de um agendamento existente (PENDING ou CONFIRMED).
+ *
+ * Edição direta — mantém protocolo, cliente e snapshots intactos.
+ * Conflito de horário (23P01) retorna erro amigável.
+ */
+export async function adminRescheduleAppointment(
+  appointmentId: string,
+  newDate: string, // YYYY-MM-DD
+  newStartTime: string, // HH:mm
+): Promise<ActionResult> {
+  const guard = await requireAuth();
+  if (!guard.ok) return guard;
+
+  const current = await db.appointment.findUnique({
+    where: { id: appointmentId },
+    select: { status: true, durationMinutesSnapshot: true, date: true, startTime: true },
+  });
+
+  if (!current) return { ok: false, error: "Agendamento não encontrado" };
+  if (current.status !== "PENDING" && current.status !== "CONFIRMED") {
+    return { ok: false, error: "Só é possível remarcar agendamentos pendentes ou confirmados" };
+  }
+
+  const newEndTime = addMinutesToHHmm(newStartTime, current.durationMinutesSnapshot);
+  const newDateUTC = fromZonedTime(`${newDate}T12:00:00`, TZ);
+  const oldDateISO = current.date.toISOString().slice(0, 10);
+
+  try {
+    await db.$transaction([
+      db.appointment.update({
+        where: { id: appointmentId },
+        data: { date: newDateUTC, startTime: newStartTime, endTime: newEndTime },
+      }),
+      db.appointmentHistory.create({
+        data: {
+          appointmentId,
+          eventType: "reschedule",
+          changedBy: `admin:${guard.userId}`,
+          reason: `${oldDateISO} ${current.startTime} → ${newDate} ${newStartTime}`,
+        },
+      }),
+    ]);
+  } catch (err) {
+    if (isOverlapError(err)) {
+      return { ok: false, error: "Horário conflita com outro agendamento" };
+    }
+    log.error({ err }, "adminRescheduleAppointment failed");
+    return { ok: false, error: "Não foi possível remarcar. Tente novamente." };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath(`/admin/agenda/${appointmentId}`);
+
+  return { ok: true };
+}

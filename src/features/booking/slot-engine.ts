@@ -65,7 +65,7 @@ export function computeSlots(input: SlotEngineInput): string[] {
     earliestSlotStart = null,
     dateIso,
     timezone = SLOT_TZ,
-    slotStep = 30,
+    slotStep = 60,
   } = input;
 
   if (availabilities.length === 0) return [];

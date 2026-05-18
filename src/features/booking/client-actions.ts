@@ -8,7 +8,8 @@ import { getSettings } from "@/features/settings/queries";
  * manualmente sem respeitar antecedência mínima / limite máximo.
  */
 export async function getSlotsAction(serviceId: string, dateIso: string): Promise<string[]> {
-  return getAvailableSlotsForDate(serviceId, dateIso);
+  const settings = await getSettings();
+  return getAvailableSlotsForDate(serviceId, dateIso, { slotStep: settings.slotStepMinutes });
 }
 
 /**
@@ -21,5 +22,6 @@ export async function getPublicSlotsAction(serviceId: string, dateIso: string): 
   return getAvailableSlotsForDate(serviceId, dateIso, {
     minNoticeHours: settings.minimumScheduleNoticeHours,
     maxDaysAhead: settings.maximumScheduleDaysAhead,
+    slotStep: settings.slotStepMinutes,
   });
 }
