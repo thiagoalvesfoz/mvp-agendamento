@@ -2,7 +2,8 @@ import "server-only";
 import { db } from "@/lib/db";
 import { addDays, addHours, format } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
-import { TZ, combineDateAndTimeInTZ } from "@/lib/time";
+import { TZ } from "@/lib/time";
+import { computeSlots } from "./slot-engine";
 import type { BlockedDateEntry } from "./components/calendar-picker";
 
 export type SlotRules = {
@@ -113,76 +114,36 @@ export async function getAvailableSlotsForDate(
     }),
   ]);
 
-  if (ranges.length === 0) return [];
-
-  // Bloqueios de dia inteiro por RecurringBlock (retorna imediatamente)
-  for (const rb of recurringBlocks) {
+  // Filtra RecurringBlocks pelo dia atual e converte para BlockedRange
+  const recurringBlockedRanges = recurringBlocks.flatMap((rb) => {
     const applies =
       (rb.pattern === "weekly" && rb.weekDay === weekDay) ||
       (rb.pattern === "yearly" && rb.month === month && rb.dayOfMonth === dayOfMonth);
-    if (applies && !rb.startTime && !rb.endTime) return [];
-  }
+    if (!applies) return [];
+    return [{ startTime: rb.startTime, endTime: rb.endTime }];
+  });
 
-  // Constrói lista de intervalos bloqueados (em minutos)
-  type Interval = { start: number; end: number };
-  const blocked: Interval[] = [];
-
-  for (const appt of existingAppts) {
-    blocked.push({
-      start: toMinutes(appt.startTime) - (appt.bufferPreSnapshot ?? 0),
-      end: toMinutes(appt.endTime) + (appt.bufferPosSnapshot ?? 0),
-    });
-  }
-
-  for (const b of partialBlocks) {
-    if (b.startTime && b.endTime) {
-      blocked.push({ start: toMinutes(b.startTime), end: toMinutes(b.endTime) });
-    }
-  }
-
-  for (const rb of recurringBlocks) {
-    const applies =
-      (rb.pattern === "weekly" && rb.weekDay === weekDay) ||
-      (rb.pattern === "yearly" && rb.month === month && rb.dayOfMonth === dayOfMonth);
-    if (applies && rb.startTime && rb.endTime) {
-      blocked.push({ start: toMinutes(rb.startTime), end: toMinutes(rb.endTime) });
-    }
-  }
-
-  // Antecedência mínima
-  const earliestStart =
+  const earliestSlotStart =
     rules?.minNoticeHours != null ? addHours(new Date(), rules.minNoticeHours) : null;
 
-  const SLOT_STEP = 30;
-  const slots: string[] = [];
-
-  for (const r of ranges) {
-    let cur = toMinutes(r.startTime);
-    const rangeEnd = toMinutes(r.endTime);
-
-    while (cur + service.durationMinutes <= rangeEnd) {
-      const slotEnd = cur + service.durationMinutes;
-      const isBlocked = blocked.some(({ start, end }) => cur < end && start < slotEnd);
-      const tooEarly =
-        earliestStart != null && combineDateAndTimeInTZ(dateIso, toHHmm(cur)) < earliestStart;
-
-      if (!isBlocked && !tooEarly) slots.push(toHHmm(cur));
-      cur += SLOT_STEP;
-    }
-  }
-
-  return slots;
-}
-
-function toMinutes(hhmm: string): number {
-  const [h, m] = hhmm.split(":").map(Number);
-  return (h ?? 0) * 60 + (m ?? 0);
-}
-
-function toHHmm(minutes: number): string {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  return computeSlots({
+    durationMinutes: service.durationMinutes,
+    availabilities: ranges,
+    appointments: existingAppts.map((a) => ({
+      startTime: a.startTime,
+      endTime: a.endTime,
+      bufferPre: a.bufferPreSnapshot ?? 0,
+      bufferPos: a.bufferPosSnapshot ?? 0,
+    })),
+    blockedRanges: [
+      ...partialBlocks.flatMap((b) =>
+        b.startTime && b.endTime ? [{ startTime: b.startTime, endTime: b.endTime }] : [],
+      ),
+      ...recurringBlockedRanges,
+    ],
+    earliestSlotStart,
+    dateIso,
+  });
 }
 
 /**
