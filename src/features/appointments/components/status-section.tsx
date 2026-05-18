@@ -9,7 +9,7 @@
  * qualquer transição — útil para corrigir lançamentos errados (ex: reabrir
  * um cancelado).
  */
-import { BottomSheet } from "@/components/shared/bottom-sheet";
+import { Sheet } from "@/components/shared/sheet";
 import { I } from "@/components/shared/icons";
 import { StatusDot } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
@@ -113,19 +113,12 @@ function StatusPickerSheet({
   onPick: (s: AppointmentStatus) => void;
 }) {
   return (
-    <BottomSheet
-      open={open}
-      onClose={onCancel}
-      className="rounded-t-[20px] border-t border-border bg-background p-5"
-    >
-      <div className="flex justify-center pb-3 pt-1">
-        <div className="h-1 w-10 rounded-full bg-border" />
-      </div>
-      <h3 className="text-[17px] font-semibold tracking-tight">Alterar status</h3>
-      <p className="mt-1 text-[12.5px] text-muted-foreground">
-        Selecione o novo status. Toda mudança fica registrada no histórico.
-      </p>
-      <div className="mt-4 space-y-1.5">
+    <Sheet open={open} onClose={onCancel}>
+      <Sheet.Header
+        title="Alterar status"
+        description="Selecione o novo status. Toda mudança fica registrada no histórico."
+      />
+      <Sheet.Content className="space-y-1.5">
         {ORDER.map((s) => {
           const { label, hint } = STATUS_THEME[s];
           const isCurrent = s === current;
@@ -146,10 +139,18 @@ function StatusPickerSheet({
             </button>
           );
         })}
-      </div>
-      <Button variant="outline" className="mt-4 w-full" onClick={onCancel} disabled={isPending}>
-        Fechar
-      </Button>
-    </BottomSheet>
+      </Sheet.Content>
+      <Sheet.Footer>
+        <Button
+          variant="outline"
+          size="lg"
+          className="w-full"
+          onClick={onCancel}
+          disabled={isPending}
+        >
+          Fechar
+        </Button>
+      </Sheet.Footer>
+    </Sheet>
   );
 }

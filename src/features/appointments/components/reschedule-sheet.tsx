@@ -1,6 +1,6 @@
 "use client";
 
-import { BottomSheet } from "@/components/shared/bottom-sheet";
+import { Sheet } from "@/components/shared/sheet";
 import { I } from "@/components/shared/icons";
 import { Button } from "@/components/ui/button";
 import { adminRescheduleAppointment } from "@/features/appointments/actions";
@@ -82,70 +82,45 @@ export function RescheduleSheet({
         <I.Calendar size={16} /> Remarcar
       </Button>
 
-      <BottomSheet
-        open={open}
-        onClose={() => setOpen(false)}
-        className="rounded-t-[20px] border-t border-[var(--border)] bg-[var(--background)]"
-      >
-        <div className="flex max-h-[85dvh] flex-col">
-          {/* Handle + header */}
-          <div className="px-5 pb-3 pt-4">
-            <div className="mb-3 flex justify-center">
-              <div className="h-1 w-10 rounded-full bg-[var(--border)]" />
-            </div>
-            <h3 className="text-[17px] font-semibold tracking-tight">Remarcar agendamento</h3>
-            <p className="mt-1 text-[13px] text-[var(--muted-foreground)]">
-              Escolha nova data e horário. Protocolo e dados são mantidos.
-            </p>
-          </div>
+      <Sheet open={open} onClose={() => setOpen(false)}>
+        <Sheet.Header
+          title="Remarcar agendamento"
+          description="Escolha nova data e horário. Protocolo e dados são mantidos."
+        />
+        <Sheet.Content className="space-y-4">
+          <CalendarPicker value={selectedDate} onChange={handleDateChange} />
 
-          {/* Conteúdo scrollável */}
-          <div className="flex-1 overflow-y-auto px-5 pb-4">
-            <div className="space-y-4">
-              <CalendarPicker value={selectedDate} onChange={handleDateChange} />
-
-              {selectedDate && (
-                <div>
-                  <p className="mb-2 text-[12px] font-medium uppercase tracking-[0.12em] text-[var(--muted-foreground)]">
-                    Horários disponíveis
-                  </p>
-                  {loadingSlots ? (
-                    <div className="py-4 text-center text-[13px] text-[var(--muted-foreground)]">
-                      Carregando...
-                    </div>
-                  ) : (
-                    <TimeGrid slots={slots} value={selectedTime} onChange={setSelectedTime} />
-                  )}
+          {selectedDate && (
+            <div>
+              <p className="mb-2 text-[12px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                Horários disponíveis
+              </p>
+              {loadingSlots ? (
+                <div className="py-4 text-center text-[13px] text-muted-foreground">
+                  Carregando...
                 </div>
-              )}
-
-              {error && (
-                <p className="text-center text-[13px] text-[var(--destructive)]">{error}</p>
+              ) : (
+                <TimeGrid slots={slots} value={selectedTime} onChange={setSelectedTime} />
               )}
             </div>
-          </div>
+          )}
 
-          {/* Footer fixo */}
-          <div
-            className="border-t border-[var(--border)] px-5 py-3.5"
-            style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.875rem)" }}
+          {error && <p className="text-center text-[13px] text-destructive">{error}</p>}
+        </Sheet.Content>
+        <Sheet.Footer>
+          <Button variant="outline" className="flex-1" onClick={() => setOpen(false)}>
+            Cancelar
+          </Button>
+          <Button
+            variant="primary"
+            className="flex-1"
+            onClick={handleConfirm}
+            disabled={!canConfirm || isCurrentSlot || isPending}
           >
-            <div className="flex gap-2">
-              <Button variant="outline" className="flex-1" onClick={() => setOpen(false)}>
-                Cancelar
-              </Button>
-              <Button
-                variant="primary"
-                className="flex-1"
-                onClick={handleConfirm}
-                disabled={!canConfirm || isCurrentSlot || isPending}
-              >
-                {isPending ? "Salvando..." : "Confirmar"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </BottomSheet>
+            {isPending ? "Salvando..." : "Confirmar"}
+          </Button>
+        </Sheet.Footer>
+      </Sheet>
     </>
   );
 }
